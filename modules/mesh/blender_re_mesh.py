@@ -797,9 +797,9 @@ def exportREMeshFile(filePath,options):
 						mod = obj.modifiers.new(name="EdgeSplit", type='EDGE_SPLIT')
 						mod.use_edge_angle = False
 						mod.use_edge_sharp = True
-				if "_Group_" in obj.name:
+				if "Group_" in obj.name:
 					try:
-						groupID = int(obj.name.split("_Group_")[1].split("_")[0])
+						groupID = int(obj.name.split("Group_")[1].split("_")[0])
 					except:
 						pass
 				else:
