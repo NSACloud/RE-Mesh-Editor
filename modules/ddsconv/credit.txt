@@ -1,0 +1,2 @@
+Credit to matyalatte for custom texconv dll and dds loading code
+https://github.com/matyalatte/Blender-DDS-Addon
