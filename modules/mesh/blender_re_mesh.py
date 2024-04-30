@@ -100,9 +100,10 @@ def createMaterialDict(materialNameList):
 		materialDict[materialName] = material
 	return materialDict
 
-def getCollection(collectionName,parentCollection = None):
-	if not bpy.data.collections.get(collectionName):
+def getCollection(collectionName,parentCollection = None,makeNew = False):
+	if makeNew or not bpy.data.collections.get(collectionName):
 		collection = bpy.data.collections.new(collectionName)
+		collectionName = collection.name
 		if parentCollection != None:
 			parentCollection.children.link(collection)
 		else:
@@ -269,7 +270,7 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 			if lod in parsedMesh.shadowMeshLinkedLODList:
 				shadowLODString = f" + Shadow LOD{parsedMesh.shadowMeshLinkedLODList.index(lod)}"
 		if createCollections:
-			lodCollection = getCollection(f"{meshType} LOD{str(lodIndex)}{shadowLODString} - {meshCollection.name}",meshCollection)
+			lodCollection = getCollection(f"{meshType} LOD{str(lodIndex)}{shadowLODString} - {meshCollection.name}",meshCollection,makeNew = True)
 			lodCollection["LOD Distance"] = lod.lodDistance
 		else:
 			lodCollection = meshCollection
@@ -430,7 +431,7 @@ def importREMeshFile(filePath,options):
 	print(f"Mesh parsing took {timeFormat%(meshParseTime * 1000)} ms.")
 	armatureObj = None
 	if options["createCollections"]:
-		meshCollection = getCollection(meshFileName)
+		meshCollection = getCollection(meshFileName,makeNew = True)
 		meshCollection.color_tag = "COLOR_01"
 		bpy.context.scene.re_mdf_toolpanel.meshCollection = meshCollection.name
 	else:
@@ -492,7 +493,7 @@ def importREMeshFile(filePath,options):
 	bpy.context.scene["REMeshLastImportedMeshVersion"] = meshVersion	
 	if options["importBoundingBoxes"]:
 		if options["createCollections"]:
-			boundingBoxCollection = getCollection(f"{meshFileName} Bounding Boxes",meshCollection)
+			boundingBoxCollection = getCollection(f"{meshFileName} Bounding Boxes",meshCollection,makeNew = True)
 			boundingBoxCollection["~TYPE"] = "RE_MESH_BOUNDING_BOX_COLLECTION"
 		else:
 			boundingBoxCollection = meshCollection
@@ -519,6 +520,20 @@ def checkObjForUVDoubling(obj):
 			else:
 				UVPoints[currentVertIndex] = uv
 	return hasUVDoubling
+
+def splitSharpEdges(obj):
+	oldActiveObj = bpy.context.view_layer.objects.active
+	bpy.context.view_layer.objects.active = obj
+	bpy.ops.object.mode_set(mode='EDIT')
+	obj = bpy.context.edit_object
+	me = obj.data
+	bm = bmesh.from_edit_mesh(me)
+	# old seams
+	sharp = [e for e in bm.edges if not e.smooth]
+	bmesh.ops.split_edges(bm, edges=sharp)
+	bmesh.update_edit_mesh(me)
+	bpy.ops.object.mode_set(mode='OBJECT')
+	bpy.context.view_layer.objects.active = oldActiveObj
 
 def exportREMeshFile(filePath,options):
 	#TODO Warning Conditions
@@ -793,10 +808,8 @@ def exportREMeshFile(filePath,options):
 				
 					
 				if options["preserveSharpEdges"]:
-					if "EdgeSplit" not in obj.modifiers:
-						mod = obj.modifiers.new(name="EdgeSplit", type='EDGE_SPLIT')
-						mod.use_edge_angle = False
-						mod.use_edge_sharp = True
+					splitSharpEdges(obj)
+					
 				if "Group_" in obj.name:
 					try:
 						groupID = int(obj.name.split("Group_")[1].split("_")[0])
@@ -906,7 +919,7 @@ def exportREMeshFile(filePath,options):
 					subMeshWorldMatrix = rawsubmesh.matrix_world	
 					
 				evaluatedSubMeshData.transform(subMeshWorldMatrix)
-				evaluatedSubMeshData.normals_split_custom_set_from_vertices([vert.normal for vert in evaluatedSubMeshData.vertices])
+				#evaluatedSubMeshData.normals_split_custom_set_from_vertices([vert.normal for vert in evaluatedSubMeshData.vertices])
 				if bpy.app.version < (4,0,0):
 					evaluatedSubMeshData.use_auto_smooth = True
 					evaluatedSubMeshData.calc_normals_split()
@@ -982,15 +995,15 @@ def exportREMeshFile(filePath,options):
 							#print(f"ERROR: Multiple UVs per vertex on UV1 of {evaluatedSubMeshData.name}")
 							#raise Exception
 						if meshHasUV2:
-							uv2 = evaluatedSubMeshData.uv_layers[0].data[loop.index].uv
-							parsedSubMesh.uvList[currentVertIndex] = uv2
+							uv2 = evaluatedSubMeshData.uv_layers[1].data[loop.index].uv
+							parsedSubMesh.uv2List[currentVertIndex] = uv2
 							
-							if currentVertIndex in UVPoints and UVPoints[currentVertIndex] != uv2:
+							if currentVertIndex in UV2Points and UV2Points[currentVertIndex] != uv2:
 								addErrorToDict(errorDict, "MultipleUVsAssignedToVertex", rawsubmesh.name)
 								#print(f"ERROR: Multiple UVs per vertex on UV2 of {rawsubmesh.name}")
 								#raise Exception
 							else:
-								UVPoints[currentVertIndex] = uv2
+								UV2Points[currentVertIndex] = uv2
 					
 					if currentVertIndex == previousIndex:#Skip looping over vertices that have already been read
 						continue

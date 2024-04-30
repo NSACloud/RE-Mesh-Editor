@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 7),
+	"version": (0, 8),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -110,7 +110,9 @@ class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
 
 class AddItemOperator(bpy.types.Operator):
 	bl_idname = "re_mesh.chunk_path_list_add_item"
+	bl_description = "Add path to the extracted chunk's natives\STM\ folder.\n"+r"Example: I:\RE4_EXTRACT\re_chunk_000\natives\STM"
 	bl_label = "Add Path"
+	
 
 	def execute(self, context):
 		# Add an item to the list
@@ -120,6 +122,7 @@ class AddItemOperator(bpy.types.Operator):
 # Operator to remove an item from the list
 class RemoveItemOperator(bpy.types.Operator):
 	bl_idname = "re_mesh.chunk_path_list_remove_item"
+	bl_description = "Remove chunk path from the list"
 	bl_label = "Remove Selected Path"
 
 	index: bpy.props.IntProperty()
@@ -132,6 +135,7 @@ class RemoveItemOperator(bpy.types.Operator):
 # Operator to reorder items in the list
 class ReorderItemOperator(bpy.types.Operator):
 	bl_idname = "re_mesh.chunk_path_list_reorder_item"
+	bl_description = "Change the order in which files will be searched"
 	bl_label = "Reorder Item"
 
 	direction: bpy.props.EnumProperty(
@@ -395,12 +399,12 @@ class ExportREMesh(Operator, ExportHelper):
 	   default = True)
 	autoSolveRepeatedUVs : BoolProperty(
 	   name = "Auto Solve Repeated UVs",
-	   description = "(RE Toolbox Required)\nSplits connected UV islands if present. The mesh format does not allow for multiple uvs assigned to a vertex.\nNOTE: This will modify the object and may slightly increase time taken to export",
+	   description = "(RE Toolbox Required)\nSplits connected UV islands if present. The mesh format does not allow for multiple uvs assigned to a vertex.\nNOTE: This will modify the object and may slightly increase time taken to export. If auto smooth is disabled on the mesh, the normals may change",
 	   default = True)
 	preserveSharpEdges : BoolProperty(
-	   name = "Add Edge Split Modifier",
-	   description = "Adds an edge split modifier set to sharp edges for all objects. This prevents edges that are marked as sharp from being lost",
-	   default = True)
+	   name = "Split Sharp Edges",
+	   description = "Edge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the meshes in the collection",
+	   default = False)
 	useBlenderMaterialName : BoolProperty(
 	   name = "Use Blender Material Names",
 	   description = "If left unchecked, the exporter will get the material names to be used from the end of each object name. For example, if a mesh is named LOD_0_Group_0_Sub_0__Shirts_Mat, the material name is Shirts_Mat. If this option is enabled, the material name will instead be taken from the first material assigned to the object",
@@ -415,9 +419,11 @@ class ExportREMesh(Operator, ExportHelper):
 	   default = False)
 	def invoke(self, context, event):
 		if self.targetCollection == "":
-			self.targetCollection = context.scene.get("REMeshLastImportedCollection","")
-			if self.targetCollection.endswith(".mesh"):
-				self.filepath = self.targetCollection + self.filename_ext
+			prevCollection = context.scene.get("REMeshLastImportedCollection","")
+			if prevCollection in bpy.data.collections:
+				self.targetCollection = prevCollection
+			if ".mesh" in prevCollection:#Remove blender suffix after .mesh if it exists
+				self.filepath = prevCollection.split(".mesh")[0]+".mesh" + self.filename_ext
 		if context.scene.get("REMeshLastImportedMeshVersion",0) in meshFileVersionToGameNameDict:
 			self.filename_ext = "."+str(context.scene["REMeshLastImportedMeshVersion"])
 		context.window_manager.fileselect_add(self)

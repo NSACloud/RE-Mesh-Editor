@@ -10,6 +10,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
  - Allows for importing and exporting of RE Engine mdf2 (material) files.
+ - MDF material editing from within Blender.
  - Preset system that allows for presets of materials to be saved and shared.
  - Supports LOD (level of detail) import and export.
  - Texture conversion tools.
@@ -27,9 +28,9 @@ Support for more games may be added in the future.
 
 ## Requirements
 * [Blender 2.8 or higher](https://www.blender.org/download/)
+* [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
   
 **Not required but strongly recommended:**
-* [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
 * [RE Chain Editor](https://github.com/NSACloud/RE-Chain-Editor) - Blender addon for creation of chain files. Used to add physics to models.
 
 ## Installation
@@ -41,9 +42,35 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
+## Change Log
+
+### V0.8 - 4/29/2024
+
+* Fixed issue causing UV2 to not export correctly.
+* Fixed issue where split normals didn't export correctly.
+* Fixed issue where a new collection would not be created when importing a mesh with the same name as an existing mesh.
+* Fixed issue where a mesh collection would be assigned in the mesh export options even if it didn't exist.
+* Replaced "Add Edge Split Modifier" with "Split Sharp Edges" in the mesh export options. Now disabled by default.
+* Added tool tips to the chunk path buttons in the addon preferences.
+
+NOTE: RE Toolbox has also been updated. Be sure to update it as well as it contains important fixes to "Solve Repeated UVs".
+
+<details>
+  <summary>Older Version Change Logs</summary>
+
+### V0.7 - 4/28/2024
+
+* Fixed issue where group IDs would be lost upon export if "Import All LODs" was disabled.
+
+### V0.6 - 4/28/2024
+
+* Beta initial release.
+
+ </details>
+
 ## Usage Guide
 
-Video guide coming soon.
+Video guide coming soon. Images will be added to the text guide once the video is done.
 
 **Quick Model Import Guide**
 
@@ -85,6 +112,7 @@ You may be using an outdated .mdf2 file, be sure to extract from the latest patc
 
 ## Credits
 [Monster Hunter Modding Discord](https://discord.gg/gJwMdhK)
+
 [Modding Haven Discord](https://discord.gg/modding-haven-718224210270617702)
 - [AsteriskAmpersand](https://github.com/AsteriskAmpersand) - Mesh format research and tex conversion code
 - [AlphaZomega](https://github.com/alphazolam/) - RE Mesh 010 Template and Noesis plugin
