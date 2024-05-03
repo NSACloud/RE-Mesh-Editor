@@ -184,6 +184,10 @@ def importMDF(mdfFile,meshMaterialDict,materialLoadLevel,reloadCachedTextures,ch
 	TEXTURE_CACHE_DIR = bpy.context.preferences.addons[ADDON_NAME].preferences.textureCachePath
 	allowedTextureTypes = set()
 	
+	
+	loadedImageDict = dict()
+	errorFileSet = set()
+	
 	#MaterialLoadLevel
 	"""
 	1: Load Albedo only
@@ -248,14 +252,23 @@ def importMDF(mdfFile,meshMaterialDict,materialLoadLevel,reloadCachedTextures,ch
 					outputPath = os.path.join(TEXTURE_CACHE_DIR,baseTexturePath+".tif")
 					
 					texPath = getTexPath(baseTexturePath,chunkPathList,mdfVersion)
+					
 					if texPath != None:
-						try:
-							imageData = loadTex(texPath,outputPath,texConv,reloadCachedTextures)
-						except Exception as err:
-							raiseWarning(f"An error occured while attempting to convert {texPath} - {str(err)}")
+						if texPath in loadedImageDict:
+							imageData = loadedImageDict[texPath]
+						else:
+							try:
+								if texPath not in errorFileSet:
+									imageData = loadTex(texPath,outputPath,texConv,reloadCachedTextures)
+									loadedImageDict[texPath] = imageData
+							except Exception as err:
+								errorFileSet.add(texPath)
+								
+								raiseWarning(f"An error occured while attempting to convert {texPath} - {str(err)}")
 					else:
-						raiseWarning("Could not find texture: " + texture + ", skipping...")
-						
+						if texture not in errorFileSet:
+							raiseWarning("Could not find texture: " + texture + ", skipping...")
+							errorFileSet.add(texture)
 					if os.path.exists(outputPath):
 						#Determine what node to create for this texture
 						
@@ -339,5 +352,7 @@ def importMDF(mdfFile,meshMaterialDict,materialLoadLevel,reloadCachedTextures,ch
 					blenderMaterial.node_tree.links.remove(alphaLink)
 		else:
 			print("Material \"" + materialName + "\" is not in the MDF, cannot import")
+	errorFileSet.clear()
+	loadedImageDict.clear()
 	unload_texconv()
 	print("Finished loading materials.")

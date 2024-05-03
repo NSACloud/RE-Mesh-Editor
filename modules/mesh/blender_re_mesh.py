@@ -164,7 +164,18 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 	bpy.ops.object.mode_set(mode='OBJECT')
 	
 	if rotate90 and targetArmatureName not in bpy.data.objects:
+		prevSelection = bpy.context.selected_objects
+		for obj in prevSelection:
+			obj.select_set(False)
+		
 		armatureObj.matrix_world = armatureObj.matrix_world @ rotate90Matrix
+		armatureObj.select_set(True)
+		#I would prefer not to use bpy.ops but the data.transform on armatures does not function correctly.
+		bpy.ops.object.transform_apply(location = False,rotation = True,scale = False)
+		armatureObj.select_set(False)
+		
+		for obj in prevSelection:
+			obj.select_set(True)
 	return armatureObj
 
 def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True):
@@ -230,7 +241,7 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 		mod = meshObj.modifiers.new(name = 'Armature', type = 'ARMATURE')
 		mod.object = armature
 		#meshObj.matrix_parent_inverse = armature.matrix_world.inverted()
-	elif rotate90:
+	if rotate90:
 		meshObj.data.transform(rotate90Matrix)
 			
 		
@@ -1086,8 +1097,13 @@ def exportREMeshFile(filePath,options):
 			#print(bonePos)
 			
 			#Get position relative to bone head
-			minVec = Vector((min([pos[0] for pos in vecList]),min([pos[1] for pos in vecList]),min([pos[2] for pos in vecList]))) - bonePos
-			maxVec = Vector((max([pos[0] for pos in vecList]),max([pos[1] for pos in vecList]),max([pos[2] for pos in vecList]))) - bonePos
+			if len(vecList) > 0:
+				minVec = Vector((min([pos[0] for pos in vecList]),min([pos[1] for pos in vecList]),min([pos[2] for pos in vecList]))) - bonePos
+				maxVec = Vector((max([pos[0] for pos in vecList]),max([pos[1] for pos in vecList]),max([pos[2] for pos in vecList]))) - bonePos
+			else:
+				raiseWarning(f"{boneName} has zero weight vertex groups assigned.")
+				minVec = Vector((0.0,0.0,0.0))
+				maxVec = Vector((0.01,0.01,0.01))
 			#print(minVec)
 			#print(maxVec)
 			#boneVertDict[boneName] =

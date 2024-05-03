@@ -44,6 +44,15 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.9 - 5/3/2024
+
+* Fixed error that could occur when loose geometry was present when exporting.
+* Rotation is now applied on imported objects when Y to Z up is enabled (Rotation is now (0,0,0) instead of (0,90,0). Previously imported meshes will still work correctly on export.
+* Textures will no longer be repeatedly try to be loaded if an error occurs during attempting to import them.
+
+<details>
+  <summary>Older Version Change Logs</summary>
+
 ### V0.8 - 4/29/2024
 
 * Fixed issue causing UV2 to not export correctly.
@@ -54,9 +63,6 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * Added tool tips to the chunk path buttons in the addon preferences.
 
 NOTE: RE Toolbox has also been updated. Be sure to update it as well as it contains important fixes to "Solve Repeated UVs".
-
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.7 - 4/28/2024
 
