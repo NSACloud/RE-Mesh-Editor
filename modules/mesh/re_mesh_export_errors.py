@@ -168,7 +168,7 @@ _______________
 Add a new vertex group and weight it to a bone on the armature in weight paint mdoe.
 """,
 "MaxWeightedBonesExceeded":"""Max Weighted Bones Exceeded
-The mesh exceeded the limit of 255 bones with weights assigned to them.
+The mesh exceeded the limit of 256 bones with weights assigned to them.
 	
 HOW TO FIX:
 _______________

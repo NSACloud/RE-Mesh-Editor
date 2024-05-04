@@ -1152,7 +1152,7 @@ def WriteToNorTanBuffer(bufferStream,normalArray,tangentArray):
 	bufferStream.write(norTanArray.tobytes())
 	
 #Old method of calculating tangents, slow
-"""
+
 def WriteToNorTanBufferOld(bufferStream,normalList,vertexPosList,uvList,faceList):
 	
 	vertexCount = len(vertexPosList)
@@ -1227,7 +1227,7 @@ def WriteToNorTanBufferOld(bufferStream,normalList,vertexPosList,uvList,faceList
 	
 	
 	bufferStream.write(norTanArray.tobytes())
-"""
+
 def WriteToUVBuffer(bufferStream,uvList):
 	uvArray = np.array(uvList,dtype = np.dtype("<e"))
 	uvArray = uvArray.flatten()

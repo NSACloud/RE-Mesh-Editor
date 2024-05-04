@@ -44,14 +44,19 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.10 - 5/4/2024
+
+* Fixed issue where exported tangents were incorrect.
+* Fixed issue where an error message didn't show for having no meshes in the exported collection.
+
+<details>
+  <summary>Older Version Change Logs</summary>
+
 ### V0.9 - 5/3/2024
 
 * Fixed error that could occur when loose geometry was present when exporting.
 * Rotation is now applied on imported objects when Y to Z up is enabled (Rotation is now (0,0,0) instead of (0,90,0). Previously imported meshes will still work correctly on export.
 * Textures will no longer be repeatedly try to be loaded if an error occurs during attempting to import them.
-
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.8 - 4/29/2024
 

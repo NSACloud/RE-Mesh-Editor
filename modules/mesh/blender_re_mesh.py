@@ -21,7 +21,7 @@
 import bpy
 import bmesh
 import os
-from math import radians
+from math import radians,floor
 from mathutils import Vector,Matrix
 from itertools import chain, repeat, islice
 from .file_re_mesh import readREMesh,writeREMesh,ParsedREMeshToREMesh,Sphere,AABB,Matrix4x4,meshFileVersionToGameNameDict
@@ -596,9 +596,8 @@ def exportREMeshFile(filePath,options):
 	print("\033[96m__________________________________\nRE Mesh export started.\033[0m")
 	
 	
-	#Basic Error Checking
-	#if errorList == []:
-
+	if bpy.context and bpy.context.active_object != None:
+		bpy.ops.object.mode_set(mode='OBJECT')
 	
 	maxWeightsPerVertex = 8
 	maxWeightedBones = 256
@@ -607,8 +606,8 @@ def exportREMeshFile(filePath,options):
 		maxWeightedBones = 1024
 	MAX_VERTICES = 65535
 	MAX_FACES = 4294967295
-	normalizeWeights = True
-	rotate90 = False
+	
+	subMeshCount = 0
 	
 	targetCollection = bpy.data.collections.get(options["targetCollection"])
 	
@@ -810,7 +809,7 @@ def exportREMeshFile(filePath,options):
 			
 				
 			if obj.type == "MESH" and not obj.get("MeshExportExclude") and selected:
-				
+				subMeshCount += 1
 				if options["autoSolveRepeatedUVs"]:
 					hasUVDoubling = checkObjForUVDoubling(obj)
 					if hasUVDoubling:
@@ -1005,16 +1004,16 @@ def exportREMeshFile(filePath,options):
 						#else:
 							#print(f"ERROR: Multiple UVs per vertex on UV1 of {evaluatedSubMeshData.name}")
 							#raise Exception
-						if meshHasUV2:
-							uv2 = evaluatedSubMeshData.uv_layers[1].data[loop.index].uv
-							parsedSubMesh.uv2List[currentVertIndex] = uv2
-							
-							if currentVertIndex in UV2Points and UV2Points[currentVertIndex] != uv2:
-								addErrorToDict(errorDict, "MultipleUVsAssignedToVertex", rawsubmesh.name)
-								#print(f"ERROR: Multiple UVs per vertex on UV2 of {rawsubmesh.name}")
-								#raise Exception
-							else:
-								UV2Points[currentVertIndex] = uv2
+					if meshHasUV2:
+						uv2 = evaluatedSubMeshData.uv_layers[1].data[loop.index].uv
+						parsedSubMesh.uv2List[currentVertIndex] = uv2
+						
+						if currentVertIndex in UV2Points and UV2Points[currentVertIndex] != uv2:
+							addErrorToDict(errorDict, "MultipleUVsAssignedToVertex", rawsubmesh.name)
+							#print(f"ERROR: Multiple UVs per vertex on UV2 of {rawsubmesh.name}")
+							#raise Exception
+						else:
+							UV2Points[currentVertIndex] = uv2
 					
 					if currentVertIndex == previousIndex:#Skip looping over vertices that have already been read
 						continue
@@ -1030,11 +1029,11 @@ def exportREMeshFile(filePath,options):
 					
 					#Vertex Tangent
 					
-					loopTangent = loop.tangent * 127
-					tx = int(loopTangent[0] + 127.0)
-					ty = int(loopTangent[1] + 127.0)
-					tz = int(loopTangent[2] + 127.0)
-					sign = int(-loop.bitangent_sign*127.0+128.0)
+					loopTangent = loop.tangent * 1.001 * 127
+					tx = int(floor(loopTangent[0]))
+					ty = int(floor(loopTangent[1]))
+					tz = int(floor(loopTangent[2]))
+					sign = int(floor(loop.bitangent_sign*127.0))
 
 					parsedSubMesh.tangentList[currentVertIndex] = (tx, ty, tz, sign)
 					
@@ -1133,32 +1132,33 @@ def exportREMeshFile(filePath,options):
 	for group in parsedMesh.mainMeshLODList[-1].visconGroupList:
 		vertArrayList.extend([submesh.vertexPosList for submesh in group.subMeshList])
 	#print(vertArrayList)
-	fullVertArray = np.vstack(vertArrayList)
-	if parsedMesh.boundingSphere == None:
-		center,radius = bounding_sphere_ritter(fullVertArray)
-		parsedMesh.boundingSphere = Sphere()
-		parsedMesh.boundingSphere.x = center[0]
-		parsedMesh.boundingSphere.y = center[1]
-		parsedMesh.boundingSphere.z = center[2]
-		parsedMesh.boundingSphere.r = radius
-		#print(center)
-		#print(radius)
-	if parsedMesh.boundingBox == None:
-		minVec = Vector((min([pos[0] for pos in fullVertArray]),min([pos[1] for pos in fullVertArray]),min([pos[2] for pos in fullVertArray])))
-		maxVec = Vector((max([pos[0] for pos in fullVertArray]),max([pos[1] for pos in fullVertArray]),max([pos[2] for pos in fullVertArray])))
-		parsedMesh.boundingBox = AABB()
-		parsedMesh.boundingBox.min.x =  minVec[0]
-		parsedMesh.boundingBox.min.y =  minVec[1]
-		parsedMesh.boundingBox.min.z =  minVec[2]
-		parsedMesh.boundingBox.max.x =  maxVec[0]
-		parsedMesh.boundingBox.max.y =  maxVec[1]
-		parsedMesh.boundingBox.max.z =  maxVec[2]
+	if vertArrayList != []:
+		fullVertArray = np.vstack(vertArrayList)
+		if parsedMesh.boundingSphere == None:
+			center,radius = bounding_sphere_ritter(fullVertArray)
+			parsedMesh.boundingSphere = Sphere()
+			parsedMesh.boundingSphere.x = center[0]
+			parsedMesh.boundingSphere.y = center[1]
+			parsedMesh.boundingSphere.z = center[2]
+			parsedMesh.boundingSphere.r = radius
+			#print(center)
+			#print(radius)
+		if parsedMesh.boundingBox == None:
+			minVec = Vector((min([pos[0] for pos in fullVertArray]),min([pos[1] for pos in fullVertArray]),min([pos[2] for pos in fullVertArray])))
+			maxVec = Vector((max([pos[0] for pos in fullVertArray]),max([pos[1] for pos in fullVertArray]),max([pos[2] for pos in fullVertArray])))
+			parsedMesh.boundingBox = AABB()
+			parsedMesh.boundingBox.min.x =  minVec[0]
+			parsedMesh.boundingBox.min.y =  minVec[1]
+			parsedMesh.boundingBox.min.z =  minVec[2]
+			parsedMesh.boundingBox.max.x =  maxVec[0]
+			parsedMesh.boundingBox.max.y =  maxVec[1]
+			parsedMesh.boundingBox.max.z =  maxVec[2]
 	meshBBoxEndTime = time.time()
 	meshBBoxTime =  meshBBoxEndTime - meshBBoxStartTime
 	print(f"Calculating mesh bounding sphere and bounding box took {timeFormat%(meshBBoxTime * 1000)} ms.")
 	
 	if parsedMesh.skeleton != None and parsedMesh.skeleton.weightedBones != None and len(parsedMesh.skeleton.weightedBones) > maxWeightedBones:
-		print(f"Maximum Weighted Bones Exceeded! {str(len(parsedMesh.skeleton.weightedBones))} / {maxWeightedBones}")
+		print(f"\nMaximum Weighted Bones Exceeded! {str(len(parsedMesh.skeleton.weightedBones))} / {maxWeightedBones}")
 		addErrorToDict(errorDict, "MaxWeightedBonesExceeded", None)
 	"""
 	if armatureObj != None and len(parsedMesh.skeleton.weightedBones) == 0 and len(parsedMesh.skeleton.boneList) > 0:
@@ -1175,6 +1175,9 @@ def exportREMeshFile(filePath,options):
 		bpy.data.meshes.remove(mesh)
 	deleteCopiedMeshList.clear()
 	#print(remapDict)
+	
+	if subMeshCount == 0:
+		addErrorToDict(errorDict, "NoMeshesInCollection", None)
 	
 	if errorDict != {}:
 		showErrorMessageBox("Mesh contains errors and can not be exported. Check the console (Window > Toggle System Console) for info on how to fix it.")
@@ -1209,6 +1212,7 @@ def exportREMeshFile(filePath,options):
 	print(f"Mesh export finished in {timeFormat%(meshExportTime * 1000)} ms.")
 	
 	print("\nMesh Info:")
+	print(f"Mesh Count: {str(subMeshCount)}")
 	print(f"Vertex Count: {str(vertexCount)}")
 	print(f"Face Count: {str(faceCount)}")
 	print(f"Vertex Buffer Format: {vertexBufferString}")
