@@ -17,15 +17,21 @@ class WM_OT_NewMDFHeader(Operator):
 	bl_idname = "re_mdf.create_mdf_collection"
 	bl_options = {'UNDO'}
 	bl_description = "Create an MDF collection for putting materials into.\nNOTE: The name of the collection is not important, you can rename it if you want to"
+	collectionName : bpy.props.StringProperty(name = "MDF Name",
+										 description = "The name of the newly created mdf collection.\nUse the same name as the mesh file",
+										 default = "newMDF"
+										)
 	def execute(self, context):
-		currentIndex = 0
-		name = "MDF Collection " + str(currentIndex)
-		while(checkNameUsage(name,checkSubString=True,objList = bpy.data.collections)):
-			currentIndex +=1
-			name = "MDF Collection " + str(currentIndex)
-		createMDFCollection(name)
-		return {'FINISHED'}
-
+		if self.collectionName.strip() != "":
+			createMDFCollection(self.collectionName.strip()+".mdf2")
+			self.report({"INFO"},"Created new RE MDF collection.")
+			return {'FINISHED'}
+		else:
+			self.report({"ERROR"},"Invalid MDF collection name.")
+			return {'CANCELLED'}
+	
+	def invoke(self,context,event):
+		return context.window_manager.invoke_props_dialog(self)
 class WM_OT_ReindexMaterials(Operator):
 	bl_label = "Reindex Materials"
 	bl_description = "Reorders the materials and sets their names to the name set in the custom properties. This is done automatically upon exporting"

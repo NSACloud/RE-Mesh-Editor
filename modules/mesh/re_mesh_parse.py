@@ -92,6 +92,7 @@ def ReadVertexElementBuffers(vertexElementList,vertexBuffer,tagSet):
 		"Color":None,
 		}
 	lastIndex = len(vertexElementList)-1
+	importedElementsSet = set()
 	for index,vertexElement in enumerate(vertexElementList):
 		if index == lastIndex:
 			#bufferEnd = len(vertexBuffer)
@@ -101,8 +102,15 @@ def ReadVertexElementBuffers(vertexElementList,vertexBuffer,tagSet):
 		elementName = typeNameMapping[vertexElement.typing]
 		#print(f"{elementName} start {str(vertexElement.posStartOffset)} end {str(bufferEnd)} size {str(bufferEnd-vertexElement.posStartOffset)}")
 		#print(elementName)
-		vertexDict[elementName] = BufferReadDict[elementName](vertexBuffer[vertexElement.posStartOffset:bufferEnd],tagSet)
-		
+
+		if elementName not in importedElementsSet:#Prevent importing of doubled vertex element entries present on some meshes
+			#I suspect the doubled vertex elements are for when the shadow meshes have their own unique LODs
+			#TODO Make shadowVertexDict
+			if "shadowLOD" not in tagSet:#Skip reading the first vertex element entry of a type if reading unique shadow LOD
+				vertexDict[elementName] = BufferReadDict[elementName](vertexBuffer[vertexElement.posStartOffset:bufferEnd],tagSet)
+			importedElementsSet.add(elementName)
+		elif "shadowLOD" in tagSet:
+			vertexDict[elementName] = BufferReadDict[elementName](vertexBuffer[vertexElement.posStartOffset:bufferEnd],tagSet)
 	return vertexDict
 
 class VisconGroup:
@@ -259,7 +267,12 @@ class ParsedREMesh:
 			tags = set()
 			if reMesh.fileHeader.version == 220705151:#Street Fighter 6 internal version
 				tags.add("SixWeightCompressed")#Add tag to parse compressed weights
+			#if duplicate in vertexelementlist, add shadowLOD tag
+			
 			vertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
+			#TODO
+			#tags.add("shadowLOD")
+			#shadowVertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
 		#Parse Main Meshes
 		if reMesh.lodHeader != None and vertexDict != None:
 			self.boundingSphere = reMesh.lodHeader.sphere
@@ -272,6 +285,9 @@ class ParsedREMesh:
 				if offset in lodOffsetDict:
 					self.shadowMeshLinkedLODList.append(lodOffsetDict[offset])
 				else:#This shouldn't happen
+					#Update: it does :/
+					#RE3_EXTRACT\re_chunk_000\natives\stm\escape\character\enemy\em9200\mesh\em9200.mesh.2109108288
+					#TODO Add unique shadow mesh LOD importing
 					print("ERROR: Shadow mesh has unique lod offsets, cannot import")
 			#self.shadowMeshLODList = parseLODStructure(reMesh,reMesh.shadowHeader.lodGroupList,vertexDict,usedVertexOffsetDict)
 		

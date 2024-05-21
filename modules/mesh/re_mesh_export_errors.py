@@ -40,7 +40,7 @@ Specify an MDF material name on the end of the object name separated by two unde
 Example Object Name: LOD_0_Group_0_Sub_0__pl1000_Body_Mat
 """,
 
-"MoreThanOneMaterialOnSubMesh":"""More Than One Material On SubMesh
+"MoreThanOneMaterialOnSubMesh":"""More Than One Material On Sub Mesh
 A mesh has more than one material assigned to it. All meshes must have only one material assigned to them.
 	
 HOW TO FIX:
@@ -49,7 +49,7 @@ _______________
 Select the listed mesh in edit mode, press A to select all vertices. Then press P > Material to split the mesh by it's materials.
 """,
 
-"NoUVMapOnSubMesh":"""No UV Map On SubMesh
+"NoUVMapOnSubMesh":"""No UV Map On Sub Mesh
 A mesh has no UV map. All meshes require at least one uv map.
 	
 HOW TO FIX:
@@ -58,7 +58,7 @@ _______________
 Create a UV map.
 """,
 
-"NoVerticesOnSubMesh":"""No Vertices On SubMesh
+"NoVerticesOnSubMesh":"""No Vertices On Sub Mesh
 A mesh has no vertices. All meshes must have at least 3 vertices and 1 face.
 	
 HOW TO FIX:
@@ -159,13 +159,13 @@ _______________
 	
 Import a valid armature from an existing mesh file.
 """,
-"NoWeightsOnMesh":"""No Weights on Mesh
+"NoWeightsOnMesh":"""No Weights on Sub Mesh
 A mesh has an armature, but no weights assigned to bones.
 	
 HOW TO FIX:
 _______________
 	
-Add a new vertex group and weight it to a bone on the armature in weight paint mdoe.
+Add a new vertex group and weight it to a bone on the armature in weight paint mode.
 """,
 "MaxWeightedBonesExceeded":"""Max Weighted Bones Exceeded
 The mesh exceeded the limit of 256 bones with weights assigned to them.

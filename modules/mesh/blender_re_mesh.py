@@ -135,7 +135,7 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 		armatureData = bpy.data.armatures.new(armatureName)	
 		armatureObj = bpy.data.objects.new(armatureName, armatureData)
 		collection.objects.link(armatureObj)
-
+	armatureObj.hide_viewport = False
 	bpy.context.view_layer.objects.active = armatureObj
 	bpy.ops.object.mode_set(mode='EDIT')
 	
@@ -143,6 +143,8 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 	
 	if mergedArmature:
 		print(f"Merging imported armature with {armatureObj.name}")
+		if rotate90:
+			armatureObj.data.transform(rotateNeg90Matrix)#TODO do a less ugly workaround for merging rotated armatures
 	elif targetArmatureName != "":
 		print(f"The specified armature to merge with could not be found. Importing the armature as a new object.")
 	
@@ -154,13 +156,18 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 				editBone.parent = armatureData.edit_bones[boneNameIndexDict[bone.parentIndex]]
 			else:
 				bone.head = Vector([.0, .0, .01])
-			editBone.length = 0.1
+			editBone.length = 0.1#TODO set bone length based on distance to first child bone to make face bones less of a mess
 			editBone.matrix = bone.worldMatrix.matrix
 			editBone["reMeshWorldMatrix"] = bone.worldMatrix.matrix
 			editBone["reMeshLocalMatrix"] = bone.localMatrix.matrix
 			editBone["reMeshInverseMatrix"] = bone.inverseMatrix.matrix
 			if mergedArmature:
 				print(f"[MERGE] Added {bone.boneName} to {armatureObj.name}")
+			
+			
+	if mergedArmature:
+		if rotate90:
+			armatureObj.data.transform(rotate90Matrix)#TODO do a less ugly workaround for merging rotated armatures
 	bpy.ops.object.mode_set(mode='OBJECT')
 	
 	if rotate90 and targetArmatureName not in bpy.data.objects:
@@ -428,6 +435,9 @@ def importREMeshFile(filePath,options):
 		for obj in bpy.data.objects:
 			bpy.data.objects.remove(obj)
 			obj.user_clear()
+		for nodeGroup in bpy.data.node_groups:
+			bpy.data.node_groups.remove(nodeGroup)
+		
 
 	print("\033[96m__________________________________\nRE Mesh import started.\033[0m")
 		
@@ -532,19 +542,7 @@ def checkObjForUVDoubling(obj):
 				UVPoints[currentVertIndex] = uv
 	return hasUVDoubling
 
-def splitSharpEdges(obj):
-	oldActiveObj = bpy.context.view_layer.objects.active
-	bpy.context.view_layer.objects.active = obj
-	bpy.ops.object.mode_set(mode='EDIT')
-	obj = bpy.context.edit_object
-	me = obj.data
-	bm = bmesh.from_edit_mesh(me)
-	# old seams
-	sharp = [e for e in bm.edges if not e.smooth]
-	bmesh.ops.split_edges(bm, edges=sharp)
-	bmesh.update_edit_mesh(me)
-	bpy.ops.object.mode_set(mode='OBJECT')
-	bpy.context.view_layer.objects.active = oldActiveObj
+
 
 def exportREMeshFile(filePath,options):
 	#TODO Warning Conditions
@@ -627,6 +625,7 @@ def exportREMeshFile(filePath,options):
 	newMeshDataList = []
 	vertexGroupsSet = set()
 	weightedBonesSet = set()
+	cloneMeshNameDict = {}
 	deleteCopiedMeshList = []
 	boundingBoxCollection = None
 	importedBoneBoundingBoxes = {}
@@ -647,7 +646,7 @@ def exportREMeshFile(filePath,options):
 	
 	exportArmatureData = None
 	if armatureObj != None:
-		
+		print(f"Armature: {armatureObj.name}")
 		parsedMesh.skeleton = Skeleton()
 		exportArmatureData = armatureObj.data.copy()
 		if options["rotate90"]:
@@ -801,6 +800,7 @@ def exportREMeshFile(filePath,options):
 		boneRemapStartTime = time.time()
 		#Get all meshes inside the collection
 		doubledUVList = []
+		sharpEdgeSplitList = []
 		for obj in lod.objects:
 			if options["selectedOnly"]:
 				selected = obj in bpy.context.selected_objects
@@ -810,15 +810,27 @@ def exportREMeshFile(filePath,options):
 				
 			if obj.type == "MESH" and not obj.get("MeshExportExclude") and selected:
 				subMeshCount += 1
+				cloneObj = obj.copy()
+				#Get copy of sub mesh with modifiers applied
+				#Creates copy of object so that solve repeated uvs and sharp edge splitting can be done and not affect the original mesh
+				cloneObj.name ="CLN_" + obj.name
+				cloneObj.data = bpy.data.meshes.new_from_object(obj.evaluated_get(dg))
+				clonedMeshCollection = getCollection("clonedMeshes")
+				clonedMeshCollection.objects.link(cloneObj)
+				
+				print(f"Created temporary clone of {obj.name}: {cloneObj.name}")
+				cloneMeshNameDict[obj.name] = cloneObj.name
+				deleteCopiedMeshList.append(cloneObj)
 				if options["autoSolveRepeatedUVs"]:
-					hasUVDoubling = checkObjForUVDoubling(obj)
+					hasUVDoubling = checkObjForUVDoubling(cloneObj)
 					if hasUVDoubling:
 						#print(f"Found doubled uvs on {obj.name}")
-						doubledUVList.append(obj)
+						doubledUVList.append(cloneObj)
 				
 					
 				if options["preserveSharpEdges"]:
-					splitSharpEdges(obj)
+					sharpEdgeSplitList.append(cloneObj)
+					
 					
 				if "Group_" in obj.name:
 					try:
@@ -834,7 +846,7 @@ def exportREMeshFile(filePath,options):
 					hasWeights = False
 					for vg in obj.vertex_groups:#If weight is applied to any vertex groups, add them to weighted bone set
 						
-						if any(vg.index in [g.group for g in v.groups] for v in obj.data.vertices) and vg.name in armatureObj.data.bones:
+						if any(vg.index in [g.group for g in v.groups] for v in cloneObj.data.vertices) and vg.name in armatureObj.data.bones:
 							weightedBonesSet.add(vg.name)
 							hasWeights = True
 						else:
@@ -861,6 +873,22 @@ def exportREMeshFile(filePath,options):
 			for obj in previousSelection:
 				obj.select_set(True)
 		
+		if sharpEdgeSplitList != []:
+			previousSelection = bpy.context.selected_objects
+			bpy.ops.object.select_all(action='DESELECT')
+			for obj in sharpEdgeSplitList:
+				obj.select_set(True)
+			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):#RE Toolbox installed
+				try:	
+					bpy.ops.re_toolbox.split_sharp_edges()
+				except Exception as err:
+					raiseWarning(f"Failed to split sharp edges. RE Toolbox may be outdated. Update to the latest version in Edit > Preferences > Addons > RE Toolbox\n{str(err)}")
+			else:
+				raiseWarning("RE Toolbox is not installed. Cannot split sharp edges.")
+			bpy.ops.object.select_all(action='DESELECT')
+			for obj in previousSelection:
+				obj.select_set(True)
+		
 		
 		#Build remap dict once all objects of the first lod are looped through
 		
@@ -883,11 +911,8 @@ def exportREMeshFile(filePath,options):
 			visconGroup.visconGroupNum = visconGroupID
 			#Sort by submesh number
 			for submeshIndex,rawsubmesh in enumerate(sorted(visconDict[visconGroupID],key=lambda obj: obj.name)):
-				rawsubmesh.data.update()
-				#Get copy of sub mesh with modifiers applied
-				evaluatedSubMeshData = bpy.data.meshes.new_from_object(rawsubmesh.evaluated_get(dg))
-				deleteCopiedMeshList.append(evaluatedSubMeshData)
 				
+				evaluatedSubMeshData = bpy.data.objects[cloneMeshNameDict[rawsubmesh.name]].data
 				if len((evaluatedSubMeshData.vertices)) == 0:
 					addErrorToDict(errorDict, "NoVerticesOnSubMesh", rawsubmesh.name)
 					
@@ -1172,8 +1197,12 @@ def exportREMeshFile(filePath,options):
 	if exportArmatureData != None:
 		bpy.data.armatures.remove(exportArmatureData)
 	for mesh in deleteCopiedMeshList:
-		bpy.data.meshes.remove(mesh)
+		bpy.data.objects.remove(mesh,do_unlink = True)
+		#bpy.data.meshes.remove(mesh)
+	if "clonedMeshes" in bpy.data.collections:
+		bpy.data.collections.remove(bpy.data.collections["clonedMeshes"])
 	deleteCopiedMeshList.clear()
+	cloneMeshNameDict.clear()
 	#print(remapDict)
 	
 	if subMeshCount == 0:
@@ -1185,7 +1214,7 @@ def exportREMeshFile(filePath,options):
 		return False
 	
 	meshWriteStartTime = time.time()
-	reMesh = ParsedREMeshToREMesh(parsedMesh, meshVersion)  
+	reMesh = ParsedREMeshToREMesh(parsedMesh, meshVersion)
 	writeREMesh(reMesh, filePath)
 	meshWriteEndTime = time.time()
 	meshWriteExportTime =  meshWriteEndTime - meshWriteStartTime

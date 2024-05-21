@@ -224,7 +224,7 @@ def MDFErrorCheck(collectionName):
 			else:
 				errorList.append("Duplicate material name on " + obj.name+". Set the material name in the custom properties of the material object to a different name.")
 	
-	meshCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.meshCollection,None)
+	meshCollection = bpy.data.collections.get(collectionName.replace(".mdf2",".mesh",1),None)
 	if meshCollection != None:
 		for obj in meshCollection.all_objects:
 			if obj.type == "MESH" and not "MeshExportExclude" in obj and "__" in obj.name:

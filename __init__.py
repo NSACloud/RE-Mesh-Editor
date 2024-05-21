@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 10),
+	"version": (0, 11),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -256,7 +256,7 @@ class ImportREMesh(Operator, ImportHelper):
 		description="Choose which textures to import. Affects how quickly the material can be imported. Load Materials must be enabled for this option to do anything",
 		default = "3",
 		items=[ ("1", "Albedo Only (Fast)", ""),
-				("2", "Main Textures (Slower)", "Loads Albedo, Roughness, Metallic, Alpha"),
+				("2", "Main Textures (Slower)", "Loads Albedo, Normal, Roughness, Metallic, Alpha"),
 				("3", "All Textures (Slowest)", "Loads all textures from the mdf, including ones not usable by Blender"),
 			  ]
 		)
@@ -399,11 +399,11 @@ class ExportREMesh(Operator, ExportHelper):
 	   default = True)
 	autoSolveRepeatedUVs : BoolProperty(
 	   name = "Auto Solve Repeated UVs",
-	   description = "(RE Toolbox Required)\nSplits connected UV islands if present. The mesh format does not allow for multiple uvs assigned to a vertex.\nNOTE: This will modify the object and may slightly increase time taken to export. If auto smooth is disabled on the mesh, the normals may change",
+	   description = "(RE Toolbox Required)\nSplits connected UV islands if present. The mesh format does not allow for multiple uvs assigned to a vertex.\nNOTE: This will modify the exported mesh. If auto smooth is disabled on the mesh, the normals may change",
 	   default = True)
 	preserveSharpEdges : BoolProperty(
 	   name = "Split Sharp Edges",
-	   description = "Edge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the meshes in the collection",
+	   description = "(RE Toolbox Required)\nEdge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the exported mesh",
 	   default = False)
 	useBlenderMaterialName : BoolProperty(
 	   name = "Use Blender Material Names",
@@ -438,12 +438,15 @@ class ExportREMesh(Operator, ExportHelper):
 		layout.label(text = "Advanced Options")
 		layout.prop(self, "exportAllLODs")
 		#layout.prop(self, "exportBlendShapes")
-		
+		hasREToolbox = hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel")
 		row = layout.row()
-		row.enabled = hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel")
+		row.enabled = hasREToolbox
 		row.prop(self,"autoSolveRepeatedUVs")
+		row2 = layout.row()
+		row2.enabled = hasREToolbox
+		row2.prop(self,"preserveSharpEdges")
 		
-		layout.prop(self,"preserveSharpEdges")
+
 		layout.prop(self, "rotate90")
 		layout.prop(self, "useBlenderMaterialName")
 		layout.prop(self, "preserveBoneMatrices")
@@ -472,14 +475,15 @@ class ExportREMesh(Operator, ExportHelper):
 					newExportItem.path = self.filepath
 					newExportItem.meshCollection = self.targetCollection
 					newExportItem.exportAllLODs = self.exportAllLODs
-					newExportItem.exportBlendShapes = self.exportBlendShapes
+					newExportItem.preserveSharpEdges = self.preserveSharpEdges
 					newExportItem.rotate90 = self.rotate90
+					newExportItem.exportBlendShapes = self.exportBlendShapes
 					newExportItem.useBlenderMaterialName = self.useBlenderMaterialName
 					newExportItem.preserveBoneMatrices = self.preserveBoneMatrices
 					newExportItem.exportBoundingBoxes = self.exportBoundingBoxes
 					print("Added path to RE Toolbox Batch Export list.")
 		else:
-			self.report({"INFO"},"RE Mesh export failed. See Window > Toggle System Console for info.")
+			self.report({"INFO"},"RE Mesh export failed. See Window > Toggle System Console for info on how to fix it.")
 		return {"FINISHED"}
 
 class ImportREMDF(bpy.types.Operator, ImportHelper):
@@ -499,9 +503,9 @@ class ImportREMDF(bpy.types.Operator, ImportHelper):
 
 	def execute(self, context):
 		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
-		print(f"\n{textColors.BOLD}RE MDF Editor V{editorVersion}{textColors.ENDC}")
+		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
 		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
-		print("https://github.com/NSACloud/RE-MDF-Editor")
+		print("https://github.com/NSACloud/RE-Mesh-Editor")
 		success = importMDFFile(self.filepath)
 		if success:
 			return {"FINISHED"}

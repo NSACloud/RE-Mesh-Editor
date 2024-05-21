@@ -27,7 +27,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
 Support for more games may be added in the future.
 
 ## Requirements
-* [Blender 2.8 or higher](https://www.blender.org/download/)
+* [Blender 2.93 or higher](https://www.blender.org/download/)
 * [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
   
 **Not required but strongly recommended:**
@@ -44,13 +44,21 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
-### V0.10 - 5/4/2024
+### V0.11 - 5/20/2024
 
-* Fixed issue where exported tangents were incorrect.
-* Fixed issue where an error message didn't show for having no meshes in the exported collection.
+* Auto Solve Repeated UVs and Split Sharp Edges no longer modifies the meshes in the scene. The changes will only be applied on the exported mesh.
+* Split Sharp Edges export option now requires RE Toolbox.
+* Fixed issue where merging armatures didn't work correctly.
+* Fixed issue where exporting an MDF with more than one mesh collection in a scene could cause warnings about mismatched materials.
+* Fixed issue causing some meshes in RE3 to not be importable.
 
 <details>
   <summary>Older Version Change Logs</summary>
+
+## V0.10 - 5/4/2024
+
+* Fixed issue where exported tangents were incorrect.
+* Fixed issue where an error message didn't show for having no meshes in the exported collection.
 
 ### V0.9 - 5/3/2024
 
