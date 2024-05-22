@@ -44,6 +44,10 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.12 - 5/21/2024
+
+* Fixed issue with importing SF6 meshes from the latest update.
+
 ### V0.11 - 5/20/2024
 
 * Auto Solve Repeated UVs and Split Sharp Edges no longer modifies the meshes in the scene. The changes will only be applied on the exported mesh.

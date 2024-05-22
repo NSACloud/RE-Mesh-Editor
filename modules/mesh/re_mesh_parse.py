@@ -265,7 +265,7 @@ class ParsedREMesh:
 		#Parse Vertex Buffer
 		if reMesh.meshBufferHeader != None:
 			tags = set()
-			if reMesh.fileHeader.version == 220705151:#Street Fighter 6 internal version
+			if reMesh.meshVersion == 230110883:#Street Fighter 6 mesh version
 				tags.add("SixWeightCompressed")#Add tag to parse compressed weights
 			#if duplicate in vertexelementlist, add shadowLOD tag
 			

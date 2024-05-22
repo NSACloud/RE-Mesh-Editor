@@ -985,6 +985,7 @@ class FloatData():
 		file.seek(startPos)
 class REMesh():
 	def __init__(self):
+		self.meshVersion = 0
 		self.fileHeader = FileHeader()
 		self.lodHeader = None
 		self.shadowHeader = None
@@ -1735,6 +1736,7 @@ def readREMesh(filepath):
 		raiseWarning(f"Mesh Version ({str(meshVersion)}) not supported! Attempting import...")
 		print(f"Nearest Remap Version: {str(version)}")
 	reMeshFile = REMesh()
+	reMeshFile.meshVersion = meshVersion
 	reMeshFile.read(file,version)
 	file.close()
 	return reMeshFile
@@ -1750,6 +1752,7 @@ def writeREMesh(reMeshFile,filepath):
 		print("Unable to read mesh version from file path, assuming MHRSB")
 		meshVersion = 2109148288#MHRSB
 	version = newVersionToMeshFileVersion.get(meshVersion,getNearestRemapVersion(meshVersion))
+	reMeshFile.meshVersion = meshVersion
 	reMeshFile.write(file,version)
 	file.close()
 
