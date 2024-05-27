@@ -19,7 +19,7 @@ def findHeaderObj():
 		else:
 			return None
 
-PRESET_VERSION = 2#To be changed when there are changes to material variables
+PRESET_VERSION = 3#To be changed when there are changes to material variables
 PRESET_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.split(os.path.abspath(__file__))[0])),"Presets")
 def saveAsPreset(activeObj,presetName,gameName):
 	folderPath = os.path.join(PRESET_DIR,gameName)
@@ -42,6 +42,8 @@ def saveAsPreset(activeObj,presetName,gameName):
 				
 				materialJSONDict["Flags"] = {
 					"Ver32Unknown":activeObj.re_mdf_material.flags.ver32Unknown,
+					"Ver32Unknown1":activeObj.re_mdf_material.flags.ver32Unknown1,
+					"Ver32Unknown2":activeObj.re_mdf_material.flags.ver32Unknown2,
 					"FlagBitFlag":activeObj.re_mdf_material.flags.flagIntValue,
 					}
 				
@@ -64,13 +66,16 @@ def saveAsPreset(activeObj,presetName,gameName):
 					if value.__class__.__name__ == "IDPropertyArray":
 						value = value.to_list()
 					#print(value)	
-					propDict = {"Property Name":prop.prop_name,"Data Type":prop.data_type,"Value":value}
+					propDict = {"Property Name":prop.prop_name,"Data Type":prop.data_type,"Value":value,"Padding":prop.padding}
 					materialJSONDict["Property List"].append(propDict)
 				
 				materialJSONDict["Texture Bindings"] = []
 				for binding in activeObj.re_mdf_material.textureBindingList_items:
 					bindingDict = {"Texture Type":binding.textureType,"Texture Path":binding.path}
 					materialJSONDict["Texture Bindings"].append(bindingDict)
+				materialJSONDict["MMTRS Data"] = []
+				for item in activeObj.re_mdf_material.mmtrsData_items:
+					materialJSONDict["MMTRS Data"].append(str(item.indexString))
 			else:
 				showErrorMessageBox("Selected object can not be made into a preset.")
 			
@@ -128,13 +133,18 @@ def readPresetJSON(filepath):
 		materialObj.re_mdf_material.shaderType = materialJSONDict["Material Header"]["Material Shader Type"]
 		materialObj.re_mdf_material.mmtrPath = materialJSONDict["Material Header"]["Master Material Path"]
 		materialObj.re_mdf_material.flags.ver32Unknown = materialJSONDict["Flags"]["Ver32Unknown"]
-		
+		try:
+			materialObj.re_mdf_material.flags.ver32Unknown1 = materialJSONDict["Flags"]["Ver32Unknown1"]
+			materialObj.re_mdf_material.flags.ver32Unknown2 = materialJSONDict["Flags"]["Ver32Unknown2"]
+		except:
+			pass
 		materialObj.re_mdf_material.flags.flagIntValue = materialJSONDict["Flags"]["FlagBitFlag"]
 		
 		for propEntry in materialJSONDict["Property List"]:
 			prop = materialObj.re_mdf_material.propertyList_items.add()
 			prop.prop_name = propEntry["Property Name"]
 			prop.data_type = propEntry["Data Type"]
+			prop.padding = propEntry["Padding"]
 			if prop.data_type == "VEC4":
 				prop.float_vector_value = propEntry["Value"]
 			elif prop.data_type == "COLOR":
@@ -149,7 +159,9 @@ def readPresetJSON(filepath):
 			binding = materialObj.re_mdf_material.textureBindingList_items.add()
 			binding.textureType = bindingEntry["Texture Type"]
 			binding.path = bindingEntry["Texture Path"]
-			
+		for indexString in materialJSONDict["MMTRS Data"]:
+			item = materialObj.re_mdf_material.mmtrsData_items.add()
+			item.indexString = indexString
 		bpy.context.view_layer.objects.active = materialObj
 	else:
 		showErrorMessageBox("The active MDF collection must be set.")

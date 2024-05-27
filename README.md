@@ -44,6 +44,17 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.13 - 5/27/2024
+* Bone length of imported armatures is now determined by the area of bone weights. This makes areas with closely grouped bones such as faces look less cluttered. This is purely visual and does not affect export.
+* Fixed issue where MDF exporting didn't work correctly for Street Fighter 6.
+* Fixed issue where exporting an MDF for SF6 didn't check for material mismatches with the mesh.
+* Added MMTRS data importing for MDF files. This is only used with SF6.
+* Added more unknown values to the flags section of the MDF material flags.
+* Fixed issue where texture files in the addon folder will be backed up when the addon is updated.
+
+<details>
+  <summary>Older Version Change Logs</summary>
+
 ### V0.12 - 5/21/2024
 
 * Fixed issue with importing SF6 meshes from the latest update.
@@ -56,8 +67,6 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * Fixed issue where exporting an MDF with more than one mesh collection in a scene could cause warnings about mismatched materials.
 * Fixed issue causing some meshes in RE3 to not be importable.
 
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ## V0.10 - 5/4/2024
 

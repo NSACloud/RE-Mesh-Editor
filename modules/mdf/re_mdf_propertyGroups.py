@@ -131,8 +131,16 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 	
 class MDFFlagsPropertyGroup(bpy.types.PropertyGroup):
 	ver32Unknown: IntProperty(
-		name = "Version 32 Unknown",
-		description="Unknown value for version 32 and above, likely flags",#TODO Add description
+		name = "Version 31 Unknown",
+		description="Unknown value for version 31 and above, likely flags",#TODO Add description
+		)
+	ver32Unknown1: IntProperty(
+		name = "Version 31 Unknown 2",
+		description="Unknown value for version 31 and above, likely flags",#TODO Add description
+		)
+	ver32Unknown2: IntProperty(
+		name = "Version 31 Unknown 3",
+		description="Unknown value for version 31 and above, likely flags",#TODO Add description
 		)
 	flagIntValue: IntProperty(
 		name = "Bit Flag",
@@ -280,7 +288,10 @@ class MDFPropPropertyGroup(bpy.types.PropertyGroup):
         min=0.0,
         max=1.0,
     )
-
+    padding: bpy.props.IntProperty(#Not exposed in editor, used for SF6's weird mmtrs padding
+        name="",
+        default=0
+    )
 
 class MDFTextureBindingPropertyGroup(bpy.types.PropertyGroup):
     textureType: StringProperty(
@@ -289,7 +300,13 @@ class MDFTextureBindingPropertyGroup(bpy.types.PropertyGroup):
     path: StringProperty(
         name="",
     )
+
+class MDFMMTRSIndexPropertyGroup(bpy.types.PropertyGroup):
+    indexString: StringProperty(
+        name="Indices",
+    )
 	
+
 class MESH_UL_MDFPropertyList(bpy.types.UIList):
 	
 	filterString: StringProperty(
@@ -375,6 +392,23 @@ class MESH_UL_MDFTextureBindingList(bpy.types.UIList):
 					filtered[i] &= ~self.bitflag_filter_item
 		return filtered, ordered
 
+class MESH_UL_MDFMMTRSDataList(bpy.types.UIList):
+	
+	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        # Display the properties of each item in the UIList
+        #col1.label(text=item.name)
+		layout.ui_units_y = 1.4
+		split = layout.split(factor=0.35)
+		col1 = split.column()
+		col2 = split.column()
+		row = col2.row()
+		col2.alignment='RIGHT'
+		#col1.label(text = item.textureType)
+		layout.prop(item,"indexString")
+	# Disable double-click to rename
+	def invoke(self, context, event):
+		return {'PASS_THROUGH'}
+
 class MDFMaterialPropertyGroup(bpy.types.PropertyGroup):
 	gameName:StringProperty()
 	
@@ -421,3 +455,6 @@ class MDFMaterialPropertyGroup(bpy.types.PropertyGroup):
 	
 	textureBindingList_items: CollectionProperty(type=MDFTextureBindingPropertyGroup)
 	textureBindingList_index: IntProperty(name="")
+	
+	mmtrsData_items: CollectionProperty(type = MDFMMTRSIndexPropertyGroup)
+	mmtrsData_index: IntProperty(name="")

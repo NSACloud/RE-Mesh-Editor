@@ -3,7 +3,7 @@ import bpy
 
 from ..blender_utils import showMessageBox,showErrorMessageBox
 from ..gen_functions import textColors,raiseWarning,splitNativesPath
-from .file_re_mdf import readMDF,writeMDF,MDFFile,Material,TextureBinding,Property,gameNameMDFVersionDict,getMDFVersionToGameName
+from .file_re_mdf import readMDF,writeMDF,MDFFile,Material,TextureBinding,Property,gameNameMDFVersionDict,getMDFVersionToGameName,MMTRSData
 from .ui_re_mdf_panels import tag_redraw
 
 excludedPropertyNames = set(["~TYPE","_RNA_UI","_vs","s_curve"])
@@ -106,6 +106,7 @@ def addPropsToPropList(obj,matPropertyList):
 	for prop in matPropertyList:
 		newListItem = obj.re_mdf_material.propertyList_items.add()
 		newListItem.prop_name = prop.propName
+		newListItem.padding = prop.padding
 		lowerPropName = prop.propName.lower()
 		if prop.propName in colorPropertySet or (prop.paramCount == 4 and ("color" in lowerPropName or "_col_" in lowerPropName) and "rate" not in lowerPropName):
 			newListItem.data_type = "COLOR"
@@ -136,6 +137,15 @@ def addTextureBindingsToBindingList(obj,matTextureList):
 		newListItem.textureType = texture.textureType
 		newListItem.path = texture.texturePath
 
+def addMMTRSDataToList(obj,mmtrsData):
+	for indexList in mmtrsData.indexDataList:
+		newListItem = obj.re_mdf_material.mmtrsData_items.add()
+		newString = ""
+		for i, index in enumerate(indexList):
+			newString+=f"{str(index)}"
+			if i != len(indexList)-1:
+				newString+=","
+		newListItem.indexString = newString
 
 def getMDFFlags(obj,flags):
 	obj.re_mdf_material.flags.flagIntValue = flags.asInt32
@@ -166,10 +176,14 @@ def importMDFFile(filePath):
 		materialObj.re_mdf_material.shaderType = str(material.shaderType)
 		materialObj.re_mdf_material.mmtrPath = material.mmtrPath
 		materialObj.re_mdf_material.flags.ver32Unknown = material.ver32Unkn0
+		materialObj.re_mdf_material.flags.ver32Unknown1 = material.ver32Unkn1
+		materialObj.re_mdf_material.flags.ver32Unknown2 = material.ver32Unkn2
 		
 		getMDFFlags(materialObj,material.flags)
 		addPropsToPropList(materialObj,material.propertyList)
 		addTextureBindingsToBindingList(materialObj, material.textureList)
+		if material.mmtrsData != None:
+			addMMTRSDataToList(materialObj,material.mmtrsData)
 		#flagsObj = createEmpty("Material "+str(index).zfill(2)+" Flags", getMaterialFlags(material.flags.flags),None,mdfCollection)
 		#textureBindingsObj = createEmpty("Material "+str(index).zfill(2)+" Texture Bindings", getTextureBindings(material.textureList),None,mdfCollection)
 		#propertyListObj = createEmpty("Material "+str(index).zfill(2)+" Property List", getPropertyList(material.propertyList),None,mdfCollection)
@@ -224,23 +238,27 @@ def MDFErrorCheck(collectionName):
 			else:
 				errorList.append("Duplicate material name on " + obj.name+". Set the material name in the custom properties of the material object to a different name.")
 	
-	meshCollection = bpy.data.collections.get(collectionName.replace(".mdf2",".mesh",1),None)
+	meshCollectionName = collectionName.replace(".mdf2",".mesh",1).replace("_v00","",1).replace("_Mat","",1)
+	meshCollection = bpy.data.collections.get(meshCollectionName,None)
 	if meshCollection != None:
 		for obj in meshCollection.all_objects:
 			if obj.type == "MESH" and not "MeshExportExclude" in obj and "__" in obj.name:
 				matName = obj.name.split("__",1)[1].split(".")[0]
 				meshMaterialSet.add(matName)
 				if matName not in materialNameSet:
-					warningList.append("The material ("+matName+") on mesh " + obj.name + " does not exist in the MDF. If this mesh is supposed to be used with this MDF, the number of materials and name of materials in the MDF must match the mesh.\nThe material will appear as a checkerboard texture in game." )
+					warningList.append("The material ("+matName+") on mesh " + obj.name + " does not exist in the MDF.")
+	else:
+		raiseWarning(f"Could not find mesh collection ({meshCollectionName}) to check materials against.")
 	if len(meshMaterialSet) != 0 and len(materialNameSet.difference(meshMaterialSet)) != 0:
 		materialString = ""
 		for materialName in materialNameSet.difference(meshMaterialSet):
 			materialString += materialName+"\n"
-		warningList.append("The following materials exist in the MDF but do not exist on the meshes in the scene:\n"+materialString+"\n If these meshes are supposed to be used with this MDF, the number of materials and name of materials in the MDF must match the mesh.\nThe material will appear as a checkerboard texture in game.")
-		
+		warningList.append(f"The following materials exist in the MDF ({collectionName}) but do not exist in the mesh ({meshCollectionName}):\n{materialString}")
+	if warningList != []:
+		warningList.append("If this mesh is supposed to be used with this MDF, the number of materials and name of materials in the MDF must match the mesh.\nThe material will appear as a checkerboard texture in game.")
 		for warning in warningList:
 			raiseWarning(warning)
-			
+				
 	if errorList == []:
 		print("No errors found.")
 		#print(noesisMeshMaterialSet)
@@ -300,6 +318,8 @@ def buildMDF(mdfCollectionName,mdfVersion = None):
 			materialEntry.materialName = materialObj.re_mdf_material.materialName
 			materialEntry.mmtrPath = materialObj.re_mdf_material.mmtrPath
 			materialEntry.ver32Unkn0 = materialObj.re_mdf_material.flags.ver32Unknown
+			materialEntry.ver32Unkn1 = materialObj.re_mdf_material.flags.ver32Unknown1
+			materialEntry.ver32Unkn2 = materialObj.re_mdf_material.flags.ver32Unknown2
 			
 			materialEntry.flags.asInt32 = materialObj.re_mdf_material.flags.flagIntValue
 			for textureBinding in materialObj.re_mdf_material.textureBindingList_items:
@@ -312,7 +332,18 @@ def buildMDF(mdfCollectionName,mdfVersion = None):
 				propertyEntry = Property()
 				propertyEntry.propName = prop.prop_name
 				propertyEntry.propValue = getPropValue(prop)
+				propertyEntry.padding = prop.padding
 				materialEntry.propertyList.append(propertyEntry)
+				
+			if len(materialObj.re_mdf_material.mmtrsData_items) != 0:
+				materialEntry.mmtrsData = MMTRSData()
+				for item in materialObj.re_mdf_material.mmtrsData_items:
+					indexList = []
+					rawIndicesList = item.indexString.split(",")
+					for entry in rawIndicesList:
+						if entry.isdigit():
+							indexList.append(int(entry))
+					materialEntry.mmtrsData.indexDataList.append(indexList)
 			newMDFFile.materialList.append(materialEntry)
 		return newMDFFile
 	else:

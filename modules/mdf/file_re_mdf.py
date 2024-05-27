@@ -111,6 +111,7 @@ class Property():
 		self.propDataOffset = 0
 		self.propName = "MDFProp"
 		self.propValue = []
+		self.padding = 0#To account for SF6's weird spacing between mmtrs properties
 	def read(self,file,matPropertyDataOffset):
 		self.propNameOffset = read_uint64(file)
 		self.unicodeMMH3Hash = read_uint(file)
@@ -165,6 +166,33 @@ class TextureBinding():
 	def __str__(self):
 		return str(self.__class__) + ": " + str(self.__dict__)
 
+class MMTRSData():
+	def __init__(self):
+		self.offsetList = []
+		self.indexDataList = []
+
+	def read(self,file):
+		#Amount of offsets always seems to be 8, nothing indicates count
+		for i in range(0,8):
+			self.offsetList.append(read_uint64(file))
+		for offset in self.offsetList:
+			file.seek(offset)
+			indexCount = read_uint(file)
+			indexList = []
+			for i in range(0,indexCount):
+				indexList.append(read_uint(file))
+			self.indexDataList.append(indexList)
+		debugprint(self)
+	def write(self,file):
+		for offset in self.offsetList:
+			write_uint64(file, offset)
+		for indexList in self.indexDataList:
+			write_uint(file,len(indexList))
+			for index in indexList:
+				write_uint(file,index)
+	def __str__(self):
+		return str(self.__class__) + ": " + str(self.__dict__)
+
 class Material():
 	def __init__(self):
 		self.matNameOffset = 0
@@ -182,13 +210,13 @@ class Material():
 		self.stringTableOffset = 0
 		self.propDataOffset = 0
 		self.mmtrPathOffset = 0
-		self.ver32Unkn3 = 0
+		self.ver32MMTRSDataOffset = 0#Actually version 31 but sf6 support was added retroactively
 		self.ver32Unkn4 = 0
 		self.materialName = ""
 		self.mmtrPath = ""
 		self.textureList = []
 		self.propertyList = []
-		
+		self.mmtrsData = None
 	def read(self,file,version):
 		self.matNameOffset = read_uint64(file)
 		debugprint("matNameOffset:"+str(self.matNameOffset))
@@ -217,9 +245,13 @@ class Material():
 		self.propDataOffset = read_uint64(file)
 		self.mmtrPathOffset = read_uint64(file)
 		if version >= 31:
-			self.ver32Unkn3 = read_int(file)
+			self.ver32MMTRSDataOffset = read_int(file)
 			self.ver32Unkn4 = read_int(file)
 		currentPos = file.tell()
+		if self.ver32MMTRSDataOffset != 0:
+			file.seek(self.ver32MMTRSDataOffset)
+			self.mmtrsData = MMTRSData()
+			self.mmtrsData.read(file)
 		file.seek(self.matNameOffset)
 		self.materialName = read_unicode_string(file)
 		file.seek(self.mmtrPathOffset)
@@ -234,9 +266,16 @@ class Material():
 			self.textureList.append(textureEntry)
 		file.seek(self.propHeadersOffset)
 		self.propertyList = []
+		#Get padding size of properties for SF6
+		lastPropEndPos = 0
 		for i in range(0,self.propertyCount):
+			
 			propertyEntry = Property()
 			propertyEntry.read(file,self.propDataOffset)
+			propertyEntry.padding = propertyEntry.propDataOffset - lastPropEndPos
+			#print(f"{propertyEntry.propName} - {propertyEntry.padding}")
+			lastPropEndPos = propertyEntry.propDataOffset + 4*(propertyEntry.paramCount)
+			
 			debugprint(propertyEntry)
 			self.propertyList.append(propertyEntry)
 		file.seek(currentPos)
@@ -304,7 +343,7 @@ class Material():
 		write_uint64(file, self.propDataOffset)
 		write_uint64(file, self.mmtrPathOffset)
 		if version >= 31:
-			write_int(file, self.ver32Unkn3)
+			write_int(file, self.ver32MMTRSDataOffset)#Write mmtrs data later
 			write_int(file, self.ver32Unkn4)
 	def __str__(self):
 		return str(self.__class__) + ": " + str(self.__dict__)
@@ -379,6 +418,7 @@ class MDFFile():
 		currentPropDataBlockOffset = 0
 		currentPropHeaderOffset = 0
 		currentTexHeaderOffset = 0
+		currentMMTRSOffset = 0
 		
 		for material in self.materialList:
 			textureEntriesSize += len(material.textureList) * self.sizeData.TEXTURE_ENTRY_SIZE
@@ -396,8 +436,8 @@ class MDFFile():
 			currentTexHeaderOffset += material.textureCount * self.sizeData.TEXTURE_ENTRY_SIZE
 			for prop in material.propertyList:
 				currentPropSize = len(list(prop.propValue))*self.sizeData.PROPERTY_VALUE_SIZE
-				prop.propDataOffset = currentPropOffset
-				currentPropOffset += currentPropSize
+				prop.propDataOffset = currentPropOffset + prop.padding
+				currentPropOffset += currentPropSize + prop.padding
 				prop.paramCount = len(list(prop.propValue))
 				prop.asciiMMH3Hash = hash(prop.propName)
 				prop.unicodeMMH3Hash = hash_wide(prop.propName)
@@ -469,6 +509,17 @@ class MDFFile():
 			material.texHeadersOffset = textureEntryStartOffset + texHeaderOffsetList[index]
 			material.stringTableOffset = stringTableStartOffset
 			material.propDataOffset = propDataStartOffset + propDataBlockOffsetList[index]
+			
+		currentMMTRSOffset = currentPropDataBlockOffset + propDataStartOffset
+		for material in self.materialList:
+			if material.mmtrsData != None:
+				material.ver32MMTRSDataOffset = currentMMTRSOffset
+				currentMMTRIndexListOffset =  currentMMTRSOffset + 8 * 8
+				material.mmtrsData.offsetList.clear()
+				for i in range(0,8):
+					material.mmtrsData.offsetList.append(currentMMTRIndexListOffset)
+					currentMMTRIndexListOffset +=  4 + 4 * len(material.mmtrsData.indexDataList[i])
+				currentMMTRSOffset = currentMMTRIndexListOffset
 	def write(self,file,version):
 		
 		if version >= 31:
@@ -512,6 +563,13 @@ class MDFFile():
 				file.seek(material.propDataOffset + prop.propDataOffset)
 				for value in list(prop.propValue):
 					write_float(file,value)
+					
+		
+		for material in self.materialList:
+			if material.mmtrsData != None:
+				file.seek(material.ver32MMTRSDataOffset)
+				#print(material.mmtrsData)
+				material.mmtrsData.write(file)
 def readMDF(filepath):
 	#print(textColors.OKCYAN + "__________________________________\nMDF read started." + textColors.ENDC)
 	print("Opening " + filepath)

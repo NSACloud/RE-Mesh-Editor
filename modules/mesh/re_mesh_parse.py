@@ -12,6 +12,7 @@ typeStrideDict = {
 	"Color":4,
 	}
 
+blendShapeNameMapping =["BlendShapeByte","BlendShapeShort"]
 def ReadPosBuffer(vertexPosBuffer,tags):
 	posList = np.frombuffer(vertexPosBuffer,dtype="<3f").tolist()
 	return posList
@@ -82,6 +83,32 @@ BufferReadDict = {
 	"Color":ReadColorBuffer,
 	}
 
+def ReadBlendShapeByteBuffer(blendShapeBuffer,tags):
+	blendShapeArray = np.frombuffer(blendShapeBuffer,dtype="<4B",)
+	blendShapeFloatArray = np.empty((len(blendShapeBuffer//4),4), dtype=np.dtype("<4f"))
+	#TODO Do this through numpy
+	for index, entry in enumerate(blendShapeArray):
+		blendShapeFloatArray[index][0] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][0] < 0))
+		blendShapeFloatArray[index][1] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][1] < 0))
+		blendShapeFloatArray[index][2] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][2] < 0))
+		blendShapeFloatArray[index][3] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][3] < 0))
+	return blendShapeFloatArray.tolist()
+
+def ReadBlendShapeShortBuffer(blendShapeBuffer,tags):
+	blendShapeArray = np.frombuffer(blendShapeBuffer,dtype="<4H",)
+	blendShapeFloatArray = np.empty((len(blendShapeBuffer//8),4), dtype=np.dtype("<4f"))
+	#TODO Do this through numpy
+	for index, entry in enumerate(blendShapeArray):
+		blendShapeFloatArray[index][0] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][0] < 0))
+		blendShapeFloatArray[index][1] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][1] < 0))
+		blendShapeFloatArray[index][2] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][2] < 0))
+		blendShapeFloatArray[index][3] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][3] < 0))
+	return blendShapeFloatArray.tolist()
+
+BlendShapeBufferReadDict = {
+	"BlendShapeByte":ReadBlendShapeByteBuffer,
+	"BlendShapeShort":ReadBlendShapeShortBuffer,
+	}
 def ReadVertexElementBuffers(vertexElementList,vertexBuffer,tagSet):
 	vertexDict = {
 		"Position":None,
@@ -140,6 +167,7 @@ class SubMesh:
 		self.isReusedMesh = False
 		self.linkedSubMesh = None
 		self.subMeshIndex = 0
+		self.blendShapeList = []
 
 class ParsedBone:
 	def __init__(self):
@@ -157,6 +185,11 @@ class Skeleton:
 	def __init__(self):
 		self.weightedBones = []
 		self.boneList = []
+
+class BlendShape:
+	def __init__(self):
+		self.blendShapeName = "newBlendShape"
+		self.deltas = []
 
 def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict):
 	lodList = []
@@ -273,6 +306,7 @@ class ParsedREMesh:
 			#TODO
 			#tags.add("shadowLOD")
 			#shadowVertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
+		#Parse Blend Shapes
 		#Parse Main Meshes
 		if reMesh.lodHeader != None and vertexDict != None:
 			self.boundingSphere = reMesh.lodHeader.sphere

@@ -21,7 +21,7 @@
 import bpy
 import bmesh
 import os
-from math import radians,floor
+from math import radians,floor,sqrt
 from mathutils import Vector,Matrix
 from itertools import chain, repeat, islice
 from .file_re_mesh import readREMesh,writeREMesh,ParsedREMeshToREMesh,Sphere,AABB,Matrix4x4,meshFileVersionToGameNameDict
@@ -156,7 +156,13 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 				editBone.parent = armatureData.edit_bones[boneNameIndexDict[bone.parentIndex]]
 			else:
 				bone.head = Vector([.0, .0, .01])
-			editBone.length = 0.1#TODO set bone length based on distance to first child bone to make face bones less of a mess
+				
+			if bone.boundingBox != None:
+				editBone.length = sqrt((bone.boundingBox.max.x - bone.boundingBox.min.x)**2 + (bone.boundingBox.max.y - bone.boundingBox.min.y)**2 + (bone.boundingBox.max.z - bone.boundingBox.min.z)**2)*.15
+			else:
+				editBone.length = .05
+			if editBone.length < .01:
+				editBone.length = .01
 			editBone.matrix = bone.worldMatrix.matrix
 			editBone["reMeshWorldMatrix"] = bone.worldMatrix.matrix
 			editBone["reMeshLocalMatrix"] = bone.localMatrix.matrix
@@ -783,6 +789,8 @@ def exportREMeshFile(filePath,options):
 	if meshLODCollectionList == []:
 		meshLODCollectionList = [targetCollection]
 	meshLODCollectionList.sort(key=lambda col: col.name)
+	if not options["exportAllLODs"]:
+		meshLODCollectionList = [meshLODCollectionList[0]]
 	#Loop through all lod collections, or the scene collection if there is no collections
 	meshDataStartTime = time.time()
 	isFirstLOD = True

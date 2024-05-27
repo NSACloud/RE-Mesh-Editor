@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 12),
+	"version": (0, 13),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -32,6 +32,7 @@ from .modules.mdf.ui_re_mdf_panels import (
 	OBJECT_PT_MDFFlagsPanel,
 	OBJECT_PT_MDFMaterialPropertyListPanel,
 	OBJECT_PT_MDFMaterialTextureBindingListPanel,
+	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
 	)
 from .modules.mdf.re_mdf_propertyGroups import (
 	MDFToolPanelPropertyGroup,
@@ -39,8 +40,11 @@ from .modules.mdf.re_mdf_propertyGroups import (
 	MDFPropPropertyGroup,
 	MDFTextureBindingPropertyGroup,
 	MDFMaterialPropertyGroup,
+	MDFMMTRSIndexPropertyGroup,
+	
 	MESH_UL_MDFPropertyList,
 	MESH_UL_MDFTextureBindingList,
+	MESH_UL_MDFMMTRSDataList,
 	
 	
 	
@@ -591,13 +595,16 @@ classes = [
 	ImportREMDF,
 	ExportREMDF,
 	#property groups
+	MDFMMTRSIndexPropertyGroup,
 	MDFFlagsPropertyGroup,
 	MDFToolPanelPropertyGroup,
 	MDFPropPropertyGroup,
 	MDFTextureBindingPropertyGroup,
 	MDFMaterialPropertyGroup,
+	
 	MESH_UL_MDFPropertyList,
 	MESH_UL_MDFTextureBindingList,
+	MESH_UL_MDFMMTRSDataList,
 	
 	#ui panels
 	OBJECT_PT_MDFObjectModePanel,
@@ -605,6 +612,7 @@ classes = [
 	OBJECT_PT_MDFFlagsPanel,
 	OBJECT_PT_MDFMaterialTextureBindingListPanel,
 	OBJECT_PT_MDFMaterialPropertyListPanel,
+	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
 	
 	#operators
 	WM_OT_NewMDFHeader,
