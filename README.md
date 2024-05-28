@@ -44,6 +44,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.14 - 5/28/2024
+* Fixed issue with importing armatures from mesh files exported with Noesis.
+
 ### V0.13 - 5/27/2024
 * Bone length of imported armatures is now determined by the area of bone weights. This makes areas with closely grouped bones such as faces look less cluttered. This is purely visual and does not affect export.
 * Fixed issue where MDF exporting didn't work correctly for Street Fighter 6.

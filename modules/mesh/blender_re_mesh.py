@@ -147,13 +147,14 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 			armatureObj.data.transform(rotateNeg90Matrix)#TODO do a less ugly workaround for merging rotated armatures
 	elif targetArmatureName != "":
 		print(f"The specified armature to merge with could not be found. Importing the armature as a new object.")
-	
+	boneParentList = []#List of tuples containing armature bone and parent bone name string
 	for bone in parsedSkeleton.boneList:
 		if bone.boneName not in armatureData.bones:
 			editBone = armatureData.edit_bones.new(bone.boneName)
 			editBone.tail = editBone.head + Vector((.0, .0, .1))
 			if bone.parentIndex != -1:
-				editBone.parent = armatureData.edit_bones[boneNameIndexDict[bone.parentIndex]]
+				boneParentList.append((editBone,boneNameIndexDict[bone.parentIndex]))#Set bone parents after all bones have been imported
+				#editBone.parent = armatureData.edit_bones[boneNameIndexDict[bone.parentIndex]]
 			else:
 				bone.head = Vector([.0, .0, .01])
 				
@@ -169,8 +170,10 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 			editBone["reMeshInverseMatrix"] = bone.inverseMatrix.matrix
 			if mergedArmature:
 				print(f"[MERGE] Added {bone.boneName} to {armatureObj.name}")
-			
-			
+	#Assign bone parents
+	for editBone,parentBoneName in boneParentList:
+		editBone.parent = armatureData.edit_bones[parentBoneName]
+		
 	if mergedArmature:
 		if rotate90:
 			armatureObj.data.transform(rotate90Matrix)#TODO do a less ugly workaround for merging rotated armatures

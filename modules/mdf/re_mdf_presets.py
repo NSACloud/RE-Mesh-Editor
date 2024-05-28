@@ -144,7 +144,10 @@ def readPresetJSON(filepath):
 			prop = materialObj.re_mdf_material.propertyList_items.add()
 			prop.prop_name = propEntry["Property Name"]
 			prop.data_type = propEntry["Data Type"]
-			prop.padding = propEntry["Padding"]
+			try:
+				prop.padding = propEntry["Padding"]
+			except:
+				pass
 			if prop.data_type == "VEC4":
 				prop.float_vector_value = propEntry["Value"]
 			elif prop.data_type == "COLOR":
@@ -159,9 +162,11 @@ def readPresetJSON(filepath):
 			binding = materialObj.re_mdf_material.textureBindingList_items.add()
 			binding.textureType = bindingEntry["Texture Type"]
 			binding.path = bindingEntry["Texture Path"]
-		for indexString in materialJSONDict["MMTRS Data"]:
-			item = materialObj.re_mdf_material.mmtrsData_items.add()
-			item.indexString = indexString
+		
+		if "MMTRS Data" in materialJSONDict:
+			for indexString in materialJSONDict["MMTRS Data"]:
+				item = materialObj.re_mdf_material.mmtrsData_items.add()
+				item.indexString = indexString
 		bpy.context.view_layer.objects.active = materialObj
 	else:
 		showErrorMessageBox("The active MDF collection must be set.")
