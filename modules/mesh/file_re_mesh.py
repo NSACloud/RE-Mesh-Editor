@@ -10,6 +10,16 @@
 #5. The parsed mesh format is rebuilt inside blender_re_mesh.py once it has been error checked
 #6. The parsed format is passed back to file_re_mesh.py and rebuilt into a mesh structure (ParsedREMeshToREMesh())
 
+IMPORT_BLEND_SHAPES = False#Disabled by default because it's broken at the moment.
+#Set to True if you want to try to fix blend shape importing. The relevant code is in re_mesh_parse.py.
+#There's something wrong with getting the amount of deltas and also the way the deltas are parsed is not correct.
+
+#Meshes to test blend shapes with:
+#MHR player face "F:\MHR_EXTRACT\extract\re_chunk_000\natives\STM\player\mod\face\pl_face000.mesh.2109148288"
+#RE4R leon face "I:\RE4_EXTRACT\re_chunk_000\natives\STM\_Chainsaw\Character\ch\cha0\cha000\10\cha000_10.mesh.221108797"
+#SF6 chun li body "J:\SF6_EXTRACT\re_chunk_000\natives\stm\product\model\esf\esf004\001\01\esf004_001_01.mesh.230110883"
+
+
 from ..gen_functions import getPaddedPos,getBit,setBit,getPaddingAmount,textColors,raiseWarning,raiseError,read_uint,read_int,read_int64,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_int64,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte,read_string,write_string
 import os
 import numpy as np
@@ -628,10 +638,14 @@ class FileHeader():
 			self.meshGroupOffset = read_uint64(file)
 			self.shadowMeshGroupOffset = read_uint64(file)
 			self.occlusionMeshGroupOffset = read_uint64(file)
-			self.blendShapesOffset = read_uint64(file)
-			self.sf6unkn1 = read_uint64(file)#new
-			self.meshOffset = read_uint64(file)
 			self.normalRecalcOffset = read_uint64(file)
+			self.blendShapesOffset = read_uint64(file)
+			self.meshOffset = read_uint64(file)
+			self.sf6unkn1 = read_uint64(file)#new
+			
+			
+			
+			
 			self.floatsOffset = read_uint64(file)
 			self.aabbOffset = read_uint64(file)
 			self.skeletonOffset = read_uint64(file)
@@ -674,10 +688,11 @@ class FileHeader():
 			write_uint64(file, self.meshGroupOffset)
 			write_uint64(file, self.shadowMeshGroupOffset)
 			write_uint64(file, self.occlusionMeshGroupOffset)
-			write_uint64(file, self.blendShapesOffset)
-			write_uint64(file, self.sf6unkn1)#new
-			write_uint64(file, self.meshOffset)
 			write_uint64(file, self.normalRecalcOffset)
+			write_uint64(file, self.blendShapesOffset)
+			write_uint64(file, self.meshOffset)
+			write_uint64(file, self.sf6unkn1)#new
+			
 			write_uint64(file, self.floatsOffset)
 			write_uint64(file, self.aabbOffset)
 			write_uint64(file, self.skeletonOffset)
@@ -748,48 +763,120 @@ class NormalRecalc():
 		for entry in self.faceDataList:
 			entry.write(file)
 
+class BlendSubMesh():
+	def __init__(self):
+		self.subMeshVertexStartIndex = 0
+		self.vertOffset = 0
+		self.vertCount = 0
+		self.paramUnkn3 = 0
+		
+	def read(self,file):
+		self.subMeshVertexStartIndex = read_uint(file)
+		self.vertOffset = read_uint(file)
+		self.vertCount = read_uint(file)
+		self.paramUnkn3 = read_uint(file)
+		
+	def write(self,file):
+		write_uint(file, self.subMeshVertexStartIndex)
+		write_uint(file, self.vertOffset)
+		write_uint(file, self.vertCount)
+		write_uint(file, self.paramUnkn3)
+
+class BlendTarget():
+	def __init__(self):
+		self.subMeshVertexStartIndex = 0
+		self.vertCount = 0
+		self.blendSSIndex = 0
+		self.blendShapeNum = 0
+		self.deltaOffset = 0
+		
+		#sf6 changes
+		self.unkn0 = 0
+		self.subMeshEntryCount = 0
+		self.unkn2 = 0
+		self.subMeshEntryOffset = 0
+		self.subMeshEntryList = []
+		
+		
+	def read(self,file,version):
+		if version < VERSION_SF6:
+			self.subMeshVertexStartIndex = read_uint(file)
+			self.vertCount = read_uint(file)
+			self.blendSSIndex = read_ushort(file)
+			self.blendShapeNum = read_ushort(file)
+			self.deltaOffset = read_uint(file)
+		else:
+			self.blendSSIndex = read_ushort(file)
+			self.blendShapeNum = read_ushort(file)
+			self.unkn0 = read_ushort(file)
+			self.subMeshEntryCount = read_ubyte(file)
+			self.unkn2 = read_ubyte(file)
+			self.subMeshEntryOffset = read_uint64(file)
+			currentPos = file.tell()
+			file.seek(self.subMeshEntryOffset)
+			for i in range(0,self.subMeshEntryCount):
+				subMeshEntry = BlendSubMesh()
+				subMeshEntry.read(file)
+				self.subMeshEntryList.append(subMeshEntry)
+			
+			file.seek(currentPos)
+		
+	def write(self,file,version):#TODO FIX WRITE
+		write_uint64(file, self.count)
+		write_uint64(file, self.mainOffset)
+		write_uint64(file, self.zero)
+		write_uint64(file, self.hash)
+		for entry in self.blendShapeOffsetList:
+			write_uint64(file,entry)
+		
+		for entry in self.blendShapeList:#TODO FIX WRITE
+			entry.write(file)
+
 class BlendShapeData():
 	def __init__(self):
 		self.targetCount = 1
 		self.typing = 0
-		self.padding0 = 0
+		self.unknFlag = 0
 		self.padding1 = 0
 		self.padding2 = 0
 		self.dataOffset = 0#[Target count]
 		self.aabbOffset = 0
 		self.blendSOffset = 0
 		self.blendSSOffset = 0
-		self.vertOffset = 0
-		self.vertCount = 0
-		self.visconTarget = 0#Always 0 - But is supposed to be Part IDX
-		self.blendShapeCount = 0
-		self.aabb = AABB()
+		self.blendTargetList = []
+		self.aabbList = [AABB()]
 		self.blendS = [0,0,0,0]
 		self.blendSSList = []
-	def read(self,file):
+	def read(self,file,version):
 		self.targetCount = read_ushort(file)
 		self.typing = read_ushort(file)
-		self.padding0 = read_uint(file)
+		self.unknFlag = read_uint(file)
 		self.padding1 = read_uint(file)
 		self.padding2 = read_uint(file)
 		self.dataOffset = read_uint64(file)#[Target count]
 		self.aabbOffset = read_uint64(file)
 		self.blendSOffset = read_uint64(file)
 		self.blendSSOffset = read_uint64(file)
-		self.vertOffset = read_uint(file)
-		self.vertCount = read_uint(file)
-		self.visconTarget = read_ushort(file)#Always 0 - But is supposed to be Part IDX
-		self.blendShapeCount = read_ushort(file)
-		file.seek(getPaddedPos(file.tell(), 16))#TODO FIX WRITE
-		self.aabb.read(file)
+		file.seek(self.dataOffset)
+		for i in range(0,self.targetCount):
+			blendTargetEntry = BlendTarget()
+			blendTargetEntry.read(file,version)
+			self.blendTargetList.append(blendTargetEntry)
+		file.seek(self.aabbOffset)#TODO FIX WRITE
+		self.aabbList.clear()
+		for i in range(0,self.targetCount):
+			aabbEntry = AABB()
+			aabbEntry.read(file)
+			self.aabbList.append(aabbEntry)
 		self.blendS = [read_int(file),read_int(file),read_int(file)]
 		self.blendSSList = []
-		for i in range(0,self.blendShapeCount):
-			self.blendSSList.append(read_int(file))
-	def write(self,file):
+		for blendTarget in self.blendTargetList:
+			for i in range(0,blendTarget.blendShapeNum):
+				self.blendSSList.append(read_int(file))
+	def write(self,file):#TODO FIX WRITE
 		write_ushort(file, self.targetCount)
 		write_ushort(file, self.typing)
-		write_uint(file, self.padding0)
+		write_uint(file, self.unknFlag)
 		write_uint(file, self.padding1)
 		write_uint(file, self.padding2)
 		write_uint64(file, self.dataOffset)
@@ -806,7 +893,7 @@ class BlendShapeData():
 		for entry in self.blendSSList:
 			write_int(file,entry)
 
-class BlendShape():
+class BlendShapeHeader():
 	def __init__(self):
 		self.count = 0
 		self.mainOffset = 0
@@ -815,7 +902,7 @@ class BlendShape():
 		self.blendShapeOffsetList = []
 		self.blendShapeList = []	
 		
-	def read(self,file):
+	def read(self,file,version):
 		self.count = read_uint64(file)
 		self.mainOffset = read_uint64(file)
 		self.zero = read_uint64(file)
@@ -823,13 +910,16 @@ class BlendShape():
 		self.blendShapeOffsetList = []
 		for i in range(0,self.count):
 			self.blendShapeOffsetList.append(read_uint64(file))
-		self.blendShapeList = []	
+		self.blendShapeList = []
+		currentPos = file.tell()
 		for i in range(0,self.count):
+			file.seek(self.blendShapeOffsetList[i])
 			entry = BlendShapeData()
-			entry.read(file)
+			entry.read(file,version)
 			self.blendShapeList.append(entry)
+		file.seek(currentPos)
 		
-	def write(self,file):
+	def write(self,file,version):
 		write_uint64(file, self.count)
 		write_uint64(file, self.mainOffset)
 		write_uint64(file, self.zero)
@@ -838,7 +928,7 @@ class BlendShape():
 			write_uint64(file,entry)
 		
 		for entry in self.blendShapeList:#TODO FIX WRITE
-			entry.write(file)
+			entry.write(file,version)
 
 class BoneAABBGroup():
 	def __init__(self):
@@ -1029,10 +1119,10 @@ class REMesh():
 			self.normalRecalcHeader = NormalRecalc()
 			self.normalRecalcHeader.read(file,sum([i.vertexCount for i in self.lodHeader.lodGroupList[0].meshGroupList]),sum([i.faceCount for i in self.lodHeader.lodGroupList[0].meshGroupList]))
 		
-		if self.fileHeader.blendShapesOffset:
+		if self.fileHeader.blendShapesOffset and IMPORT_BLEND_SHAPES:
 			file.seek(self.fileHeader.blendShapesOffset)
-			self.blendShapeHeader = BlendShape()
-			self.blendShapeHeader.read(file)
+			self.blendShapeHeader = BlendShapeHeader()
+			self.blendShapeHeader.read(file,version)
 		
 		if self.fileHeader.aabbOffset:
 			file.seek(self.fileHeader.aabbOffset)
@@ -1070,7 +1160,9 @@ class REMesh():
 		
 		if self.fileHeader.blendShapeNameOffset and self.blendShapeHeader != None:
 			file.seek(self.fileHeader.blendShapeNameOffset)
-			for i in range(0,self.blendShapeHeader.count):
+			blendNameCount = self.fileHeader.nameCount - len(self.materialNameRemapList) - len(self.boneNameRemapList)
+			#for i in range(0,sum([blendShape.blendShapeCount for blendShape in self.blendShapeHeader.blendShapeList])):
+			for i in range(0,blendNameCount):
 				self.blendShapeNameRemapList.append(read_ushort(file))
 	def write(self,file,version):
 		self.fileHeader.write(file,version)
@@ -1262,9 +1354,16 @@ def WriteToWeightBuffer(bufferStream,boneWeightsList,boneIndicesList,isSixWeight
 		boneIndicesArray = boneIndicesList.astype("<B")
 	
 	boneWeightsArray = np.array(boneWeightsList)
+	boneWeightsArray = np.multiply(boneWeightsArray,255)
+	boneWeightsArray = np.rint(boneWeightsArray)
+	boneWeightsArray = boneWeightsArray.astype("<B")
+	#Normalize weights
+	diffSums = 255 - np.sum(boneWeightsArray,axis = 1)
+	boneWeightsArray[:, 0] += diffSums
+	
 	weightArray = np.empty((len(boneWeightsList)*2,8), dtype=np.dtype("<B"))
 	weightArray[::2] = boneIndicesArray
-	weightArray[1::2] = np.multiply(boneWeightsArray,255)
+	weightArray[1::2] = boneWeightsArray
 	#print(weightArray)
 	bufferStream.write(weightArray.tobytes())
 	

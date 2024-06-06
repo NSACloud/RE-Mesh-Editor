@@ -44,6 +44,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.15 - 6/5/2024
+* Fixed issue where exported mesh weights would be incorrect due to rounding issues.
+
 ### V0.14 - 5/28/2024
 * Fixed issue with importing armatures from mesh files exported with Noesis.
 

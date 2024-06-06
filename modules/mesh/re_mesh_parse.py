@@ -13,6 +13,10 @@ typeStrideDict = {
 	}
 
 blendShapeNameMapping =["BlendShapeByte","BlendShapeShort"]
+blendShapeStrideDict = {
+	"BlendShapeByte":4,
+	"BlendShapeShort":8,
+	}
 def ReadPosBuffer(vertexPosBuffer,tags):
 	posList = np.frombuffer(vertexPosBuffer,dtype="<3f").tolist()
 	return posList
@@ -84,26 +88,56 @@ BufferReadDict = {
 	}
 
 def ReadBlendShapeByteBuffer(blendShapeBuffer,tags):
-	blendShapeArray = np.frombuffer(blendShapeBuffer,dtype="<4B",)
-	blendShapeFloatArray = np.empty((len(blendShapeBuffer//4),4), dtype=np.dtype("<4f"))
+	blendShapeArray = np.frombuffer(blendShapeBuffer,dtype="<4b",)
+	normalizingArray = None
+	for index,delta in enumerate(blendShapeArray):#Hack, still trying to figure out how to get the deltas to be correct
+		if delta[3] == 127:#Find the value of a delta with no change and subtract that from all deltas
+			normalizingArray = blendShapeArray[index]
+			break
+	#blendShapeFloatArray = np.empty((len(blendShapeBuffer)//4), dtype=np.dtype("<3f"))
+	
+	
+	
+	blendShapeArray = blendShapeArray.astype("float32")
+	blendShapeArray = blendShapeArray / blendShapeArray[:,3][:,np.newaxis]
+	blendShapeArray = np.delete(blendShapeArray, 3, axis=1)#Remove 4th column
+	
+	if normalizingArray is not None:
+		normalizingArray = normalizingArray.astype("float32")
+		normalizingArray = normalizingArray / 127
+		normalizingArray = np.delete(normalizingArray, 3, axis=0)#Remove 4th column
+		#print(normalizingArray)
+		blendShapeArray = blendShapeArray - np.tile(normalizingArray,(len(blendShapeArray),1))
+	#print(blendShapeFloatArray)
+	#blendShapeArray = np.where(blendShapeArray < 0,blendShapeArray / 128, blendShapeArray / 127)
+	"""
 	#TODO Do this through numpy
+	
 	for index, entry in enumerate(blendShapeArray):
 		blendShapeFloatArray[index][0] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][0] < 0))
-		blendShapeFloatArray[index][1] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][1] < 0))
-		blendShapeFloatArray[index][2] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][2] < 0))
-		blendShapeFloatArray[index][3] = blendShapeArray[index][0] / (127 + 1 * (blendShapeArray[index][3] < 0))
-	return blendShapeFloatArray.tolist()
+		blendShapeFloatArray[index][1] = blendShapeArray[index][1] / (127 + 1 * (blendShapeArray[index][1] < 0))
+		blendShapeFloatArray[index][2] = blendShapeArray[index][2] / (127 + 1 * (blendShapeArray[index][2] < 0))
+		print(blendShapeFloatArray[index])
+		#blendShapeFloatArray[index][3] = blendShapeArray[index][3] / (127 + 1 * (blendShapeArray[index][3] < 0))
+	"""
+	return blendShapeArray
 
 def ReadBlendShapeShortBuffer(blendShapeBuffer,tags):
 	blendShapeArray = np.frombuffer(blendShapeBuffer,dtype="<4H",)
-	blendShapeFloatArray = np.empty((len(blendShapeBuffer//8),4), dtype=np.dtype("<4f"))
+	#blendShapeFloatArray = np.empty((len(blendShapeBuffer)//8), dtype=np.dtype("<3f"))
+	blendShapeArray = np.delete(blendShapeArray, 3, axis=1)#Remove 4th column
+	blendShapeArray = blendShapeArray.astype("float32")
+	
+	blendShapeArray = np.where(blendShapeArray < 0,blendShapeArray / 32768, blendShapeArray / 32767)
+	"""
 	#TODO Do this through numpy
 	for index, entry in enumerate(blendShapeArray):
 		blendShapeFloatArray[index][0] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][0] < 0))
-		blendShapeFloatArray[index][1] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][1] < 0))
-		blendShapeFloatArray[index][2] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][2] < 0))
-		blendShapeFloatArray[index][3] = blendShapeArray[index][0] / (32767 + 1 * (blendShapeArray[index][3] < 0))
-	return blendShapeFloatArray.tolist()
+		blendShapeFloatArray[index][1] = blendShapeArray[index][1] / (32767 + 1 * (blendShapeArray[index][1] < 0))
+		blendShapeFloatArray[index][2] = blendShapeArray[index][2] / (32767 + 1 * (blendShapeArray[index][2] < 0))
+		#blendShapeFloatArray[index][3] = blendShapeArray[index][3] / (32767 + 1 * (blendShapeArray[index][3] < 0))
+	"""
+	return blendShapeArray
 
 BlendShapeBufferReadDict = {
 	"BlendShapeByte":ReadBlendShapeByteBuffer,
@@ -191,12 +225,87 @@ class BlendShape:
 		self.blendShapeName = "newBlendShape"
 		self.deltas = []
 
-def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict):
+def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blendShapeBuffer = None):
 	lodList = []
-	for lodGroup in targetLODList:
+	currentBlendShapeOffset = 0
+	blendShapeDict = {}
+	for lodIndex, lodGroup in enumerate(targetLODList):
+		
+		#BLEND SHAPES - LOD level
+		if reMesh.blendShapeHeader != None and len(reMesh.blendShapeHeader.blendShapeList) > lodIndex:
+			blendShapeLODData = reMesh.blendShapeHeader.blendShapeList[lodIndex]
+		else:
+			blendShapeLODData = None
+		
+		#BLEND SHAPES - submesh
+		currentBlendShapeNameIndex = 0
+		currentBlendDeltaOffset = 0
+		if blendShapeLODData != None:
+			blendShapeTags = set()#Unused currently but there if needed in the future
+			#identifier = [reMesh.lodHeader.lodGroupOffsetList[lodIndex]]
+			print(f"LOD Index {str(lodIndex)}")
+			bufferType = blendShapeNameMapping[blendShapeLODData.typing]
+			bufferStride = blendShapeStrideDict[bufferType]
+			
+			#endOffset = currentBlendShapeOffset + (blendShapeLODData.vertCount*bufferStride)
+			
+			#blendShapeDeltas = BlendShapeBufferReadDict[bufferType](blendShapeBuffer[currentBlendShapeOffset:endOffset],tags = blendShapeTags)
+			
+			#TODO Get slice containing only current LOD, currently parses whole buffer for each LOD
+			blendShapeDeltas = BlendShapeBufferReadDict[bufferType](blendShapeBuffer,tags = blendShapeTags)
+			
+			#print(f"Delta Vert Count {str(len(blendShapeDeltas))}")
+			#(f"Delta Length {str(endOffset-currentBlendShapeOffset)}")
+			#currentBlendShapeOffset = endOffset
+			
+			currentDeltaOffset = 0
+			for blendTargetIndex,blendTarget in enumerate(blendShapeLODData.blendTargetList):
+				for blendNameIndex in range(0,blendTarget.blendShapeNum):
+					blendShapeName = reMesh.rawNameList[reMesh.blendShapeNameRemapList[currentBlendShapeNameIndex+blendNameIndex]]
+					
+					#print(blendShapeEntry.blendShapeName)
+					if blendTarget.subMeshEntryCount != 0:#If Version >= SF6
+						for subMeshEntry in blendTarget.subMeshEntryList:
+							
+							blendShapeEntry = BlendShape()
+							blendShapeEntry.blendShapeName = blendShapeName
+							blendShapeEntry.deltas = blendShapeDeltas[currentBlendDeltaOffset:currentBlendDeltaOffset+subMeshEntry.vertCount]
+							
+							#blendShapeEntry.deltas[:,0] *= blendShapeLODData.aabbList[blendTargetIndex].max.x
+							#blendShapeEntry.deltas[:,1] *= blendShapeLODData.aabbList[blendTargetIndex].max.y
+							#blendShapeEntry.deltas[:,2] *= blendShapeLODData.aabbList[blendTargetIndex].max.z
+							
+							currentBlendDeltaOffset += subMeshEntry.vertCount
+							if subMeshEntry.subMeshVertexStartIndex in blendShapeDict:
+								blendShapeDict[subMeshEntry.subMeshVertexStartIndex].append(blendShapeEntry)
+							else:
+								blendShapeDict[subMeshEntry.subMeshVertexStartIndex] = [blendShapeEntry]
+							#blendShapeList.append(blendShapeEntry)
+							#blendShapeDict[subMeshEntry.subMeshVertexStartIndex] = blendShapeList
+						
+					else:
+						blendShapeEntry = BlendShape()
+						blendShapeEntry.blendShapeName = blendShapeName
+						blendShapeEntry.deltas = blendShapeDeltas[currentBlendDeltaOffset:currentBlendDeltaOffset+blendTarget.vertCount]
+						
+						#blendShapeEntry.deltas[:,0] *= blendShapeLODData.aabbList[blendTargetIndex].max.x
+						#blendShapeEntry.deltas[:,1] *= blendShapeLODData.aabbList[blendTargetIndex].max.y
+						#blendShapeEntry.deltas[:,2] *= blendShapeLODData.aabbList[blendTargetIndex].max.z
+						
+						currentBlendDeltaOffset += blendTarget.vertCount
+						if blendTarget.subMeshVertexStartIndex in blendShapeDict:
+							blendShapeDict[blendTarget.subMeshVertexStartIndex].append(blendShapeEntry)
+						else:
+							blendShapeDict[blendTarget.subMeshVertexStartIndex] = [blendShapeEntry]
+							
+				currentBlendShapeNameIndex += blendTarget.blendShapeNum
+				
 		lod = LODLevel()
 		lod.lodDistance = lodGroup.distance
 		for visconGroup in lodGroup.meshGroupList:
+			
+			
+			
 			group = VisconGroup()
 			group.visconGroupNum = visconGroup.visconGroupID
 			lastSubmeshIndex = len(visconGroup.vertexInfoList) -1
@@ -236,6 +345,38 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict):
 				if vertexDict["Color"] != None:
 					submesh.colorList = vertexDict["Color"][meshInfo.vertexStartIndex:bufferEnd]
 				
+				if blendShapeLODData != None:
+					"""
+					vertexCount = len(vertexDict["Position"])
+					for blendShapeIndex in range(0,blendShapeLODData.blendShapeCount):
+						
+						blendShapeEntry = BlendShape()
+						blendShapeEntry.blendShapeName = reMesh.rawNameList[reMesh.blendShapeNameRemapList[blendShapeIndex]]
+						
+						meshVertStart = meshInfo.vertexStartIndex
+						meshVertEnd = bufferEnd
+						
+						blendShapeVertStart = blendShapeLODData.vertOffset
+						blendShapeVertEnd = blendShapeLODData.vertOffset + blendShapeLODData.vertCount
+						
+						if meshVertStart < blendShapeVertEnd and meshVertEnd > blendShapeVertStart:
+							blendShapeEntry.deltas = [(0, 0, 0) for i in range(meshVertStart, blendShapeVertStart)]
+							for ix in range(max(meshVertStart, blendShapeVertStart), min(meshVertEnd, blendShapeVertEnd)):
+								blendShapeEntry.deltas.append(blendShapeDeltas[ix-blendShapeVertStart])
+								
+							for ix in range(meshVertEnd, blendShapeVertEnd):
+								blendShapeEntry.deltas.append((0, 0, 0))
+						else:
+							blendShapeEntry.deltas = []
+						#blendShapeEntry.deltas = blendShapeDeltas[currentDeltaOffset:currentDeltaOffset+vertexCount].tolist()
+						#print(len(blendShapeEntry.deltas))
+						#print(blendShapeEntry.blendShapeName)
+						#print(blendShapeEntry.deltas)
+						submesh.blendShapeList.append(blendShapeEntry)
+				#blendShapeDict[identifier] = shapeList
+				"""
+				if meshInfo.vertexStartIndex in blendShapeDict:
+					submesh.blendShapeList.extend(blendShapeDict[meshInfo.vertexStartIndex])
 				group.subMeshList.append(submesh)
 			lod.visconGroupList.append(group)
 		lodList.append(lod)
@@ -307,11 +448,21 @@ class ParsedREMesh:
 			#tags.add("shadowLOD")
 			#shadowVertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
 		#Parse Blend Shapes
+		vertexCount = len(vertexDict["Position"])
+		lastElement = reMesh.meshBufferHeader.vertexElementList[-1]
+		blendShapeStartPos = lastElement.posStartOffset + vertexCount * lastElement.stride
+		blendShapeBuffer = reMesh.meshBufferHeader.vertexBuffer[blendShapeStartPos:]
+		if reMesh.blendShapeHeader != None:
+			
+			print(f"blendShape buffer start pos {str(reMesh.meshBufferHeader.vertexBufferOffset+blendShapeStartPos)}")
+			
+				
+				
 		#Parse Main Meshes
 		if reMesh.lodHeader != None and vertexDict != None:
 			self.boundingSphere = reMesh.lodHeader.sphere
 			self.boundingBox = reMesh.lodHeader.bbox
-			self.mainMeshLODList = parseLODStructure(reMesh,reMesh.lodHeader.lodGroupList,vertexDict,usedVertexOffsetDict)
+			self.mainMeshLODList = parseLODStructure(reMesh,reMesh.lodHeader.lodGroupList,vertexDict,usedVertexOffsetDict,blendShapeBuffer)
 			for i in range(len(self.mainMeshLODList)):
 				lodOffsetDict[reMesh.lodHeader.lodGroupOffsetList[i]] = self.mainMeshLODList[i]
 		if reMesh.shadowHeader != None and vertexDict != None:

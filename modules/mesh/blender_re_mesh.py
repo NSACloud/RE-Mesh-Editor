@@ -43,7 +43,10 @@ def pad(iterable, size, padding=None):
 	return islice(pad_infinite(iterable, padding), size)
 def normalize(lst):
 	s = sum(lst)
-	return map(lambda x: float(x)/s, lst)
+	if s != 0.0:
+		return list(map(lambda x: float(x)/s, lst))
+	else: 
+		return lst
 def normalizeVec(vec):
     return Vector(vec).normalized()
 def dist(a, b) -> float:
@@ -194,7 +197,7 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 			obj.select_set(True)
 	return armatureObj
 
-def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True):
+def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
 	meshData = bpy.data.meshes.new(meshName)
 	#Import vertices and faces
 	meshData.from_pydata(vertexList, [], faceList)
@@ -268,6 +271,27 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 		collection.objects.link(meshObj)
 	else:
 		bpy.context.scene.collection.objects.link(meshObj)
+	
+	#Import Blend Shapes
+	if blendShapeList != []:
+		skB = meshObj.shape_key_add(name = "Basis")
+		skB.interpolation = 'KEY_LINEAR'
+		print(meshObj.name)
+		
+		for blendShapeEntry in blendShapeList:
+				name = blendShapeEntry.blendShapeName
+				print(name)
+				#print(blendShapeEntry.deltas)
+				deltas = [Vector (val) for val in blendShapeEntry.deltas]
+				#print(deltas)
+				sk = meshObj.shape_key_add(name = name)
+				sk.interpolation = 'KEY_LINEAR'
+				print(f"mesh vertices: {len(meshObj.data.vertices)}")
+				print(f"delta vertices: {len(deltas)}")
+				#if len(deltas) == len(meshObj.data.vertices):
+				for i in range(len(meshObj.data.vertices)):
+					sk.data[i].co = meshObj.data.vertices[i].co + deltas[i]
+	
 	return meshObj
 
 def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict,importAllLODs = False,createCollections = True,importShadowMeshes = False,rotate90 = True,mergeGroups = False):
@@ -336,7 +360,8 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 						material = materialDict[materialName],
 						armature=armatureObj,
 						collection=lodCollection,
-						rotate90 = rotate90
+						rotate90 = rotate90,
+						blendShapeList = subMesh.blendShapeList
 						)
 					if mergeGroups:
 						objMergeList.append(meshObj)
