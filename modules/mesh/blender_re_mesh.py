@@ -1,21 +1,16 @@
 #Author: NSA Cloud
 #TODO
 #Add Blendshapes
+#Fix exporting SF6 Akuma with LODs, LODs use bones not used by LOD0
 
 #Import
-#-Add armature only import x
-#-Add armature merging x
-#-Reload cached textures doesn't reload x
-#-Add merge mesh groups import option x
+
 #-Redo vertex color based material importing
 
 #Export
-#-Add common error checking x 
-#-Add doubled uv checking x
-#-Exporting imported mesh bounding sphere doesn't work properly
+
 #-Submeshes aren't sorted
-#-Add selected object only export
-#-Fix scene collection mesh detection
+
 
 
 import bpy
@@ -239,19 +234,23 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 	if vertexGroupWeightList != [] and boneNameList != []:
 		#Only create vertex groups for bones that get used
 		
-		
-		#print(boneNameList)
-		usedBoneIndices = sorted(list({x for vertex in vertexGroupBoneIndicesList for x in vertex}))#Get all used bone indices in hierarchy order
-		for boneIndex in usedBoneIndices:
-			meshObj.vertex_groups.new(name = boneNameList[boneIndex])
-			
-		for vertexIndex, boneIndexList in enumerate(vertexGroupBoneIndicesList):
-			#print(vertexIndex)
-			#print(boneIndexList)
-			for weightIndex, boneIndex in enumerate(boneIndexList):
-				if vertexGroupWeightList[vertexIndex][weightIndex] > 0:
-					boneName = boneNameList[boneIndex]
-					meshObj.vertex_groups[boneName].add([vertexIndex],vertexGroupWeightList[vertexIndex][weightIndex],'ADD')
+		if len(boneNameList) > 1:
+			#print(boneNameList)
+			usedBoneIndices = sorted(list({x for vertex in vertexGroupBoneIndicesList for x in vertex}))#Get all used bone indices in hierarchy order
+			for boneIndex in usedBoneIndices:
+				meshObj.vertex_groups.new(name = boneNameList[boneIndex])
+				
+			for vertexIndex, boneIndexList in enumerate(vertexGroupBoneIndicesList):
+				#print(vertexIndex)
+				#print(boneIndexList)
+				for weightIndex, boneIndex in enumerate(boneIndexList):
+					if vertexGroupWeightList[vertexIndex][weightIndex] > 0:
+						boneName = boneNameList[boneIndex]
+						meshObj.vertex_groups[boneName].add([vertexIndex],vertexGroupWeightList[vertexIndex][weightIndex],'ADD')
+		else:#No bone remap table edge case
+			vg = meshObj.vertex_groups.new(name=boneNameList[0])
+			for i in range(len(meshObj.data.vertices)):
+				vg.add([i], 1.0, 'REPLACE')
 	
 	
 	
@@ -306,8 +305,11 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 		shortName = "Occlusion"
 	firstLOD = True
 	
-	if parsedMesh.skeleton != None and parsedMesh.skeleton.weightedBones != []:
-		boneNameList = parsedMesh.skeleton.weightedBones
+	if parsedMesh.skeleton != None:
+		if parsedMesh.skeleton.weightedBones != []:
+			boneNameList = parsedMesh.skeleton.weightedBones
+		elif len(parsedMesh.skeleton.boneList) != 0:#No bone remap table
+			boneNameList = [parsedMesh.skeleton.boneList[0].boneName]
 	else:
 		boneNameList = []
 	
@@ -1118,7 +1120,7 @@ def exportREMeshFile(filePath,options):
 							for weightIndex,weight in enumerate(weightList):
 								if weight != 0.0:
 									boneVertDict[parsedMesh.skeleton.weightedBones[weightIndicesList[weightIndex]]].append(vertex.co)
-						parsedSubMesh.weightList[currentVertIndex] = list(pad(weightList,size=8,padding=0.0))
+						parsedSubMesh.weightList[currentVertIndex] = list(pad(normalize(weightList),size=8,padding=0.0))
 						parsedSubMesh.weightIndicesList[currentVertIndex] = list(pad(weightIndicesList,size=8,padding=0))
 				
 				visconGroup.subMeshList.append(parsedSubMesh)

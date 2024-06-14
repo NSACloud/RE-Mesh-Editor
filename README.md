@@ -44,6 +44,10 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.16 - 6/14/2024
+* Fixed issue where low influence weights would be weighted incorrectly upon export.
+* Fixed issue where some single weight meshes wouldn't import with weights
+
 ### V0.15 - 6/5/2024
 * Fixed issue where exported mesh weights would be incorrect due to rounding issues.
 

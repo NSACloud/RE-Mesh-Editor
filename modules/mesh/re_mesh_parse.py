@@ -1,6 +1,6 @@
 import numpy as np
 import struct
-from .file_re_mesh import Matrix4x4,AABB,Sphere,CompressedSixWeightIndices
+from .file_re_mesh import Matrix4x4,AABB,Sphere,CompressedSixWeightIndices,CompressedBlendShapeVertexInt
 
 typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color"]
 typeStrideDict = {
@@ -88,6 +88,17 @@ BufferReadDict = {
 	}
 
 def ReadBlendShapeByteBuffer(blendShapeBuffer,tags):
+	blendShapeIntArray = np.frombuffer(blendShapeBuffer,dtype="<L")
+	
+	blendShapeArray = np.empty((len(blendShapeIntArray),3),dtype = "<f")
+	bf = CompressedBlendShapeVertexInt()
+	
+	for index, value in enumerate(blendShapeIntArray):
+		bf.asUInt32 = value
+		blendShapeArray[index] = np.asarray((bf.pos.x,bf.pos.y,bf.pos.z))
+	
+	#print(blendShapeArray)
+	"""
 	blendShapeArray = np.frombuffer(blendShapeBuffer,dtype="<4b",)
 	normalizingArray = None
 	for index,delta in enumerate(blendShapeArray):#Hack, still trying to figure out how to get the deltas to be correct
@@ -110,6 +121,7 @@ def ReadBlendShapeByteBuffer(blendShapeBuffer,tags):
 		blendShapeArray = blendShapeArray - np.tile(normalizingArray,(len(blendShapeArray),1))
 	#print(blendShapeFloatArray)
 	#blendShapeArray = np.where(blendShapeArray < 0,blendShapeArray / 128, blendShapeArray / 127)
+	"""
 	"""
 	#TODO Do this through numpy
 	
@@ -258,8 +270,21 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 			#(f"Delta Length {str(endOffset-currentBlendShapeOffset)}")
 			#currentBlendShapeOffset = endOffset
 			
+			
+			
 			currentDeltaOffset = 0
+			#TODO - Blend shape vertex count can span across meshes, add list of vertex ranges for every sub mesh
 			for blendTargetIndex,blendTarget in enumerate(blendShapeLODData.blendTargetList):
+				
+				if blendShapeLODData.typing == 0:
+					step_size_x = (blendShapeLODData.aabbList[blendTargetIndex].max.x - blendShapeLODData.aabbList[blendTargetIndex].min.x) / (2 ** 11 - 1)
+					step_size_y = (blendShapeLODData.aabbList[blendTargetIndex].max.y - blendShapeLODData.aabbList[blendTargetIndex].min.y) / (2 ** 10 - 1)
+					step_size_z = (blendShapeLODData.aabbList[blendTargetIndex].max.z - blendShapeLODData.aabbList[blendTargetIndex].min.z) / (2 ** 11 - 1)
+				else:
+					step_size_x = (blendShapeLODData.aabbList[blendTargetIndex].max.x - blendShapeLODData.aabbList[blendTargetIndex].min.x) / (2 ** 16 - 1)
+					step_size_y = (blendShapeLODData.aabbList[blendTargetIndex].max.y - blendShapeLODData.aabbList[blendTargetIndex].min.y) / (2 ** 16 - 1)
+					step_size_z = (blendShapeLODData.aabbList[blendTargetIndex].max.z - blendShapeLODData.aabbList[blendTargetIndex].min.z) / (2 ** 16 - 1)
+				
 				for blendNameIndex in range(0,blendTarget.blendShapeNum):
 					blendShapeName = reMesh.rawNameList[reMesh.blendShapeNameRemapList[currentBlendShapeNameIndex+blendNameIndex]]
 					
@@ -270,10 +295,13 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 							blendShapeEntry = BlendShape()
 							blendShapeEntry.blendShapeName = blendShapeName
 							blendShapeEntry.deltas = blendShapeDeltas[currentBlendDeltaOffset:currentBlendDeltaOffset+subMeshEntry.vertCount]
+							blendShapeEntry.deltas[:,0] *= step_size_x
+							blendShapeEntry.deltas[:,1] *= step_size_y
+							blendShapeEntry.deltas[:,2] *= step_size_z
 							
-							#blendShapeEntry.deltas[:,0] *= blendShapeLODData.aabbList[blendTargetIndex].max.x
-							#blendShapeEntry.deltas[:,1] *= blendShapeLODData.aabbList[blendTargetIndex].max.y
-							#blendShapeEntry.deltas[:,2] *= blendShapeLODData.aabbList[blendTargetIndex].max.z
+							#blendShapeEntry.deltas[:,0] -= blendShapeLODData.aabbList[blendTargetIndex].max.x
+							#blendShapeEntry.deltas[:,1] -= blendShapeLODData.aabbList[blendTargetIndex].max.y
+							#blendShapeEntry.deltas[:,2] -= blendShapeLODData.aabbList[blendTargetIndex].max.z
 							
 							currentBlendDeltaOffset += subMeshEntry.vertCount
 							if subMeshEntry.subMeshVertexStartIndex in blendShapeDict:
@@ -288,9 +316,9 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 						blendShapeEntry.blendShapeName = blendShapeName
 						blendShapeEntry.deltas = blendShapeDeltas[currentBlendDeltaOffset:currentBlendDeltaOffset+blendTarget.vertCount]
 						
-						#blendShapeEntry.deltas[:,0] *= blendShapeLODData.aabbList[blendTargetIndex].max.x
-						#blendShapeEntry.deltas[:,1] *= blendShapeLODData.aabbList[blendTargetIndex].max.y
-						#blendShapeEntry.deltas[:,2] *= blendShapeLODData.aabbList[blendTargetIndex].max.z
+						blendShapeEntry.deltas[:,0] *= step_size_x
+						blendShapeEntry.deltas[:,1] *= step_size_y
+						blendShapeEntry.deltas[:,2] *= step_size_z
 						
 						currentBlendDeltaOffset += blendTarget.vertCount
 						if blendTarget.subMeshVertexStartIndex in blendShapeDict:

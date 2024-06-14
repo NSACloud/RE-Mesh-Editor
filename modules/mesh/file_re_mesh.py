@@ -108,6 +108,23 @@ class CompressedSixWeightIndices(ctypes.Union):
 					("weights",    CompressedSixWeightIndices_bits ),
 					("asUInt64", c_uint64)
 				]
+
+c_uint32 = ctypes.c_uint32
+class CompressedBlendShapeVertexInt_bits(ctypes.LittleEndianStructure):
+	_fields_ = 	[
+					("x",c_uint32,11),
+					("y",c_uint32,10),
+					("z",c_uint32,11),
+		
+				]
+	
+class CompressedBlendShapeVertexInt(ctypes.Union):
+	
+	_anonymous_ = ("pos",)
+	_fields_ =	[
+					("pos",    CompressedBlendShapeVertexInt_bits ),
+					("asUInt32", c_uint32)
+				]
 class Vec3():
 	def __init__(self):
 		self.x = 0.0
@@ -1354,12 +1371,20 @@ def WriteToWeightBuffer(bufferStream,boneWeightsList,boneIndicesList,isSixWeight
 		boneIndicesArray = boneIndicesList.astype("<B")
 	
 	boneWeightsArray = np.array(boneWeightsList)
-	boneWeightsArray = np.multiply(boneWeightsArray,255)
-	boneWeightsArray = np.rint(boneWeightsArray)
+	boneWeightsArray = np.multiply(boneWeightsArray,256)
+	boneWeightsArray = np.floor(boneWeightsArray)
+	#boneWeightsArray = np.rint(boneWeightsArray)
+	boneWeightsArray = np.where(boneWeightsArray > 255,255,boneWeightsArray)
 	boneWeightsArray = boneWeightsArray.astype("<B")
 	#Normalize weights
-	diffSums = 255 - np.sum(boneWeightsArray,axis = 1)
+	diffSums = 255 - np.sum(boneWeightsArray,axis = 1,dtype = "<B")
+	diffSums = np.where(diffSums > 250,0,diffSums)#Fix for weights that round to 0 or close to it
+	#for val in diffSums:
+		#print(val)
 	boneWeightsArray[:, 0] += diffSums
+	
+	if (diffSums > 5).any():#The difference in weight values to make them sum to 255 shouldn't be much more than 1
+		raiseWarning("Non normalized weights detected on sub mesh! Weights may not behave as expected in game!")
 	
 	weightArray = np.empty((len(boneWeightsList)*2,8), dtype=np.dtype("<B"))
 	weightArray[::2] = boneIndicesArray

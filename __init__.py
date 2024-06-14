@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 15),
+	"version": (0, 16),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -392,7 +392,7 @@ class ExportREMesh(Operator, ExportHelper):
 	exportAllLODs : BoolProperty(
 	   name = "Export All LODs",
 	   description = "Export all LODs. If disabled, only LOD0 will be exported. Note that LODs meshes must be grouped inside a collection for each level and that collection must be contained in another collection. See a mesh with LODs imported for reference on how it should look. A target collection must also be set",
-	   default = False)
+	   default = True)
 	exportBlendShapes : BoolProperty(
 	   name = "Export Blend Shapes",
 	   description = "Exports blend shapes from mesh if present",
