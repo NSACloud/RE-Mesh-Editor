@@ -44,6 +44,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.17 - 6/16/2024
+* Fixed issue where the preserve bone matrices export option didn't work. 
+
 ### V0.16 - 6/14/2024
 * Fixed issue where low influence weights would be weighted incorrectly upon export.
 * Fixed issue where some single weight meshes wouldn't import with weights

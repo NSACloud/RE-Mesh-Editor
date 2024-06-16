@@ -719,11 +719,11 @@ def exportREMeshFile(filePath,options):
 			#Get matrices
 			if options["preserveBoneMatrices"]:
 				if bone.get("reMeshWorldMatrix"):
-					parsedBone.worldMatrix.matrix = bone["reMeshWorldMatrix"]
+					parsedBone.worldMatrix.matrix = [list(row) for row in bone["reMeshWorldMatrix"]]
 				if bone.get("reMeshLocalMatrix"):
-					parsedBone.localMatrix.matrix = bone["reMeshLocalMatrix"]
+					parsedBone.localMatrix.matrix = [list(row) for row in bone["reMeshLocalMatrix"]]
 				if bone.get("reMeshInverseMatrix"):
-					parsedBone.inverseMatrix.matrix = bone["reMeshInverseMatrix"]
+					parsedBone.inverseMatrix.matrix = [list(row) for row in bone["reMeshInverseMatrix"]]
 			else:
 				
 				worldMatrix = bone.matrix_local.to_4x4().transposed()
