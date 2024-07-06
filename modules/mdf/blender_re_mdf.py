@@ -380,7 +380,8 @@ def fixTexPath(path):#Fix potential path problems
 def buildMDF(mdfCollectionName,mdfVersion = None):
 	mdfCollection = bpy.data.collections.get(mdfCollectionName)
 	if mdfVersion == None:
-		mdfVersion = int(bpy.context.scene.re_mdf_toolpanel.activeGame[1::])
+		
+		mdfVersion = getMDFVersionToGameName(bpy.context.scene.re_mdf_toolpanel.activeGame)
 	reindexMaterials(mdfCollectionName)
 	if mdfCollection != None:
 		valid = MDFErrorCheck(mdfCollectionName)

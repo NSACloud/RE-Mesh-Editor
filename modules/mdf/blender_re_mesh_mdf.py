@@ -191,7 +191,7 @@ NAMTypes = set([
 	])	
 
 
-def importMDF(mdfFile,meshMaterialDict,materialLoadLevel,reloadCachedTextures,chunkPath = ""):
+def importMDF(mdfFile,meshMaterialDict,materialLoadLevel,reloadCachedTextures,chunkPath = "",gameName = None):
 	TEXTURE_CACHE_DIR = bpy.context.preferences.addons[ADDON_NAME].preferences.textureCachePath
 	allowedTextureTypes = set()
 	
@@ -206,7 +206,8 @@ def importMDF(mdfFile,meshMaterialDict,materialLoadLevel,reloadCachedTextures,ch
 	3: Load all textures, including ones unusable by Blender
 	"""
 	mdfVersion = mdfFile.fileVersion
-	gameName = getMDFVersionToGameName(mdfVersion)
+	if gameName == None:
+		gameName = getMDFVersionToGameName(mdfVersion)
 	mdfMaterialDict = mdfFile.getMaterialDict()
 	#if not os.path.isdir(chunkPath):
 		#raiseWarning("Natives path not found, can't import textures")
