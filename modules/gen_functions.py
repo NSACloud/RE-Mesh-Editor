@@ -202,3 +202,12 @@ def splitNativesPath(filePath):#Splits file path of RE Engine natives/platform f
 		return (rootPath,nativesPath)
 	except:
 		return None
+	
+def getAdjacentFileVersion(rootPath,fileType):
+	fileVersion = -1
+	search = wildCardFileSearch(os.path.join(rootPath,"*"+fileType+"*"))
+	if search != None:
+		versionExtension = os.path.splitext(search)[1][1::]
+		if versionExtension.isdigit():
+			fileVersion = int(versionExtension)
+	return fileVersion

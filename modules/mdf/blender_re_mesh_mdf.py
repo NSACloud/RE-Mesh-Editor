@@ -39,6 +39,7 @@ def findMDFPathFromMeshPath(meshPath):
 		".220128762":".21",#RE7RT
 		".221108797":".32",#RE4
 		".230110883":".31",#SF6
+		".231011879":".40",#DD2
 		
 		}
 	mdfVersion = mdfVersionDict.get(meshVersion,None)
@@ -49,7 +50,9 @@ def findMDFPathFromMeshPath(meshPath):
 			mdfPath = wildCardFileSearch(f"{fileRoot}_Mat.mdf2.*")
 		if mdfPath == None:
 			mdfPath = wildCardFileSearch(f"{fileRoot}_v00.mdf2.*")
-		
+		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
+			
+			mdfPath = wildCardFileSearch(f"{fileRoot[:-1] + 'm'}.mdf2.*")#DD2 female armor uses male mdf, so replace _f with _m
 	else:	
 		mdfPath = f"{fileRoot}.mdf2{mdfVersion}"
 		if not os.path.isfile(mdfPath):
@@ -58,21 +61,29 @@ def findMDFPathFromMeshPath(meshPath):
 		if not os.path.isfile(mdfPath):
 			print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
 			mdfPath = f"{fileRoot}_v00.mdf2{mdfVersion}"
+			
+		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
+			
+			mdfPath = f"{fileRoot[:-1] + 'm'}.mdf2{mdfVersion}"#DD2 female armor uses male mdf, so replace _f with _m
+			
 		if not os.path.isfile(mdfPath):
+			print(f"Could not find {mdfPath}.")
 			mdfPath = None
+			
 	return mdfPath
-	
+texVersionDict = {
+	".6":".8",
+	".10":".10",
+	".13":".190820018",
+	".19":".30",
+	".21":".34",
+	".23":".28",
+	".32":".143221013",
+	".40":".760230703",
+  }	
 def getTexPath(baseTexturePath,chunkPathList,mdfVersion):
 	
-	texVersionDict = {
-		".6":".8",
-		".10":".10",
-		".13":".190820018",
-		".19":".30",
-		".21":".34",
-		".23":".28",
-		".32":".143221013",
-	  }
+	
 	inputPath = None
 	texVersion = texVersionDict.get(mdfVersion,"")
 	for chunkPath in chunkPathList:

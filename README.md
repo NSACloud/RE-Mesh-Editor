@@ -18,11 +18,15 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - RE Toolbox batch export integration. Any files exported will be added to the RE Toolbox batch export list.
    
  ## Supported Games
- - **Monster Hunter Rise**
- - **Resident Evil 2/3 Remake Ray Tracing Version**
+ - **Devil May Cry 5**
+ - **Resident Evil 2/3 Remake (Supports both RT and Non RT Versions)**
  - **Resident Evil 4 Remake**
+ - **Resident Evil 7 Ray Tracing Version**
  - **Resident Evil 8**
+ - **Monster Hunter Rise**
  - **Street Fighter 6**
+ - **Dragon's Dogma 2**
+ - **Kunitsu-Gami: Path of the Goddess**
  
 Support for more games may be added in the future.
 
@@ -44,6 +48,15 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.18 - 7/5/2024
+* Added support for Dragon's Dogma 2, Devil May Cry 5, Kunitsu-Gami, Resident Evil 2/3 Non RT, and Resident Evil 7 RT.
+* Added support for GPU Buffer data used in DD2 MDF files.
+* LOD collections are no longer created upon import if "Import All LODs" is unchecked.
+* Fixed issue where the exported local bone matrix was incorrect.
+
+<details>
+  <summary>Older Version Change Logs</summary>
+
 ### V0.17 - 6/16/2024
 * Fixed issue where the preserve bone matrices export option didn't work. 
 
@@ -64,9 +77,6 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * Added MMTRS data importing for MDF files. This is only used with SF6.
 * Added more unknown values to the flags section of the MDF material flags.
 * Fixed issue where texture files in the addon folder will be backed up when the addon is updated.
-
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.12 - 5/21/2024
 

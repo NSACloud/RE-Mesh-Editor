@@ -175,6 +175,19 @@ _______________
 	
 Reduce the amount of chain bones on the armature.
 """,
+"InvalidWeights":"""Invalid Weighting
+A submesh contains invalid weights and can't be exported.
+	
+HOW TO FIX:
+_______________
+	
+Check that the armature is inside the mesh collection.
+
+Also check that all bones that are being weighted to are on the armature.
+
+Be sure to limit total weights to 6, normalize all, and remove unweighted vertex groups.
+
+""",
 	}
 	
 def printErrorDict(errorDict):

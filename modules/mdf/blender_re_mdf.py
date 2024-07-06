@@ -2,9 +2,78 @@ import os
 import bpy
 
 from ..blender_utils import showMessageBox,showErrorMessageBox
-from ..gen_functions import textColors,raiseWarning,splitNativesPath
-from .file_re_mdf import readMDF,writeMDF,MDFFile,Material,TextureBinding,Property,gameNameMDFVersionDict,getMDFVersionToGameName,MMTRSData
+from ..gen_functions import textColors,raiseWarning,splitNativesPath,getAdjacentFileVersion
+from .file_re_mdf import readMDF,writeMDF,MDFFile,Material,TextureBinding,Property,gameNameMDFVersionDict,getMDFVersionToGameName,MMTRSData,GPBFEntry
 from .ui_re_mdf_panels import tag_redraw
+
+MDFGameNameConflictDict = set(["RE2","RE2RT","DD2"])
+
+
+def resolveMDFGameNameConflict(gameName,mdfFile,filePath):
+	rootPath = os.path.split(filePath)[0].lower()
+	realGameName = None
+	if gameName == "RE2":
+		if "re2" in rootPath:
+			realGameName = "RE2"
+		elif "dmc5" in rootPath or "dmcv" in rootPath:
+			realGameName = "DMC5"
+		if realGameName == None:
+			meshVersion = getAdjacentFileVersion(rootPath,".mesh")
+			if meshVersion == 1808312334: #RE2:
+				realGameName = "RE2"
+			elif meshVersion == 1808282334:
+				realGameName = "DMC5"
+		if realGameName == None:
+			texVersion = getAdjacentFileVersion(rootPath,".tex")
+			if texVersion == 10:
+				realGameName = "RE2"
+			elif texVersion == 11:
+				realGameName = "DMC5"
+		if realGameName == None and len(mdfFile.materialList) > 0:
+			for texture in mdfFile.materialList[0].textureList:
+				if "objectroot" in texture.texturePath.lower():
+					realGameName = "RE2"
+					break 
+		if realGameName == None:
+			realGameName = "DMC5"
+	elif gameName == "RE2RT":
+		if "re3" in rootPath:
+			realGameName = "RE3RT"
+		elif "re2" in rootPath:
+			realGameName = "RE2RT"
+		elif "re7" in rootPath:
+			realGameName = "RE7RT"
+		if realGameName == None and len(mdfFile.materialList) > 0:
+			texVersion = getAdjacentFileVersion(rootPath,".tex")
+			if texVersion == 35:
+				realGameName = "RE7RT"
+			else:
+				for texture in mdfFile.materialList[0].textureList:
+					if "escape" in texture.texturePath.lower():
+						realGameName = "RE3RT"
+						break
+	elif gameName == "DD2":
+		if "dd2" in rootPath:
+			realGameName = "DD2"
+			
+		if realGameName == None:
+			meshVersion = getAdjacentFileVersion(rootPath,".mesh")
+			if meshVersion != -1:
+				if meshVersion != 231011879: #RE2:
+					realGameName = "KG"
+				else:
+					realGameName = "DD2"
+		if realGameName == None:
+			texVersion = getAdjacentFileVersion(rootPath,".tex")
+			if texVersion != -1:
+				if texVersion != 760230703:
+					realGameName = "KG"
+				else:
+					realGameName = "DD2"
+	if realGameName == None:
+		realGameName = gameName
+	return realGameName
+	
 
 excludedPropertyNames = set(["~TYPE","_RNA_UI","_vs","s_curve"])
 boolPropertySet = set(["BackFaceNormalFilp","uv1or2_AlphaMap"])#Manually define properties that are bools
@@ -147,6 +216,11 @@ def addMMTRSDataToList(obj,mmtrsData):
 				newString+=","
 		newListItem.indexString = newString
 
+def addGPBFDataToList(obj,bufferNameList,bufferPathList):
+	for i in range(0,len(bufferNameList)):
+		newListItem = obj.re_mdf_material.gpbfData_items.add()
+		newListItem.gpbfDataString = f"{bufferNameList[i].name},{bufferPathList[i].name},{str(bufferPathList[i].nameUTF16Hash)},{str(bufferPathList[i].nameUTF8Hash)}"
+
 def getMDFFlags(obj,flags):
 	obj.re_mdf_material.flags.flagIntValue = flags.asInt32
 	
@@ -159,7 +233,11 @@ def importMDFFile(filePath):
 	try:
 		mdfVersion = int(os.path.splitext(filePath)[1].replace(".",""))
 		if mdfVersion in gameNameMDFVersionDict:
-			bpy.context.scene.re_mdf_toolpanel.activeGame = "."+str(mdfVersion)
+			gameName = gameNameMDFVersionDict[mdfVersion]
+			if gameName in MDFGameNameConflictDict:
+				gameName = resolveMDFGameNameConflict(gameName, mdfFile, filePath)
+				print(f"MDF version {str(mdfVersion)} is used by more than one game, detected {gameName}")
+			bpy.context.scene.re_mdf_toolpanel.activeGame = gameName
 	except:
 		print("Unable to parse mdf version number in file path.")
 		meshVersion = None
@@ -169,7 +247,7 @@ def importMDFFile(filePath):
 	for index, material in enumerate(mdfFile.materialList):
 		name = "Material "+str(index).zfill(2)+ " ("+material.materialName+")"
 		materialObj = createEmpty(name,[("~TYPE","RE_MDF_MATERIAL")],None,mdfCollection)
-		gameName = getMDFVersionToGameName(mdfVersion)
+		#gameName = getMDFVersionToGameName(mdfVersion)
 		if gameName != -1:
 			materialObj.re_mdf_material.gameName = gameName
 		materialObj.re_mdf_material.materialName = material.materialName
@@ -184,6 +262,8 @@ def importMDFFile(filePath):
 		addTextureBindingsToBindingList(materialObj, material.textureList)
 		if material.mmtrsData != None:
 			addMMTRSDataToList(materialObj,material.mmtrsData)
+		if material.GPBFBufferNameCount > 0:
+			addGPBFDataToList(materialObj,material.gpbfBufferNameList,material.gpbfBufferPathList)
 		#flagsObj = createEmpty("Material "+str(index).zfill(2)+" Flags", getMaterialFlags(material.flags.flags),None,mdfCollection)
 		#textureBindingsObj = createEmpty("Material "+str(index).zfill(2)+" Texture Bindings", getTextureBindings(material.textureList),None,mdfCollection)
 		#propertyListObj = createEmpty("Material "+str(index).zfill(2)+" Property List", getPropertyList(material.propertyList),None,mdfCollection)
@@ -344,6 +424,25 @@ def buildMDF(mdfCollectionName,mdfVersion = None):
 						if entry.isdigit():
 							indexList.append(int(entry))
 					materialEntry.mmtrsData.indexDataList.append(indexList)
+					
+			if len(materialObj.re_mdf_material.gpbfData_items) != 0:
+				for item in materialObj.re_mdf_material.gpbfData_items:
+					nameEntry = GPBFEntry()
+					pathEntry = GPBFEntry()
+					split = item.gpbfDataString.split(",")
+					nameEntry.name = split[0]
+					pathEntry.name = split[1]
+					if split[2].isdigit():
+						pathEntry.nameUTF16Hash = int(split[2])
+					else:
+						pathEntry.nameUTF16Hash = 0
+					if split[3].isdigit():
+						pathEntry.nameUTF8Hash = int(split[3])
+					else:
+						pathEntry.nameUTF8Hash = 1
+					
+					materialEntry.gpbfBufferNameList.append(nameEntry)
+					materialEntry.gpbfBufferPathList.append(pathEntry)
 			newMDFFile.materialList.append(materialEntry)
 		return newMDFFile
 	else:

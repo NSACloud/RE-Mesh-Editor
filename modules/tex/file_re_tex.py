@@ -7,14 +7,18 @@ from ..gen_functions import textColors,raiseWarning,raiseError,getPaddingAmount,
 
 gameNameToTexVersionDict = {
 	"DMC5":11,
+	"RE2":10,
+	"RE3":190820018,
 	"MHR":28,
 	"MHRSB":28,
 	"RE8":30,
 	"RE2RT":34,
 	"RE3RT":34,
+	"RE7RT":35,
 	"RE4":143221013,
 	"SF6":143230113,
 	"DD2":760230703,
+	"KG":231106777,
 	}
 
 def getTexVersionFromGameName(gameName):
@@ -51,16 +55,20 @@ class TexHeader():
 		self.width = read_ushort(file)
 		self.height = read_ushort(file)
 		self.depth = read_ushort(file)
-		self.imageCount = read_ubyte(file)
-		self.imageMipHeaderSize = read_ubyte(file)
-		self.mipCount = self.imageMipHeaderSize // 16
+		if self.version > 11 and self.version != 190820018:
+			self.imageCount = read_ubyte(file)
+			self.imageMipHeaderSize = read_ubyte(file)
+			self.mipCount = self.imageMipHeaderSize // 16
+		else:
+			self.mipCount = read_ubyte(file)
+			self.imageCount = read_ubyte(file)
 		self.format = read_uint(file)
 		self.swizzleControl = read_int(file)
 		self.cubemapMarker = read_uint(file)
 		self.unkn04 = read_ubyte(file)
 		self.unkn05 = read_ubyte(file)
 		self.null0 = read_ushort(file)
-		if self.version > 27:
+		if self.version > 27 and self.version != 190820018:#Thanks RE3
 			#swizzle data,unused
 			self.swizzleHeightDepth = read_ubyte(file)
 			self.swizzleWidth = read_ubyte(file)
@@ -76,19 +84,25 @@ class TexHeader():
 		write_ushort(file, self.width)
 		write_ushort(file, self.height)
 		write_ushort(file, self.depth)
-		write_ubyte(file, self.imageCount)
-		write_ubyte(file, self.imageMipHeaderSize)
+		if self.version > 11 and self.version != 190820018:
+			write_ubyte(file, self.imageCount)
+			write_ubyte(file, self.imageMipHeaderSize)
+		else:
+			write_ubyte(file, self.mipCount)
+			write_ubyte(file, self.imageCount)
+			
 		write_uint(file, self.format)
 		write_int(file, self.swizzleControl)
 		write_uint(file, self.cubemapMarker)
 		write_ubyte(file, self.unkn04)
 		write_ubyte(file, self.unkn05)
 		write_ushort(file, self.null0)
-		write_ubyte(file, self.swizzleHeightDepth)
-		write_ubyte(file, self.swizzleWidth)
-		write_ushort(file, self.null1)
-		write_ushort(file, self.seven)
-		write_ushort(file, self.one)
+		if self.version > 27 and self.version != 190820018:#Thanks RE3
+			write_ubyte(file, self.swizzleHeightDepth)
+			write_ubyte(file, self.swizzleWidth)
+			write_ushort(file, self.null1)
+			write_ushort(file, self.seven)
+			write_ushort(file, self.one)
 
 
 class MipData():

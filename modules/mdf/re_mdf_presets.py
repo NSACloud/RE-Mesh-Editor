@@ -19,7 +19,7 @@ def findHeaderObj():
 		else:
 			return None
 
-PRESET_VERSION = 3#To be changed when there are changes to material variables
+PRESET_VERSION = 4#To be changed when there are changes to material variables
 PRESET_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.split(os.path.abspath(__file__))[0])),"Presets")
 def saveAsPreset(activeObj,presetName,gameName):
 	folderPath = os.path.join(PRESET_DIR,gameName)
@@ -31,7 +31,7 @@ def saveAsPreset(activeObj,presetName,gameName):
 			materialJSONDict = {}
 			if MDFObjType == "RE_MDF_MATERIAL":
 				materialJSONDict["presetType"] = "RE_MDF_MATERIAL"
-				materialJSONDict["MDFVersion"] = int(bpy.context.scene.re_mdf_toolpanel.activeGame[1::])
+				materialJSONDict["MDFVersion"] = bpy.context.scene.re_mdf_toolpanel.activeGame
 				materialJSONDict["presetVersion"] = PRESET_VERSION
 				
 				materialJSONDict["Material Header"] = {
@@ -76,6 +76,10 @@ def saveAsPreset(activeObj,presetName,gameName):
 				materialJSONDict["MMTRS Data"] = []
 				for item in activeObj.re_mdf_material.mmtrsData_items:
 					materialJSONDict["MMTRS Data"].append(str(item.indexString))
+					
+				materialJSONDict["GPBF Data"] = []
+				for item in activeObj.re_mdf_material.gpbfData_items:
+					materialJSONDict["GPBF Data"].append(str(item.gpbfDataString))
 			else:
 				showErrorMessageBox("Selected object can not be made into a preset.")
 			
@@ -126,9 +130,16 @@ def readPresetJSON(filepath):
 		RNADict = {"~TYPE":{"description":"For internal use. Do not change"}}
 		name = subName + " ("+materialJSONDict["Material Header"]["Material Name"]+")"
 		materialObj = createEmpty(name,[("~TYPE","RE_MDF_MATERIAL")],None,mdfCollection)
-		gameName = getMDFVersionToGameName(MDFVersion)
-		if gameName != -1:
-			materialObj.re_mdf_material.gameName = getMDFVersionToGameName(materialJSONDict["MDFVersion"])
+		
+		if "MDFVersion" in materialJSONDict:
+			if str(materialJSONDict["MDFVersion"]).isdigit():#Pre Version 4 Presets
+				gameName = getMDFVersionToGameName(int(materialJSONDict["MDFVersion"]))
+				if gameName == -1:
+					gameName = "Unknown"
+			else:
+				gameName = str(materialJSONDict["MDFVersion"])
+			materialObj.re_mdf_material.gameName = gameName
+		
 		materialObj.re_mdf_material.materialName = materialJSONDict["Material Header"]["Material Name"]
 		materialObj.re_mdf_material.shaderType = materialJSONDict["Material Header"]["Material Shader Type"]
 		materialObj.re_mdf_material.mmtrPath = materialJSONDict["Material Header"]["Master Material Path"]
@@ -167,6 +178,10 @@ def readPresetJSON(filepath):
 			for indexString in materialJSONDict["MMTRS Data"]:
 				item = materialObj.re_mdf_material.mmtrsData_items.add()
 				item.indexString = indexString
+		if "GPBF Data" in materialJSONDict:
+			for gpbfDataString in materialJSONDict["GPBF Data"]:
+				item = materialObj.re_mdf_material.gpbfData_items.add()
+				item.gpbfDataString = gpbfDataString
 		bpy.context.view_layer.objects.active = materialObj
 	else:
 		showErrorMessageBox("The active MDF collection must be set.")

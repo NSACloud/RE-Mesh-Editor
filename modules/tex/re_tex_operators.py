@@ -19,7 +19,7 @@ class WM_OT_ConvertFolderToTex(Operator):
 	bl_description = "Converts all .dds files in the chosen directory to .tex\nConverted files will be saved inside a folder called \"converted\"\nSave DDS files with compression settings set to BC7 sRGB for albedo/color textures and BC7 Linear for anything else"
 	def execute(self, context):
 		texVersion = 28
-		gameName = getMDFVersionToGameName(int(bpy.context.scene.re_mdf_toolpanel.activeGame[1::]))
+		gameName = bpy.context.scene.re_mdf_toolpanel.activeGame
 		if gameName != -1 and getTexVersionFromGameName(gameName) != -1:
 			texVersion = getTexVersionFromGameName(gameName)
 		#TODO Add support for other image formats, should be doable with texconv

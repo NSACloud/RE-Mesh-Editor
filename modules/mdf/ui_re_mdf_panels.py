@@ -208,4 +208,35 @@ class OBJECT_PT_MDFMaterialMMTRSIndexListPanel(Panel):
 			active_propname = "mmtrsData_index",
 			rows = 8,
 			type='DEFAULT'
+			)
+
+class OBJECT_PT_MDFMaterialGPBFDataListPanel(Panel):
+	bl_label = "GPBF Data"
+	bl_idname = "OBJECT_PT_mdf_material_gpbfdatalist_panel"
+	bl_parent_id = "OBJECT_PT_mdf_material_panel"  # Specify the ID of the parent panel
+	bl_space_type = 'PROPERTIES'
+	bl_region_type = 'WINDOW'
+	bl_options = {'DEFAULT_CLOSED'}
+	@classmethod
+	def poll(self,context):
+		return context.active_object != None and len(context.active_object.re_mdf_material.gpbfData_items) != 0
+	
+	def draw(self, context):
+		layout = self.layout
+		obj = context.active_object
+		re_mdf_material = obj.re_mdf_material
+		split = layout.split(factor=0.025)#Indent list slightly to make it more clear it's a part of a sub panel
+		col1 = split.column()
+		col2 = split.column()
+		col2.label(text = f"Do not change these unless you know what you're doing.")
+		col2.label(text = f"Index Count: {str(len(obj.re_mdf_material.gpbfData_items))}")
+		col2.template_list(
+			listtype_name = "MESH_UL_MDFGPBFDataList", 
+			list_id = "",
+			dataptr = re_mdf_material,
+			propname = "gpbfData_items",
+			active_dataptr = re_mdf_material, 
+			active_propname = "gpbfData_index",
+			rows = 3,
+			type='DEFAULT'
 			)	

@@ -95,8 +95,7 @@ class WM_OT_ApplyMDFToMeshCollection(Operator):
 				if material.users == 0:
 					print(f"Removed {material.name}")
 					bpy.data.materials.remove(material)
-					
-			importMDF(mdfFile, meshMaterialDict,materialLoadLevel = "3", reloadCachedTextures=True,chunkPath = modDir )
+			importMDF(mdfFile, meshMaterialDict,materialLoadLevel = "3", reloadCachedTextures=True,chunkPath = modDir,gameName = bpy.context.scene.re_mdf_toolpanel.activeGame)
 			self.report({"INFO"},"Applied MDF to mesh collection.")
 		else:
 			self.report({"ERROR"},"Invalid mesh or MDF collection.")
@@ -122,7 +121,7 @@ class WM_OT_SavePreset(Operator):
 		return context.active_object is not None
 	
 	def execute(self, context):
-		gameName = getMDFVersionToGameName(int(bpy.context.scene.re_mdf_toolpanel.activeGame[1::]))
+		gameName = bpy.context.scene.re_mdf_toolpanel.activeGame
 		finished = saveAsPreset(context.active_object, self.presetName,gameName)
 		if finished:
 			self.report({"INFO"},"Saved preset.")

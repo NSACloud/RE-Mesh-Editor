@@ -322,7 +322,7 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 		if importShadowMeshes:
 			if lod in parsedMesh.shadowMeshLinkedLODList:
 				shadowLODString = f" + Shadow LOD{parsedMesh.shadowMeshLinkedLODList.index(lod)}"
-		if createCollections:
+		if createCollections and importAllLODs:
 			lodCollection = getCollection(f"{meshType} LOD{str(lodIndex)}{shadowLODString} - {meshCollection.name}",meshCollection,makeNew = True)
 			lodCollection["LOD Distance"] = lod.lodDistance
 		else:
@@ -437,6 +437,20 @@ def importBoundingBoxes(meshBoundingBox,meshBoundingSphere,meshCollection,armatu
 				if bone.boundingBox != None:
 					importBoundingBox(bone.boundingBox,f"Bone Bounding Box ({bone.boneName})",meshCollection,armatureObj,bone.boneName,rotate90)
 
+meshGameNameConflictDict = set(["RERT"])#Games that use the same mesh version
+def resolveMeshGameNameConflict(gameName,filePath):
+	rootPath = os.path.split(filePath)[0]
+	realGameName = None
+	if gameName == "RERT":
+		if "RE2" in rootPath:
+			realGameName = "RE2RT"
+		elif "RE3" in rootPath or "escape" in rootPath.lower():
+			realGameName = "RE3RT"
+		else:
+			realGameName = "RE2RT"
+	if realGameName == None:
+		realGameName = gameName
+	return gameName
 
 #---RE MESH IO FUNCTIONS---#
 
@@ -450,6 +464,8 @@ def importREMeshFile(filePath,options):
 		meshVersion = None
 	if meshVersion in meshFileVersionToGameNameDict:
 		gameName = meshFileVersionToGameNameDict[meshVersion]
+		if gameName in meshGameNameConflictDict:
+			gameName = resolveMeshGameNameConflict(gameName, filePath)
 	else:
 		gameName = None
 		
@@ -717,7 +733,7 @@ def exportREMeshFile(filePath,options):
 			if len(bone.children) != 0:
 				nextChildIndex = boneIndexDict[bone.children[0].name]
 			#Get matrices
-			if options["preserveBoneMatrices"]:
+			if options["preserveBoneMatrices"] and bone.get("reMeshWorldMatrix"):
 				if bone.get("reMeshWorldMatrix"):
 					parsedBone.worldMatrix.matrix = [list(row) for row in bone["reMeshWorldMatrix"]]
 				if bone.get("reMeshLocalMatrix"):
@@ -730,10 +746,10 @@ def exportREMeshFile(filePath,options):
 				#print(worldMatrix)
 				
 				if bone.parent != None:
-				    localMatrix = (bone.parent.matrix_local.to_4x4().inverted() @ bone.matrix_local.to_4x4()).transposed()
+				    localMatrix = (bone.matrix_local.to_4x4().transposed()) @ (bone.parent.matrix_local.to_4x4().transposed().inverted())
 				else:
 
-					localMatrix = (bone.matrix_local).inverted().transposed()
+					localMatrix = bone.matrix_local.transposed()
 				inverseMatrix = worldMatrix.inverted()
 				
 				parsedBone.worldMatrix.matrix = [list(row) for row in worldMatrix]
@@ -1109,8 +1125,11 @@ def exportREMeshFile(filePath,options):
 					#Bone Weights
 					if parsedMesh.bufferHasWeight:
 						weightList = [g.weight for g in vertex.groups]
-						weightIndicesList = [vertexGroupIndexToRemapDict[g.group] for g in vertex.groups]
-						
+						try:
+							weightIndicesList = [vertexGroupIndexToRemapDict[g.group] for g in vertex.groups]
+						except Exception as err:
+							raiseWarning("Bone Remap Dict Error: "+str(err))
+							addErrorToDict(errorDict, "InvalidWeights", rawsubmesh.name)
 						#print(weightIndicesList)
 						if len(weightList) > maxWeightsPerVertex:
 							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)

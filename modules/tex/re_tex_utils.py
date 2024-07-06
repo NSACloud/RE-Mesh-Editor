@@ -819,6 +819,7 @@ def getTexFileFromDDS(dds,texVersion,streamingFlag = False):
 	
 	imageCount = 1 if not ddsHeader.ddpfPixelFormat.dwFourCC == 808540228 else ddsHeader.dx10Header.arraySize * (6 if cubemap else 1)
 	texHeader.imageCount = imageCount
+	texHeader.mipCount = ddsHeader.dwMipMapCount#For DMC5/RE2
 	texHeader.imageMipHeaderSize = ddsHeader.dwMipMapCount * 16
 	#texHeader.imageCount = (ddsHeader.dwMipMapCount << 12) | imageCount
 	#print(f"imageCount {imageCount}")
@@ -854,7 +855,7 @@ def getTexFileFromDDS(dds,texVersion,streamingFlag = False):
 		miptex.append(mips)
 	
 	stride = 0x10
-	base = (8 if texVersion >= 28 else 0) + 0x20 + stride*imageCount*ddsHeader.dwMipMapCount
+	base = (8 if texVersion >= 28 and texVersion != 190820018 else 0) + 0x20 + stride*imageCount*ddsHeader.dwMipMapCount
 	tex = []
 	headers = []
 	for texture in miptex:

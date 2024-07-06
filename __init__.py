@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 17),
+	"version": (0, 18),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -25,6 +25,7 @@ from .modules.blender_utils import operator_exists
 from .modules.mesh.file_re_mesh import meshFileVersionToGameNameDict
 from .modules.mesh.blender_re_mesh import importREMeshFile,exportREMeshFile
 #mdf
+from.modules.mdf.file_re_mdf import gameNameMDFVersionDict
 from .modules.mdf.blender_re_mdf import importMDFFile,exportMDFFile
 from .modules.mdf.ui_re_mdf_panels import (
 	OBJECT_PT_MDFObjectModePanel,
@@ -33,6 +34,7 @@ from .modules.mdf.ui_re_mdf_panels import (
 	OBJECT_PT_MDFMaterialPropertyListPanel,
 	OBJECT_PT_MDFMaterialTextureBindingListPanel,
 	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
+	OBJECT_PT_MDFMaterialGPBFDataListPanel,
 	)
 from .modules.mdf.re_mdf_propertyGroups import (
 	MDFToolPanelPropertyGroup,
@@ -41,10 +43,12 @@ from .modules.mdf.re_mdf_propertyGroups import (
 	MDFTextureBindingPropertyGroup,
 	MDFMaterialPropertyGroup,
 	MDFMMTRSIndexPropertyGroup,
+	MDFGPBFDataPropertyGroup,
 	
 	MESH_UL_MDFPropertyList,
 	MESH_UL_MDFTextureBindingList,
 	MESH_UL_MDFMMTRSDataList,
+	MESH_UL_MDFGPBFDataList,
 	
 	
 	
@@ -97,12 +101,18 @@ class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
 		name="",
 		description="Set the game",
 		items= [ 
-        ("MHRSB", "Monster Hunter Rise", ""),
-		("RE8", "Resident Evil 8", ""),
-		("RERT", "Resident Evil 2 / 3 Ray Tracing", ""),
-		("RE4", "Resident Evil 4", ""),
+		("DMC5", "Devil May Cry 5", ""),
+		("RE2", "Resident Evil 2", ""),
+		("RE3", "Resident Evil 3", ""),
+		("RE8", "Resident Evil 8", ""),	
+		("RE2RT", "Resident Evil 2 Ray Tracing", ""),
+		("RE3RT", "Resident Evil 3 Ray Tracing", ""),
+		("RE7RT", "Resident Evil 7 Ray Tracing", ""),
+		("MHRSB", "Monster Hunter Rise", ""),
 		("SF6", "Street Fighter 6", ""),
+		("RE4", "Resident Evil 4", ""),
 		("DD2", "Dragon's Dogma 2", ""),
+		("KG", "Kunitsu-Gami", ""),
 		]
     )
     path: StringProperty(
@@ -270,7 +280,7 @@ class ImportREMesh(Operator, ImportHelper):
 	   default = False)
 	mdfPath : StringProperty(
 		name = "",
-		description = "Manually set the path of the mdf2 file. The MDF is found automatically if this is left blank",
+		description = "Manually set the path of the mdf2 file. The MDF is found automatically if this is left blank.\nTip:Hold shift and right click the mdf2 file and click \"Copy as path\", then paste into this field",
 		default = "",
 		)
 	createCollections : BoolProperty(
@@ -337,8 +347,7 @@ class ImportREMesh(Operator, ImportHelper):
 		layout.prop(self, "mergeGroups")
 		#layout.prop(self, "importBlendShapes")
 		layout.prop(self, "rotate90")
-		#layout.prop(self, "importOcclusionMeshes")
-		layout.prop(self, "importBoundingBoxes")
+		#layout.prop(self, "importOcclusionMeshes")  
 	def execute(self, context):
 		try:
 			os.makedirs(bpy.context.preferences.addons[__name__].preferences.textureCachePath,exist_ok = True)
@@ -346,7 +355,7 @@ class ImportREMesh(Operator, ImportHelper):
 			raiseWarning("Could not create texture cache directory at " + bpy.context.preferences.addons[__name__].preferences.textureCachePath)
 		if self.mergeArmature:
 			self.clearScene = False
-		options = {"clearScene":self.clearScene,"createCollections":self.createCollections,"loadMaterials":self.loadMaterials,"materialLoadLevel":self.materialLoadLevel,"reloadCachedTextures":self.reloadCachedTextures,"mdfPath":self.mdfPath,"importAllLODs":self.importAllLODs,"importBlendShapes":self.importBlendShapes,"rotate90":self.rotate90,"mergeArmature":self.mergeArmature,"importArmatureOnly":self.importArmatureOnly,"mergeGroups":self.mergeGroups,"importShadowMeshes":self.importShadowMeshes,"importOcclusionMeshes":self.importOcclusionMeshes,"importBoundingBoxes":self.importBoundingBoxes}
+		options = {"clearScene":self.clearScene,"createCollections":self.createCollections,"loadMaterials":self.loadMaterials,"materialLoadLevel":self.materialLoadLevel,"reloadCachedTextures":self.reloadCachedTextures,"mdfPath":self.mdfPath.replace("\"",""),"importAllLODs":self.importAllLODs,"importBlendShapes":self.importBlendShapes,"rotate90":self.rotate90,"mergeArmature":self.mergeArmature,"importArmatureOnly":self.importArmatureOnly,"mergeGroups":self.mergeGroups,"importShadowMeshes":self.importShadowMeshes,"importOcclusionMeshes":self.importOcclusionMeshes,"importBoundingBoxes":self.importBoundingBoxes}
 		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
 		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
 		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
@@ -369,13 +378,18 @@ class ExportREMesh(Operator, ExportHelper):
 	filename_ext: EnumProperty(
 		name="",
 		description="Set which game to export the mesh for",
-		items= [ 
-				(".2109148288", "Monster Hunter Rise", "Monster Hunter Rise"),
+		items= [
+				(".1808282334", "Devil May Cry 5", "Devil May Cry 5"), 
+				(".1808312334", "Resident Evil 2", "Resident Evil 2"),
+				(".1902042334", "Resident Evil 3", "Resident Evil 3"),
 				(".2101050001", "Resident Evil 8", "Resident Evil 8"),
 				(".2109108288", "Resident Evil 2 / 3 Ray Tracing", "Resident Evil 2/3 Ray Tracing Version"),
-			    (".221108797", "Resident Evil 4", "Resident Evil 4"),
+				(".220128762", "Resident Evil 7 Ray Tracing", "Resident Evil 7 Ray Tracing Version"),
+			    (".2109148288", "Monster Hunter Rise", "Monster Hunter Rise"),
+				(".221108797", "Resident Evil 4", "Resident Evil 4"),
 				(".230110883", "Street Fighter 6", "Street Fighter 6"),
 				(".231011879", "Dragon's Dogma 2", "Dragon's Dogma 2"),
+				(".240306278", "Kunitsu-Gami", "Kunitsu-Gami"),
 			   ]
 		)
 	targetCollection: bpy.props.StringProperty(
@@ -526,12 +540,14 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 		name="",
 		description="Set which game to export the MDF for",
 		items=[ 
-				(".23", "Monster Hunter Rise", ""),
+				(".10", "Devil May Cry 5 / Resident Evil 2", ""),
+				(".13", "Resident Evil 3", ""),
 				(".19", "Resident Evil 8", ""),
-				(".21", "Resident Evil 2 / 3 Ray Tracing", ""),
+				(".21", "Resident Evil 2 / 3 / 7 Ray Tracing", ""),
+				(".23", "Monster Hunter Rise", ""),
 				(".32", "Resident Evil 4", ""),
 				(".31", "Street Fighter 6", ""),
-				(".40", "Dragon's Dogma 2", ""),
+				(".40", "Dragon's Dogma 2 / Kunitsu-Gami", "Dragon's Dogma 2 and Kunitsu-Gami"),
 			  ]
 		)
 	targetCollection : StringProperty(
@@ -545,7 +561,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				self.targetCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
 				if self.targetCollection.endswith(".mdf2"):
 					self.filepath = self.targetCollection + self.filename_ext
-			self.filename_ext = bpy.context.scene.re_mdf_toolpanel.activeGame
+			self.filename_ext = "."+str(gameNameMDFVersionDict[bpy.context.scene.re_mdf_toolpanel.activeGame])
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
 	
@@ -596,6 +612,7 @@ classes = [
 	ExportREMDF,
 	#property groups
 	MDFMMTRSIndexPropertyGroup,
+	MDFGPBFDataPropertyGroup,
 	MDFFlagsPropertyGroup,
 	MDFToolPanelPropertyGroup,
 	MDFPropPropertyGroup,
@@ -605,6 +622,7 @@ classes = [
 	MESH_UL_MDFPropertyList,
 	MESH_UL_MDFTextureBindingList,
 	MESH_UL_MDFMMTRSDataList,
+	MESH_UL_MDFGPBFDataList,
 	
 	#ui panels
 	OBJECT_PT_MDFObjectModePanel,
@@ -613,6 +631,7 @@ classes = [
 	OBJECT_PT_MDFMaterialTextureBindingListPanel,
 	OBJECT_PT_MDFMaterialPropertyListPanel,
 	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
+	OBJECT_PT_MDFMaterialGPBFDataListPanel,
 	
 	#operators
 	WM_OT_NewMDFHeader,

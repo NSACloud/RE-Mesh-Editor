@@ -359,6 +359,7 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 				
 				if vertexDict["Position"] != None:
 					submesh.vertexPosList = vertexDict["Position"][meshInfo.vertexStartIndex:bufferEnd]
+				#print(f"{meshInfo.faceStartIndex*2} - {meshInfo.faceStartIndex*2+meshInfo.faceCount*2}")
 				submesh.faceList = ReadFaceBuffer(reMesh.meshBufferHeader.faceBuffer[meshInfo.faceStartIndex*2:meshInfo.faceStartIndex*2+meshInfo.faceCount*2])
 				if vertexDict["NorTan"] != None:
 					submesh.normalList = vertexDict["NorTan"][0][meshInfo.vertexStartIndex:bufferEnd]

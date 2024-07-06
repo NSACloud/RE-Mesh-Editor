@@ -78,7 +78,7 @@ def update_IntFromFlags(self, context):
 class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 	
 	def getMaterialPresets(self,context):
-		return reloadPresets(gameNameMDFVersionDict[int(context.scene.re_mdf_toolpanel.activeGame[1::])])
+		return reloadPresets(context.scene.re_mdf_toolpanel.activeGame)
 	mdfCollection: bpy.props.StringProperty(
 		name="",
 		description = "Set the collection containing the MDF file to edit.\nHint: MDF collections are blue.\nYou can create a new MDF collection by pressing the \"Create MDF Collection\" button",
@@ -88,12 +88,18 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 		name="",
 		description="Set the game to determine which presets to use and which chunk paths to read textures from",
 		items=[ 
-				(".23", "Monster Hunter Rise", ""),
-				(".19", "Resident Evil 8", ""),
-				(".21", "Resident Evil 2 / 3 Ray Tracing", ""),
-				(".32", "Resident Evil 4 Remake", ""),
-				(".31", "Street Fighter 6", ""),
-				(".40", "Dragon's Dogma 2", ""),
+				("DMC5", "Devil May Cry 5", ""),
+				("RE2", "Resident Evil 2", ""),
+				("RE3", "Resident Evil 3", ""),
+				("MHRSB", "Monster Hunter Rise", ""),
+				("RE8", "Resident Evil 8", ""),
+				("RE2RT", "Resident Evil 2 Ray Tracing", ""),
+				("RE3RT", "Resident Evil 3 Ray Tracing", ""),
+				("RE7RT", "Resident Evil 7 Ray Tracing", ""),
+				("RE4", "Resident Evil 4 Remake", ""),
+				("SF6", "Street Fighter 6", ""),
+				("DD2", "Dragon's Dogma 2", ""),
+				("KG", "Kunitsu-Gami", ""),
 			  ]
 		)
 	materialPresets: EnumProperty(
@@ -305,7 +311,10 @@ class MDFMMTRSIndexPropertyGroup(bpy.types.PropertyGroup):
     indexString: StringProperty(
         name="Indices",
     )
-	
+class MDFGPBFDataPropertyGroup(bpy.types.PropertyGroup):
+    gpbfDataString: StringProperty(
+        name="GPBF Data",
+    )	
 
 class MESH_UL_MDFPropertyList(bpy.types.UIList):
 	
@@ -409,6 +418,23 @@ class MESH_UL_MDFMMTRSDataList(bpy.types.UIList):
 	def invoke(self, context, event):
 		return {'PASS_THROUGH'}
 
+class MESH_UL_MDFGPBFDataList(bpy.types.UIList):
+	
+	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        # Display the properties of each item in the UIList
+        #col1.label(text=item.name)
+		layout.ui_units_y = 1.4
+		split = layout.split(factor=0.35)
+		col1 = split.column()
+		col2 = split.column()
+		row = col2.row()
+		col2.alignment='RIGHT'
+		#col1.label(text = item.textureType)
+		layout.prop(item,"gpbfDataString")
+	# Disable double-click to rename
+	def invoke(self, context, event):
+		return {'PASS_THROUGH'}
+
 class MDFMaterialPropertyGroup(bpy.types.PropertyGroup):
 	gameName:StringProperty()
 	
@@ -458,3 +484,6 @@ class MDFMaterialPropertyGroup(bpy.types.PropertyGroup):
 	
 	mmtrsData_items: CollectionProperty(type = MDFMMTRSIndexPropertyGroup)
 	mmtrsData_index: IntProperty(name="")
+	
+	gpbfData_items: CollectionProperty(type = MDFGPBFDataPropertyGroup)
+	gpbfData_index: IntProperty(name="")
