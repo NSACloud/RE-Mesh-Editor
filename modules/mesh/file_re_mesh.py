@@ -1587,7 +1587,8 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 						WriteToUVBuffer(UVBuffer,parsedSubMesh.uvList)
 						if parsedSubMesh.uv2List is not None:
 							WriteToUVBuffer(UV2Buffer,parsedSubMesh.uv2List)
-						if parsedSubMesh.weightIndicesList != [] and parsedSubMesh.weightList != []:
+						
+						if len(parsedSubMesh.weightIndicesList) != 0 and len(parsedSubMesh.weightIndicesList) == len(parsedSubMesh.weightList):
 							WriteToWeightBuffer(weightBuffer,parsedSubMesh.weightList,parsedSubMesh.weightIndicesList,isSixWeight)
 						
 						#Add vertex color if it's missing and other meshes have it

@@ -48,6 +48,13 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.20 - 7/11/2024
+* Fixed issue where MDFs using render targets (rtex) didn't export correctly.
+* Fixed issue with mesh export that caused an error on specific system configurations. 
+
+### V0.19 - 7/6/2024
+* Fixed error with "Apply Active MDF" button.
+
 ### V0.18 - 7/5/2024
 * Added support for Dragon's Dogma 2, Devil May Cry 5, Kunitsu-Gami, Resident Evil 2/3 Non RT, and Resident Evil 7 RT.
 * Added support for GPU Buffer data used in DD2 MDF files.
