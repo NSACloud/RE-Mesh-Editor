@@ -31,6 +31,12 @@ import numpy as np
 timeFormat = "%d"
 rotateNeg90Matrix = Matrix.Rotation(radians(-90.0), 4, 'X')
 rotate90Matrix = Matrix.Rotation(radians(90.0), 4, 'X')
+def triangulateMesh(mesh):
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.triangulate(bm, faces = bm.faces[:])
+    bm.to_mesh(mesh)
+
 def pad_infinite(iterable, padding=None):
 	return chain(iterable, repeat(padding))
 
@@ -967,6 +973,7 @@ def exportREMeshFile(filePath,options):
 			for submeshIndex,rawsubmesh in enumerate(sorted(visconDict[visconGroupID],key=lambda obj: obj.name)):
 				
 				evaluatedSubMeshData = bpy.data.objects[cloneMeshNameDict[rawsubmesh.name]].data
+				triangulateMesh(evaluatedSubMeshData)
 				if len((evaluatedSubMeshData.vertices)) == 0:
 					addErrorToDict(errorDict, "NoVerticesOnSubMesh", rawsubmesh.name)
 					

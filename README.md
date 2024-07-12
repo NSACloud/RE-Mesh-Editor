@@ -48,6 +48,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.21 - 7/12/2024
+* Exported meshes are triangulated automatically. This does not alter meshes in the scene, it only affects the exported mesh file.
+
 ### V0.20 - 7/11/2024
 * Fixed issue where MDFs using render targets (rtex) didn't export correctly.
 * Fixed issue with mesh export that caused an error on specific system configurations. 
