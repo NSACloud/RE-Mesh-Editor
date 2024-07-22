@@ -48,6 +48,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.22 - 7/21/2024
+* Fixed mesh export issue where if vertex weights were below a certain amount, the vertices would snap to the world origin in game.
+
 ### V0.21 - 7/12/2024
 * Exported meshes are triangulated automatically. This does not alter meshes in the scene, it only affects the exported mesh file.
 
@@ -145,7 +148,7 @@ Video guide coming soon. Images will be added to the text guide once the video i
 4. Import the model you want to replace it with.
 5. Pose your model and rig it to the armature from the imported mesh file.
 6. Separate your model by material (Ctrl P > Material) so that every mesh only has one material.
-7. Move your meshes into the "Main Mesh LOD 0" collection either by dragging them onto it in the outliner, or pressing M (Move To Collection).
+7. Move your meshes into the red .mesh collection either by dragging them onto it in the outliner, or pressing M (Move To Collection).
 8. Rename your meshes to the same naming format as the imported mesh. (Example: Group_0_Sub_0__**MaterialName**)
 9. Import the .mdf2 file that was alongside the .mesh file.
 10. Rename the mdf material objects to your new material names in Object Properties > RE MDF Material Settings > Material Name

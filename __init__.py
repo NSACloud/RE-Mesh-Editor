@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 21),
+	"version": (0, 22),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -347,6 +347,7 @@ class ImportREMesh(Operator, ImportHelper):
 		layout.prop(self, "mergeGroups")
 		#layout.prop(self, "importBlendShapes")
 		layout.prop(self, "rotate90")
+		layout.prop(self, "importBoundingBoxes")
 		#layout.prop(self, "importOcclusionMeshes")  
 	def execute(self, context):
 		try:

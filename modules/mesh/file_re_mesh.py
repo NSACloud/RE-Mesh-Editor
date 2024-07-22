@@ -1423,21 +1423,39 @@ def WriteToWeightBuffer(bufferStream,boneWeightsList,boneIndicesList,isSixWeight
 	else:
 		boneIndicesArray = boneIndicesList.astype("<B")
 	
-	boneWeightsArray = np.array(boneWeightsList)
-	boneWeightsArray = np.multiply(boneWeightsArray,256)
-	boneWeightsArray = np.floor(boneWeightsArray)
-	#boneWeightsArray = np.rint(boneWeightsArray)
-	boneWeightsArray = np.where(boneWeightsArray > 255,255,boneWeightsArray)
-	boneWeightsArray = boneWeightsArray.astype("<B")
-	#Normalize weights
-	diffSums = 255 - np.sum(boneWeightsArray,axis = 1,dtype = "<B")
-	diffSums = np.where(diffSums > 250,0,diffSums)#Fix for weights that round to 0 or close to it
-	#for val in diffSums:
-		#print(val)
-	boneWeightsArray[:, 0] += diffSums
 	
-	if (diffSums > 5).any():#The difference in weight values to make them sum to 255 shouldn't be much more than 1
+	
+	boneWeightsArray = np.array(boneWeightsList)
+	
+	#Clean Weights
+	#boneWeightsArray = np.round(boneWeightsArray,decimals=4)
+	#MIN_FLOAT_VALUE = 0.01
+	#boneWeightsArray = np.where(((boneWeightsArray != 0) & (boneWeightsArray < MIN_FLOAT_VALUE)),0.0,boneWeightsArray)
+	
+	#boneWeightsArray = np.round(boneWeightsArray,decimals = 2)
+	weightSums = np.sum(boneWeightsArray,axis = 1,dtype = np.float32)
+	#print(weightSums)
+	#Normalize weights to 1.0
+	with np.errstate(divide='ignore', invalid='ignore'):
+	    boneWeightsArray = boneWeightsArray / weightSums[:,None]
+	    boneWeightsArray[weightSums == 0] = 0
+	boneWeightsArray = np.multiply(boneWeightsArray,255)
+	boneWeightsArray = np.round(boneWeightsArray)
+	diffSums = 255.0 - np.sum(boneWeightsArray,axis = 1,dtype = np.float32)
+	#print(diffSums)
+	#for i in range(len(boneWeightsArray)):
+		#print(f"{boneWeightsArray[i]}, difference: {diffSums[i]}")
+	
+	#Add difference of 255 to the largest value of each row in weight array
+	boneWeightsArray[np.arange(boneWeightsArray.shape[0]), np.argmax(boneWeightsArray, axis=1)] += diffSums
+	#boneWeightsArray[:, 0] += diffSums
+	boneWeightsArray = boneWeightsArray.astype("<B")
+	
+	if (255 - np.sum(boneWeightsArray,axis = 1,dtype = np.int32) != 0).any():
 		raiseWarning("Non normalized weights detected on sub mesh! Weights may not behave as expected in game!")
+	
+	#Set zero weight bone indices to 0
+	#boneIndicesArray = np.where(boneWeightsArray == 0,0,boneIndicesArray)
 	
 	weightArray = np.empty((len(boneWeightsList)*2,8), dtype=np.dtype("<B"))
 	weightArray[::2] = boneIndicesArray

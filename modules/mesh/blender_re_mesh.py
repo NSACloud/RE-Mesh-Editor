@@ -973,7 +973,7 @@ def exportREMeshFile(filePath,options):
 			for submeshIndex,rawsubmesh in enumerate(sorted(visconDict[visconGroupID],key=lambda obj: obj.name)):
 				
 				evaluatedSubMeshData = bpy.data.objects[cloneMeshNameDict[rawsubmesh.name]].data
-				triangulateMesh(evaluatedSubMeshData)
+				#triangulateMesh(evaluatedSubMeshData)
 				if len((evaluatedSubMeshData.vertices)) == 0:
 					addErrorToDict(errorDict, "NoVerticesOnSubMesh", rawsubmesh.name)
 					
@@ -1130,23 +1130,29 @@ def exportREMeshFile(filePath,options):
 						
 				
 					#Bone Weights
+					MIN_WEIGHT = 0.004#If the weight is any lower than this, the engine freaks out and puts the vert at the origin
+					weightList = []
+					weightIndicesList = []
 					if parsedMesh.bufferHasWeight:
+						for g in vertex.groups:
+							if g.weight > MIN_WEIGHT:
+								weightList.append(g.weight)
+								weightIndicesList.append(vertexGroupIndexToRemapDict[g.group])
+								#Gather vertex positions of bone weights to generate bone bounding box
+								boneVertDict[parsedMesh.skeleton.weightedBones[weightIndicesList[-1]]].append(vertex.co)
+						"""
 						weightList = [g.weight for g in vertex.groups]
 						try:
 							weightIndicesList = [vertexGroupIndexToRemapDict[g.group] for g in vertex.groups]
 						except Exception as err:
 							raiseWarning("Bone Remap Dict Error: "+str(err))
 							addErrorToDict(errorDict, "InvalidWeights", rawsubmesh.name)
+						"""
 						#print(weightIndicesList)
 						if len(weightList) > maxWeightsPerVertex:
 							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
 						
-						#Gather vertex positions of bone weights to generate bone bounding box
-						if isFirstLOD:
-							for weightIndex,weight in enumerate(weightList):
-								if weight != 0.0:
-									boneVertDict[parsedMesh.skeleton.weightedBones[weightIndicesList[weightIndex]]].append(vertex.co)
-						parsedSubMesh.weightList[currentVertIndex] = list(pad(normalize(weightList),size=8,padding=0.0))
+						parsedSubMesh.weightList[currentVertIndex] = list(pad(weightList,size=8,padding=0.0))
 						parsedSubMesh.weightIndicesList[currentVertIndex] = list(pad(weightIndicesList,size=8,padding=0))
 				
 				visconGroup.subMeshList.append(parsedSubMesh)
