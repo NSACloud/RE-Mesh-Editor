@@ -973,6 +973,7 @@ def exportREMeshFile(filePath,options):
 			for submeshIndex,rawsubmesh in enumerate(sorted(visconDict[visconGroupID],key=lambda obj: obj.name)):
 				
 				evaluatedSubMeshData = bpy.data.objects[cloneMeshNameDict[rawsubmesh.name]].data
+				vertexGroupCount = len(rawsubmesh.vertex_groups)#For checking out of bound weight indices
 				triangulateMesh(evaluatedSubMeshData)
 				if len((evaluatedSubMeshData.vertices)) == 0:
 					addErrorToDict(errorDict, "NoVerticesOnSubMesh", rawsubmesh.name)
@@ -1135,7 +1136,7 @@ def exportREMeshFile(filePath,options):
 					weightIndicesList = []
 					if parsedMesh.bufferHasWeight:
 						for g in vertex.groups:
-							if g.weight >= MIN_WEIGHT:
+							if g.weight >= MIN_WEIGHT and g.group < vertexGroupCount:
 								weightList.append(g.weight)
 								weightIndicesList.append(vertexGroupIndexToRemapDict[g.group])
 								#Gather vertex positions of bone weights to generate bone bounding box

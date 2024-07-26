@@ -48,6 +48,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.25 - 7/26/2024
+* Fixed issue where Blender could give out of bound vertex group indices and cause an error.
+
 ### V0.24 - 7/26/2024
 * Fixed issue where BaseTwoSideEnable was missing in the UI for MDF flags.
 
