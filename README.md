@@ -48,6 +48,12 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.24 - 7/26/2024
+* Fixed issue where BaseTwoSideEnable was missing in the UI for MDF flags.
+
+### V0.23 - 7/22/2024
+* Fixed mesh triangulation being disabled after previous update.
+
 ### V0.22 - 7/21/2024
 * Fixed mesh export issue where if vertex weights were below a certain amount, the vertices would snap to the world origin in game.
 

@@ -106,6 +106,7 @@ class OBJECT_PT_MDFFlagsPanel(Panel):
 		col2.prop(flags, "ver32Unknown2")
 		col2.prop(flags,"flagIntValue")
 		
+		col2.prop(flags,"BaseTwoSideEnable")
 		col2.prop(flags,"BaseAlphaTestEnable")
 		col2.prop(flags,"ShadowCastDisable")
 		col2.prop(flags,"VertexShaderUsed")
