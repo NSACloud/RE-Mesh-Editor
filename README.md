@@ -31,7 +31,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
 Support for more games may be added in the future.
 
 ## Requirements
-* [Blender 2.93 or higher](https://www.blender.org/download/)
+* [Blender 2.93 or higher (4.2.1 or higher recommended)](https://www.blender.org/download/)
 * [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
   
 **Not required but strongly recommended:**
@@ -42,11 +42,48 @@ Download the addon from the "Download RE Mesh Editor" link at the top or click C
 
 In Blender, go to Edit > Preferences > Addons, then click "Install" in the top right.
 
+NOTE: If you are on Blender 4.2 or above, the install button is found by clicking the arrow in the top right of the addon menu.
+
+![image](https://github.com/user-attachments/assets/49dd95c1-9a20-49d8-af55-7160d54836df)
+
 Navigate to the downloaded zip file for this addon and click "Install Addon". The addon should then be usable.
 
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.26 - 9/14/2024
+* Material importing has been improved. Imported materials now more closely resemble how they appear in game.
+* MDF files will now be imported along with the mesh file, this can be disabled by unchecking "Load MDF Material Data" in the import options.
+* Added drag and drop mesh importing - drag and drop a .mesh or .mdf2 file into the 3D view to import it. (Blender 4.1 and higher only)
+  
+https://github.com/user-attachments/assets/c0286b80-8860-47b5-a03a-25c4249d9cb1
+
+* Added drag and drop tex conversion - drag and drop a .tex or .dds file into the 3D view to convert it. (Blender 4.1 and higher only)
+
+
+https://github.com/user-attachments/assets/96181373-aa36-4ff2-820a-f4bbc4180c1f
+
+
+
+* Changes made to certain MDF material properties now reflect in Blender. MDF properties that have a wrench icon next to them are previewable.
+
+
+https://github.com/user-attachments/assets/ff3e918d-641e-4e78-ae5a-43ecab1a4a6b
+
+
+* Blender 4.2 and above now cache textures as DDS files instead of TIF. This massively decreases material importing time. (Approximately 6x faster)
+* Extended max vertex limit per sub mesh from 65535 to 4294967295.
+
+* Added support for conversion of array textures. (Tex files that have multiple images inside them)
+* The console is now opened when importing or exporting mesh files. This can be disabled in the addon preferences.
+* When an exported mesh has errors that prevent export, a window will pop up explaining what's wrong with the mesh and how to fix it.
+* NRRT/NRRC normal maps are now displayed correctly.
+* Fixed issue where certain textures didn't convert correctly.
+* Many minor bug fixes
+
+<details>
+  <summary>Older Version Change Logs</summary>
 
 ### V0.25 - 7/26/2024
 * Fixed issue where Blender could give out of bound vertex group indices and cause an error.
@@ -75,9 +112,6 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * Added support for GPU Buffer data used in DD2 MDF files.
 * LOD collections are no longer created upon import if "Import All LODs" is unchecked.
 * Fixed issue where the exported local bone matrix was incorrect.
-
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.17 - 6/16/2024
 * Fixed issue where the preserve bone matrices export option didn't work. 
@@ -145,6 +179,7 @@ NOTE: RE Toolbox has also been updated. Be sure to update it as well as it conta
 
  </details>
 
+
 ## Usage Guide
 
 Video guide coming soon. Images will be added to the text guide once the video is done.
@@ -168,7 +203,7 @@ Video guide coming soon. Images will be added to the text guide once the video i
 15. Save edited textures to their own folder as a .dds file. For the compression settings, use BC7 sRGB if it's an albedo/color map or BC7 Linear if it's anything else.
 16. In the RE MDF tab on the sidebar, set the Mod Directory to the natives\STM\ folder inside your mod folder.
 17. Set the image directory to the directory containing the .dds files you saved.
-18. Press "Convert DDS to Tex", then press "Copy Converted Tex Files". The tex files will be placed at whatever path you set them to be in the MDF material.
+18. Press "Convert Directory to Tex", then press "Copy Converted Tex Files". The tex files will be placed at whatever path you set them to be in the MDF material.
 19. To test the textures, press "Apply Active MDF". Check the console (Window > Toggle System Console) and make sure that there's no warnings about the textures that you created.
 20. (Optional) Add bones to the armature to be used as physics bones. Create chains using RE Chain Editor.
 21. Export from File > Export > RE Mesh/MDF and put them in the mod folder at their original chunk path.
@@ -195,3 +230,4 @@ You may be using an outdated .mdf2 file, be sure to extract from the latest patc
 - [AlphaZomega](https://github.com/alphazolam/) - RE Mesh 010 Template and Noesis plugin
 - [CG Cookie](https://github.com/CGCookie) - Addon updater module
 - [matyalatte](https://github.com/matyalatte/Texconv-Custom-DLL) - DirectX Texconv DLL library
+- [PittRBM](https://x.com/wDnrbm) - NRRT texture node setup

@@ -44,12 +44,35 @@ class OBJECT_PT_MDFObjectModePanel(Panel):
 		
 		layout.operator("re_mdf.save_selected_as_preset")
 		layout.operator("re_mdf.open_preset_folder")
-		layout.label(text="Test MDF")
+		layout.label(text="Apply MDF to Mesh")
 		layout.label(text = "Mesh Collection")
 		layout.prop_search(re_mdf_toolpanel, "meshCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_01")
 		layout.label(text = "Mod Directory")
 		layout.prop(re_mdf_toolpanel, "modDirectory")
 		layout.operator("re_mdf.apply_mdf")
+		
+
+class OBJECT_PT_MDFMaterialLoadSettingsPanel(Panel):
+	bl_label = "MDF Load Settings"
+	bl_idname = "OBJECT_PT_mdf_material_load_settings_panel"
+	bl_parent_id = "OBJECT_PT_mdf_tools_panel"  # Specify the ID of the parent panel
+	bl_space_type = "VIEW_3D"   
+	bl_region_type = "UI"
+	bl_category = "RE MDF"   
+	bl_options = {'DEFAULT_CLOSED'}
+	
+	def draw(self, context):
+		layout = self.layout
+		obj = context.active_object
+		re_mdf_toolpanel = context.scene.re_mdf_toolpanel
+		split = layout.split(factor=0.025)#Indent list slightly to make it more clear it's a part of a sub panel
+		col1 = split.column()
+		col2 = split.column()
+		col2.alignment='RIGHT'
+		col2.prop(re_mdf_toolpanel,"reloadCachedTextures")
+		col2.prop(re_mdf_toolpanel, "loadUnusedTextures")
+		col2.prop(re_mdf_toolpanel, "loadUnusedProps")
+		col2.prop(re_mdf_toolpanel, "useBackfaceCulling")
 		
 		
 class OBJECT_PT_MDFMaterialPanel(Panel):
@@ -84,6 +107,7 @@ class OBJECT_PT_MDFMaterialPanel(Panel):
 		col4.prop(re_mdf_material, "materialName")
 		col4.prop(re_mdf_material, "mmtrPath") 
 		col4.prop(re_mdf_material, "shaderType")
+		col4.prop(re_mdf_material, "linkedMaterial")
 
 class OBJECT_PT_MDFFlagsPanel(Panel):
 	bl_label = "Flags"

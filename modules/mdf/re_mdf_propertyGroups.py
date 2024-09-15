@@ -16,7 +16,109 @@ from .file_re_mdf import gameNameMDFVersionDict
 from .blender_re_mesh_mdf import importMDF
 from .re_mdf_presets import reloadPresets
 
+
+
+
+
+def getUsableProps(propFileList):
+	propSet = set()
+	path = os.path.split(__file__)[0]
+	for file in propFileList:
+		f = open(os.path.join(path,file),"r")
+		for line in f.readlines():
+			if "addPropertyNode(matInfo[\"mPropDict\"]" in line:
+				propName = line.split("addPropertyNode(matInfo[\"mPropDict\"][\"")[1].split("\"]",1)[0]
+				propSet.add(propName)
+		f.close()
+	return propSet
+try:
+	editablePropsSet = getUsableProps(
+	propFileList = [
+		
+		"blender_re_mesh_mdf.py",
+		"blender_nodes_re_mdf.py",])
+except Exception as err:
+	print(f"Unable to load usable properties - {str(err)}")
+	editablePropsSet = set()
+#print(editablePropsSet)
 flags = MDFFlags()#Bitflag struct
+
+def linkBlenderMaterial(materialObj,materialName):
+	
+	#Check if material name is used more than once, link it if it's only used once
+	matchCount = 0
+	materialKey = None
+	for mat in bpy.data.materials.keys():
+		if materialName == mat.split(".",1)[0]:
+			materialKey = mat
+			matchCount += 1
+	if matchCount == 1:
+		#print(f"Linked {materialObj.name} to {bpy.data.materials[materialKey]} (Fast)")
+		materialObj.re_mdf_material.linkedMaterial = bpy.data.materials[materialKey]
+	elif matchCount > 1:
+		#If there's more than one material with the same name, search for a mesh collection with the same name as the mdf and find the material assigned to an object
+		mdfCollectionName = None#Get first mdf collection linked to material obj
+		for collection in materialObj.users_collection:
+			if ".mdf2" in collection.name:
+				mdfCollectionName = collection.name
+		
+		if mdfCollectionName != None:
+			meshCollection = bpy.data.collections.get(mdfCollectionName.replace(".mdf2",".mesh",1).replace("_v00","",1).replace("_Mat","",1),None)
+			
+			if meshCollection != None:
+				meshObj = None#Mesh object with mdf material assigned to it
+				for obj in meshCollection.all_objects:
+					if obj.type == "MESH":
+						if materialName in obj.name and "__" in obj.name:
+							if materialName == obj.name.split("__",1)[1].split(".")[0]:
+								meshObj = obj
+								break
+				if meshObj != None:
+					for material in meshObj.data.materials:
+						if material.name.split(".")[0] == materialName:
+							materialObj.re_mdf_material.linkedMaterial = material
+							#print(f"Linked {materialObj.name} to {material} (Slow)")
+							break						
+								
+def update_materialNodes(self,context):
+	obj = self.id_data
+	if self.prop_name in editablePropsSet:
+		#matName = obj.re_mdf_material.materialName
+		if obj.re_mdf_material.linkedMaterial == None:
+			linkBlenderMaterial(obj, obj.re_mdf_material.materialName)
+		
+		#TODO filter by collection
+		if obj.re_mdf_material.linkedMaterial != None:
+			node = obj.re_mdf_material.linkedMaterial.node_tree.nodes.get(self.prop_name,None)
+			if node != None:
+				#print(self.data_type)
+				#print(node.name)
+				if self.data_type == "FLOAT":
+					value = self.float_value
+					node.outputs["Value"].default_value = value
+				elif self.data_type == "VEC4":
+					value = list(self.float_vector_value)
+					node.inputs[0].default_value = value[0]
+					node.inputs[1].default_value = value[1]
+					node.inputs[2].default_value = value[2]
+					node.inputs[3].default_value = value[3]
+				elif self.data_type == "COLOR":
+					value = list(self.color_value)
+					node.inputs["Color"].default_value = value
+	
+				elif self.data_type == "BOOL":
+					if self.bool_value:
+						value = 1.0
+					else:
+						value = 0.0
+					node.outputs["Value"].default_value = value
+				else:
+					value = 0.0
+					node.outputs["Value"].default_value = value
+	
+		
+			
+			#print(f"Set Prop on {obj.name} - {matName} - {self.prop_name} - {self.data_type} - {str(value)}")
 
 def update_modDirectoryRelPathToAbs(self,context):
 	try:
@@ -96,7 +198,7 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 				("RE2RT", "Resident Evil 2 Ray Tracing", ""),
 				("RE3RT", "Resident Evil 3 Ray Tracing", ""),
 				("RE7RT", "Resident Evil 7 Ray Tracing", ""),
-				("RE4", "Resident Evil 4 Remake", ""),
+				("RE4", "Resident Evil 4", ""),
 				("SF6", "Street Fighter 6", ""),
 				("DD2", "Dragon's Dogma 2", ""),
 				("KG", "Kunitsu-Gami", ""),
@@ -134,6 +236,24 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 		description="Opens the directory containing the converted image files after conversion",
 		default = False,
 		)
+	#mdf load settings
+	loadUnusedTextures : BoolProperty(
+	   name = "Load Unused Textures",
+	   description = "Loads textures that have no function assigned to them in the material shader graph.\nLeaving this disabled will make materials load faster.\nOnly enable this if you plan on editing the material shader graph",
+	   default = False)
+	loadUnusedProps : BoolProperty(
+	   name = "Load Unused Material Properties",
+	   description = "Loads material properties that have no function assigned to them in the material shader graph.\nLeaving this disabled will make materials load faster.\nOnly enable this if you plan on editing the material shader graph",
+	   default = False)
+	useBackfaceCulling : BoolProperty(
+	   name = "Use Backface Culling",
+	   description = "Enables backface culling on materials. May improve Blender's performance on high poly meshes.\nBackface culling will only be enabled on materials without the two sided flag",
+	   default = False)
+
+	reloadCachedTextures : BoolProperty(
+	   name = "Reload Cached Textures",
+	   description = "Convert all textures again instead of reading from already converted textures. Use this if you make changes to textures and need to reload them",
+	   default = True)
 	
 class MDFFlagsPropertyGroup(bpy.types.PropertyGroup):
 	ver32Unknown: IntProperty(
@@ -279,13 +399,16 @@ class MDFPropPropertyGroup(bpy.types.PropertyGroup):
     float_vector_value: bpy.props.FloatVectorProperty(
         name="",
         size=4,
+		update = update_materialNodes
     )
     float_value: bpy.props.FloatProperty(
         name="",
+		update = update_materialNodes
     )
     bool_value: bpy.props.BoolProperty(
         name="",
-        default=False
+        default=False,
+		update = update_materialNodes
     )
     color_value: bpy.props.FloatVectorProperty(
         name="",
@@ -293,6 +416,7 @@ class MDFPropPropertyGroup(bpy.types.PropertyGroup):
         size=4,
         min=0.0,
         max=1.0,
+		update = update_materialNodes
     )
     padding: bpy.props.IntProperty(#Not exposed in editor, used for SF6's weird mmtrs padding
         name="",
@@ -332,7 +456,7 @@ class MESH_UL_MDFPropertyList(bpy.types.UIList):
 		col2 = split.column()
 		row = col2.row()
 		col2.alignment='RIGHT'
-		col1.label(text = item.prop_name)
+		col1.label(text = item.prop_name,icon = "MODIFIER" if item.prop_name in editablePropsSet else "NONE")
 		if item.data_type == 'VEC4':
 			row.prop(item, "float_vector_value")
 		elif item.data_type == 'FLOAT':
@@ -475,6 +599,11 @@ class MDFMaterialPropertyGroup(bpy.types.PropertyGroup):
 			   ]
 		)
 	
+	linkedMaterial: bpy.props.PointerProperty(
+        name="Linked Material",
+		description="The Blender material that corresponds to this MDF material. Any changes made to supported MDF properties will reflect on the Blender material.\nIf a linked material is not set, it will be set automatically once an MDF property is changed",
+        type=bpy.types.Material,
+    )
 	flags:PointerProperty(type = MDFFlagsPropertyGroup)
 	propertyList_items: CollectionProperty(type=MDFPropPropertyGroup)
 	propertyList_index: IntProperty(name="")

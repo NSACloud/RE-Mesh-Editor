@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 25),
+	"version": (0, 26),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -35,6 +35,7 @@ from .modules.mdf.ui_re_mdf_panels import (
 	OBJECT_PT_MDFMaterialTextureBindingListPanel,
 	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
 	OBJECT_PT_MDFMaterialGPBFDataListPanel,
+	OBJECT_PT_MDFMaterialLoadSettingsPanel,
 	)
 from .modules.mdf.re_mdf_propertyGroups import (
 	MDFToolPanelPropertyGroup,
@@ -64,6 +65,8 @@ from .modules.mdf.re_mdf_operators import (
 
 )
 #tex
+from .modules.tex.file_re_tex import gameNameToTexVersionDict
+
 from .modules.tex.ui_re_tex_panels import (
 	OBJECT_PT_TexConversionPanel,
 	)
@@ -71,8 +74,15 @@ from .modules.tex.ui_re_tex_panels import (
 from .modules.tex.re_tex_operators import (
 	WM_OT_ConvertFolderToTex,
 	WM_OT_CopyConvertedTextures,
+	WM_OT_ConvertDDSTexFile,
 
 )
+
+from .modules.mesh.re_mesh_export_errors import  (
+	REMeshErrorEntry,
+	MESH_UL_REMeshErrorList,
+	WM_OT_ShowREMeshErrorWindow,
+	)
 
 os.system("color")#Enable console colors
 
@@ -173,11 +183,27 @@ class MESH_UL_ChunkPathList(bpy.types.UIList):
 		layout.prop(item,"path")
 class REMeshPreferences(AddonPreferences):
 	bl_idname = __name__
+	
+	dragDropImportOptions: BoolProperty(
+		name="Show Drag and Drop Import Options (Blender 4.1 or higher)",
+		description = "Show import options when dragging a mesh or mdf file into the 3D View.\nIf this is disabled, the default import options will be used.\nDrag and drop importing is only supported on Blender 4.1 or higher",
+		default = False if bpy.app.version < (4,1,0) else True
+	)
+	showConsole: BoolProperty(
+		name="Show Console During Import/Export",
+		description = "When importing or exporting a file, the console will be opened so that progress can be viewed.\nNote that if the console is already opened before import or export, it will be closed instead.\n This is a limitation of Blender, there's no way to get the active state of the console window.",
+		default = True
+	)
 	textureCachePath: StringProperty(
 		name="Texture Cache Path",
 		subtype='DIR_PATH',
 		description = "Location to save converted textures",
 		default = os.path.join(os.path.dirname(os.path.realpath(__file__)),"TextureCache")
+	)
+	useDDS: BoolProperty(
+		name="Use DDS Textures (Blender 4.2 or higher)",
+		description = "Use DDS textures instead of converting to TIF.\nThis greatly improves mesh import speed but is only usable on Blender 4.2 or higher.\nIf the Blender version is less than 4.2, this option will do nothing",
+		default = False if bpy.app.version < (4,2,0) else True
 	)
 	chunkPathList_items: CollectionProperty(type=ChunkPathPropertyGroup)
 	chunkPathList_index: IntProperty(name="")
@@ -225,6 +251,9 @@ class REMeshPreferences(AddonPreferences):
         text='Donate on Ko-fi',
         icon='FUND'
         )
+		layout.prop(self, "dragDropImportOptions")
+		layout.prop(self, "showConsole")
+		layout.prop(self, "useDDS")
 		layout.prop(self, "textureCachePath")
 		layout.label(text=f"Folder Size: {formatByteSize(getFolderSize(self.textureCachePath))}")
 		layout.operator("re_mesh.open_texture_cache_folder")
@@ -253,6 +282,7 @@ class ImportREMesh(Operator, ImportHelper):
 			)
 	directory : StringProperty(
 			subtype='DIR_PATH',
+			options={'SKIP_SAVE'}
 			)
 	filename_ext = ".mesh.*"
 	filter_glob: StringProperty(default="*.mesh.*", options={'HIDDEN'})
@@ -265,15 +295,24 @@ class ImportREMesh(Operator, ImportHelper):
 	   description = "Load materials from the MDF2 file. This may increase the time the mesh takes to import",
 	   default = True)
 	
-	materialLoadLevel: EnumProperty(
-		name="",
-		description="Choose which textures to import. Affects how quickly the material can be imported. Load Materials must be enabled for this option to do anything",
-		default = "3",
-		items=[ ("1", "Albedo Only (Fast)", ""),
-				("2", "Main Textures (Slower)", "Loads Albedo, Normal, Roughness, Metallic, Alpha"),
-				("3", "All Textures (Slowest)", "Loads all textures from the mdf, including ones not usable by Blender"),
-			  ]
-		)
+	loadMDFData : BoolProperty(
+	   name = "Load MDF Material Data",
+	   description = "Imports the MDF materials as objects inside a collection in the outliner.\nYou can make changes to MDF materials by selecting the Material objects in the outliner.\nUnder the Object Properties tab (orange square), there's a panel called \"RE MDF Material Settings\".\nMake any changes to MDF materials there.\nIf you're not modding an RE Engine game, you can uncheck this option since it won't be needed",
+	   default = True)
+	
+	loadUnusedTextures : BoolProperty(
+	   name = "Load Unused Textures",
+	   description = "Loads textures that have no function assigned to them in the material shader graph.\nLeaving this disabled will make materials load faster.\nOnly enable this if you plan on editing the material shader graph",
+	   default = False)
+	loadUnusedProps : BoolProperty(
+	   name = "Load Unused Material Properties",
+	   description = "Loads material properties that have no function assigned to them in the material shader graph.\nLeaving this disabled will make materials load faster.\nOnly enable this if you plan on editing the material shader graph",
+	   default = False)
+	useBackfaceCulling : BoolProperty(
+	   name = "Use Backface Culling",
+	   description = "Enables backface culling on materials. May improve Blender's performance on high poly meshes.\nBackface culling will only be enabled on materials without the two sided flag",
+	   default = False)
+
 	reloadCachedTextures : BoolProperty(
 	   name = "Reload Cached Textures",
 	   description = "Convert all textures again instead of reading from already converted textures. Use this if you make changes to textures and need to reload them",
@@ -285,7 +324,7 @@ class ImportREMesh(Operator, ImportHelper):
 		)
 	createCollections : BoolProperty(
 	   name = "Create Collections",
-	   description = "Create a collection for the mesh and for each LOD level. Note that collections are required for exporting LODs. Leaving this option enabled is recommended",
+	   description = "Create a collection for the mesh and for each LOD level. Note that collections are required for exporting LODs and applying MDF changes. Leaving this option enabled is recommended",
 	   default = True)
 	mergeArmature : StringProperty(
 	   name = "",
@@ -324,31 +363,63 @@ class ImportREMesh(Operator, ImportHelper):
 	   description = "Import mesh and bone bounding boxes for debugging purposes",
 	   default = False)
 	
+	#Internal properties for grouping material settings
+	showAdvancedOptions : BoolProperty(
+	   name = "Show Advanced Options",
+	   default = False)
+	showMaterialOptions : BoolProperty(
+	   name = "Show Material Options",
+	   default = True)
 	
-
 	def draw(self, context):
 		layout = self.layout
 		row = layout.row()
 		row.prop(self, "clearScene")
+		
+		
 		row.enabled = self.mergeArmature == ""
-		layout.prop(self, "createCollections")
-		layout.prop(self, "loadMaterials")
-		layout.label(text = "Material Load Level")
-		layout.prop(self, "materialLoadLevel")
-		layout.prop(self, "reloadCachedTextures")
-		layout.label(text = "MDF Manual Path")
-		layout.prop(self, "mdfPath")
-		layout.label(text = "Advanced Options")
-		layout.prop(self, "importAllLODs")
+		
+		#layout.prop(self, "importBlendShapes")
+		
 		layout.label(text = "Merge With Armature")
 		
 		layout.prop_search(self, "mergeArmature",bpy.data,"armatures")
-		layout.prop(self, "importArmatureOnly")
-		layout.prop(self, "mergeGroups")
-		#layout.prop(self, "importBlendShapes")
-		layout.prop(self, "rotate90")
-		layout.prop(self, "importBoundingBoxes")
-		#layout.prop(self, "importOcclusionMeshes")  
+		
+		
+		row = layout.row()
+		icon = 'DOWNARROW_HLT' if self.showMaterialOptions else 'RIGHTARROW'
+		row.prop(self, 'showMaterialOptions', icon=icon, icon_only=True)
+		row.label(text='Material Settings')
+		split = layout.split(factor = 0.01)
+		column = split.column()
+		column2 = split.column()
+		if self.showMaterialOptions:
+			column2.prop(self, "loadMaterials")
+			column2.prop(self, "loadMDFData")
+			column2.prop(self, "reloadCachedTextures")
+			column2.prop(self, "loadUnusedTextures")
+			column2.prop(self, "loadUnusedProps")
+			column2.prop(self, "useBackfaceCulling")
+			column2.label(text = "Manual MDF Path")
+			column2.prop(self, "mdfPath")	
+		
+		row = layout.row()
+		icon = 'DOWNARROW_HLT' if self.showAdvancedOptions else 'RIGHTARROW'
+		row.prop(self, 'showAdvancedOptions', icon=icon, icon_only=True)
+		row.label(text='Advanced Options')
+		split = layout.split(factor = 0.01)
+		column = split.column()
+		column2 = split.column()
+		if self.showAdvancedOptions:
+			column2.prop(self, "importAllLODs")
+			column2.prop(self, "createCollections")
+			column2.prop(self, "mergeGroups")
+			column2.prop(self, "importArmatureOnly")
+		
+			column2.prop(self, "rotate90")
+			column2.prop(self, "importBoundingBoxes")
+			#column2.prop(self, "importOcclusionMeshes")  
+		
 	def execute(self, context):
 		try:
 			os.makedirs(bpy.context.preferences.addons[__name__].preferences.textureCachePath,exist_ok = True)
@@ -356,18 +427,51 @@ class ImportREMesh(Operator, ImportHelper):
 			raiseWarning("Could not create texture cache directory at " + bpy.context.preferences.addons[__name__].preferences.textureCachePath)
 		if self.mergeArmature:
 			self.clearScene = False
-		options = {"clearScene":self.clearScene,"createCollections":self.createCollections,"loadMaterials":self.loadMaterials,"materialLoadLevel":self.materialLoadLevel,"reloadCachedTextures":self.reloadCachedTextures,"mdfPath":self.mdfPath.replace("\"",""),"importAllLODs":self.importAllLODs,"importBlendShapes":self.importBlendShapes,"rotate90":self.rotate90,"mergeArmature":self.mergeArmature,"importArmatureOnly":self.importArmatureOnly,"mergeGroups":self.mergeGroups,"importShadowMeshes":self.importShadowMeshes,"importOcclusionMeshes":self.importOcclusionMeshes,"importBoundingBoxes":self.importBoundingBoxes}
+		options = {"clearScene":self.clearScene,"createCollections":self.createCollections,"loadMaterials":self.loadMaterials,"loadMDFData":self.loadMDFData,"loadUnusedTextures":self.loadUnusedTextures,"loadUnusedProps":self.loadUnusedProps,"useBackfaceCulling":self.useBackfaceCulling,"reloadCachedTextures":self.reloadCachedTextures,"mdfPath":self.mdfPath.replace("\"",""),"importAllLODs":self.importAllLODs,"importBlendShapes":self.importBlendShapes,"rotate90":self.rotate90,"mergeArmature":self.mergeArmature,"importArmatureOnly":self.importArmatureOnly,"mergeGroups":self.mergeGroups,"importShadowMeshes":self.importShadowMeshes,"importOcclusionMeshes":self.importOcclusionMeshes,"importBoundingBoxes":self.importBoundingBoxes}
 		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
 		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
 		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
 		print("https://github.com/NSACloud/RE-Mesh-Editor")
-		success = importREMeshFile(self.filepath,options)
-		if success:
+		if bpy.context.preferences.addons[__name__].preferences.showConsole:
+			 bpy.ops.wm.console_toggle()
+		
+		multiFileImport = len(self.files) > 1
+		hasImportErrors = False
+		
+		for index, file in enumerate(self.files):
+			filepath = os.path.join(self.directory,file.name)
+			if multiFileImport:
+				print(f"Multi Mesh Import ({index+1}/{len(self.files)})")
+			if os.path.isfile(filepath):
+				success = importREMeshFile(filepath,options)
+				options["clearScene"] = False#Disable clear scene after first mesh is imported
+				if not success: hasImportErrors = True
+			else:
+				hasImportErrors = True
+				raiseWarning(f"Path does not exist, cannot import file. If you are importing multiple files at once, they must all be in the same directory.\nInvalid Path:{filepath}")
+			
+			
+			
+		if not hasImportErrors:
+			if bpy.context.preferences.addons[__name__].preferences.showConsole:
+				bpy.ops.wm.console_toggle()
+				
+			if not multiFileImport:
+				self.report({"INFO"},"Imported RE Mesh file.")
+			else:
+				self.report({"INFO"},f"Imported {str(len(self.files))} RE Mesh files.")
 			return {"FINISHED"}
 		else:
-			self.report({"INFO"},"Failed to import RE Mesh. Make sure the mesh file is imported.")
+			self.report({"INFO"},"Failed to import RE Mesh. Check the console for errors.")
 			return {"CANCELLED"}
-		
+	def invoke(self, context, event):
+		if self.directory:
+			if bpy.context.preferences.addons[__name__].preferences.dragDropImportOptions:
+				return context.window_manager.invoke_props_dialog(self)
+			else:
+				return self.execute(context)
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}
 class ExportREMesh(Operator, ExportHelper):
 	'''Export RE Mesh File'''
 	bl_idname = "re_mesh.exportfile"
@@ -483,10 +587,13 @@ class ExportREMesh(Operator, ExportHelper):
 		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
 		print("https://github.com/NSACloud/RE-Mesh-Editor")
 		
+		if bpy.context.preferences.addons[__name__].preferences.showConsole:
+			 bpy.ops.wm.console_toggle()
 		
 		success = exportREMeshFile(self.filepath,options)
 		if success:
 			self.report({"INFO"},"Exported RE Mesh successfully.")
+			
 			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
 				if not any(item.path == self.filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
 					newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
@@ -503,19 +610,24 @@ class ExportREMesh(Operator, ExportHelper):
 					print("Added path to RE Toolbox Batch Export list.")
 		else:
 			self.report({"INFO"},"RE Mesh export failed. See Window > Toggle System Console for info on how to fix it.")
+		if bpy.context.preferences.addons[__name__].preferences.showConsole:
+			 bpy.ops.wm.console_toggle()
 		return {"FINISHED"}
-
+	
+	
 class ImportREMDF(bpy.types.Operator, ImportHelper):
 	'''Import RE Engine MDF File'''
 	bl_idname = "re_mdf.importfile"
 	bl_label = "Import RE MDF"
 	bl_options = {'PRESET', "REGISTER", "UNDO"}
+	
 	files : CollectionProperty(
 			name="File Path",
 			type=OperatorFileListElement,
 			)
 	directory : StringProperty(
 			subtype='DIR_PATH',
+			options={'SKIP_SAVE'}
 			)
 	filename_ext = ".mdf.*"
 	filter_glob: StringProperty(default="*.mdf2.*", options={'HIDDEN'})
@@ -525,12 +637,35 @@ class ImportREMDF(bpy.types.Operator, ImportHelper):
 		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
 		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
 		print("https://github.com/NSACloud/RE-Mesh-Editor")
-		success = importMDFFile(self.filepath)
-		if success:
+		multiFileImport = len(self.files) > 1
+		hasImportErrors = False
+		
+		for index, file in enumerate(self.files):
+			filepath = os.path.join(self.directory,file.name)
+			if multiFileImport:
+				print(f"Multi MDF Import ({index+1}/{len(self.files)})")
+			if os.path.isfile(filepath):
+				success = importMDFFile(filepath)
+				if not success: hasImportErrors = True
+			else:
+				hasImportErrors = True
+				raiseWarning(f"Path does not exist, cannot import file. If you are importing multiple files at once, they must all be in the same directory.\nInvalid Path:{filepath}")
+			
+			
+		if not hasImportErrors:
+			if not multiFileImport:
+				self.report({"INFO"},"Imported RE MDF file.")
+			else:
+				self.report({"INFO"},f"Imported {str(len(self.files))} RE MDF files.")
 			return {"FINISHED"}
 		else:
-			self.report({"INFO"},"Failed to import RE MDF.")
+			self.report({"INFO"},"Failed to import RE MDF. Check the console for errors.")
 			return {"CANCELLED"}
+	def invoke(self, context, event):
+		if self.directory:
+			return self.execute(context)
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}
 supportedMDFVersions = set([23,19,21,32,31,40])		
 class ExportREMDF(bpy.types.Operator, ExportHelper):
 	'''Export RE Engine MDF File'''
@@ -619,6 +754,8 @@ classes = [
 	MDFPropPropertyGroup,
 	MDFTextureBindingPropertyGroup,
 	MDFMaterialPropertyGroup,
+	REMeshErrorEntry,
+	MESH_UL_REMeshErrorList,
 	
 	MESH_UL_MDFPropertyList,
 	MESH_UL_MDFTextureBindingList,
@@ -627,12 +764,14 @@ classes = [
 	
 	#ui panels
 	OBJECT_PT_MDFObjectModePanel,
+	OBJECT_PT_MDFMaterialLoadSettingsPanel,
 	OBJECT_PT_MDFMaterialPanel,
 	OBJECT_PT_MDFFlagsPanel,
 	OBJECT_PT_MDFMaterialTextureBindingListPanel,
 	OBJECT_PT_MDFMaterialPropertyListPanel,
 	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
 	OBJECT_PT_MDFMaterialGPBFDataListPanel,
+	
 	
 	#operators
 	WM_OT_NewMDFHeader,
@@ -641,11 +780,12 @@ classes = [
 	WM_OT_SavePreset,
 	WM_OT_OpenPresetFolder,
 	WM_OT_ApplyMDFToMeshCollection,
-	
+	WM_OT_ShowREMeshErrorWindow,
 	#tex
 	#operators
 	WM_OT_ConvertFolderToTex,
 	WM_OT_CopyConvertedTextures,
+	WM_OT_ConvertDDSTexFile,
 	#ui panels
 	OBJECT_PT_TexConversionPanel,
 	
@@ -653,6 +793,47 @@ classes = [
 	]
 
 
+#Drag and drop importing, 4.1 or higher only
+if bpy.app.version >= (4, 1, 0):
+	meshExtensionsString = ""
+	for meshVersion in meshFileVersionToGameNameDict.keys():
+		meshExtensionsString += f".{str(meshVersion)};"
+	class MESH_FH_drag_import(bpy.types.FileHandler):
+		bl_idname = "MESH_FH_drag_import"
+		bl_label = "File handler for RE Mesh importing"
+		bl_import_operator = "re_mesh.importfile"
+		bl_file_extensions = meshExtensionsString
+	
+		@classmethod
+		def poll_drop(cls, context):
+			return (context.area and context.area.type == 'VIEW_3D')
+	mdfExtensionsString = ""
+	for mdfVersion in gameNameMDFVersionDict.keys():
+		if isinstance(mdfVersion,int):
+			mdfExtensionsString += f".{str(mdfVersion)};"
+	
+	class MDF_FH_drag_import(bpy.types.FileHandler):
+		bl_idname = "MDF_FH_drag_import"
+		bl_label = "File handler for RE MDF importing"
+		bl_import_operator = "re_mdf.importfile"
+		bl_file_extensions = mdfExtensionsString
+		
+		@classmethod
+		def poll_drop(cls, context):
+			return (context.area and context.area.type == 'VIEW_3D')
+	texExtensionsString = ".dds;"
+	for texVersion in gameNameToTexVersionDict.values():
+		texExtensionsString += f".{str(texVersion)};"	
+	
+	class TEX_FH_drag_import(bpy.types.FileHandler):
+		bl_idname = "TEX_FH_drag_import"
+		bl_label = "File handler for RE Tex Conversion"
+		bl_import_operator = "re_tex.convert_tex_dds_files"
+		bl_file_extensions = texExtensionsString
+	
+		@classmethod
+		def poll_drop(cls, context):
+			return (context.area and context.area.type == 'VIEW_3D')
 class GU_PT_collection_custom_properties(bpy.types.Panel, PropertyPanel): #For adding custom properties to collections, fixed on 3.3 and up so not needed there
     _context_path = "collection"
     _property_type = bpy.types.Collection
@@ -686,10 +867,19 @@ def register():
 	bpy.types.Scene.re_mdf_toolpanel = PointerProperty(type=MDFToolPanelPropertyGroup)
 	bpy.types.Object.re_mdf_material = PointerProperty(type=MDFMaterialPropertyGroup)
 	
+	
+	
 	bpy.types.TOPBAR_MT_file_import.append(re_mesh_import)
 	bpy.types.TOPBAR_MT_file_export.append(re_mesh_export)
 	bpy.types.TOPBAR_MT_file_import.append(re_mdf_import)
 	bpy.types.TOPBAR_MT_file_export.append(re_mdf_export)
+
+
+	#Blender 4.1 and higher drag and drop operators
+	if bpy.app.version >= (4, 1, 0):
+		bpy.utils.register_class(MESH_FH_drag_import)
+		bpy.utils.register_class(MDF_FH_drag_import)
+		bpy.utils.register_class(TEX_FH_drag_import)
 	
 def unregister():
 	addon_updater_ops.unregister()
@@ -698,10 +888,17 @@ def unregister():
 	
 	if (3, 3, 0) > bpy.app.version:
 		bpy.utils.unregister_class(GU_PT_collection_custom_properties)
+		
+	
 	bpy.types.TOPBAR_MT_file_import.remove(re_mesh_import)
 	bpy.types.TOPBAR_MT_file_export.remove(re_mesh_export)
 	bpy.types.TOPBAR_MT_file_import.remove(re_mdf_import)
 	bpy.types.TOPBAR_MT_file_export.remove(re_mdf_export)
+	
+	if bpy.app.version >= (4, 1, 0):
+		bpy.utils.unregister_class(MESH_FH_drag_import)
+		bpy.utils.unregister_class(MDF_FH_drag_import)
+		bpy.utils.unregister_class(TEX_FH_drag_import)
 if __name__ == '__main__':
 	register()
 	

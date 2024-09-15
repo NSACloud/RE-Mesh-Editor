@@ -23,7 +23,8 @@ from .file_re_mesh import readREMesh,writeREMesh,ParsedREMeshToREMesh,Sphere,AAB
 from .re_mesh_parse import ParsedREMesh,VisconGroup,LODLevel,SubMesh,ParsedBone,Skeleton
 from ..mdf.file_re_mdf import readMDF
 from ..mdf.blender_re_mesh_mdf import findMDFPathFromMeshPath,importMDF
-from .re_mesh_export_errors import addErrorToDict,printErrorDict
+from ..mdf.blender_re_mdf import importMDFFile
+from .re_mesh_export_errors import addErrorToDict,printErrorDict,showREMeshErrorWindow
 from ..gen_functions import splitNativesPath,raiseWarning
 from ..blender_utils import showErrorMessageBox
 import time
@@ -89,12 +90,16 @@ def vertexPosToGlobal(local_coords, world_matrix):
     return np.reshape(global_coords,(-1,3))
 
 def joinObjects(objList):
-	ctx = bpy.context.copy()
-
-	# one of the objects to join
-	ctx['active_object'] = objList[0]
-	ctx['selected_editable_objects'] = objList
-	bpy.ops.object.join(ctx)
+	if bpy.app.version < (3,2,0):
+		ctx = bpy.context.copy()
+	
+		# one of the objects to join
+		ctx['active_object'] = objList[0]
+		ctx['selected_editable_objects'] = objList
+		bpy.ops.object.join(ctx)
+	else:
+		with bpy.context.temp_override(active_object=objList[0], selected_editable_objects=objList):
+			   bpy.ops.object.join()
 	
 def createMaterialDict(materialNameList):
 	materialDict = {}
@@ -150,11 +155,19 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 		if rotate90:
 			armatureObj.data.transform(rotateNeg90Matrix)#TODO do a less ugly workaround for merging rotated armatures
 	elif targetArmatureName != "":
-		print(f"The specified armature to merge with could not be found. Importing the armature as a new object.")
+		print("The specified armature to merge with could not be found. Importing the armature as a new object.")
 	boneParentList = []#List of tuples containing armature bone and parent bone name string
 	for bone in parsedSkeleton.boneList:
 		if bone.boneName not in armatureData.bones:
-			editBone = armatureData.edit_bones.new(bone.boneName)
+			hashedName = False
+			boneName = bone.boneName
+			if len(boneName) > 63:#Thank DMC5 for abominations like this: bake12_sim_sm1103_vegetablebox_04__PMesh_sm1103_vegetablebox_sm1103_vegetablebox_s6_polySurface6180__p001
+				boneName = f"#HASHED_{str(hash(boneName))}"
+				raiseWarning(f"Bone name length exceeds Blender's limit of 63 characters, hashing bone name: {bone.boneName}")
+				hashedName = True
+			editBone = armatureData.edit_bones.new(boneName)
+			if hashedName:
+				editBone["unhashedBoneName"] = bone.boneName
 			editBone.tail = editBone.head + Vector((.0, .0, .1))
 			if bone.parentIndex != -1:
 				boneParentList.append((editBone,boneNameIndexDict[bone.parentIndex]))#Set bone parents after all bones have been imported
@@ -240,11 +253,17 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 	if vertexGroupWeightList != [] and boneNameList != []:
 		#Only create vertex groups for bones that get used
 		
+		#print(boneNameList)
 		if len(boneNameList) > 1:
 			#print(boneNameList)
 			usedBoneIndices = sorted(list({x for vertex in vertexGroupBoneIndicesList for x in vertex}))#Get all used bone indices in hierarchy order
+			#print(usedBoneIndices)
 			for boneIndex in usedBoneIndices:
-				meshObj.vertex_groups.new(name = boneNameList[boneIndex])
+				boneName = boneNameList[boneIndex]
+				if len(boneName) > 63:
+					boneName = f"#HASHED_{str(hash(boneName))}"
+					
+				meshObj.vertex_groups.new(name = boneName)
 				
 			for vertexIndex, boneIndexList in enumerate(vertexGroupBoneIndicesList):
 				#print(vertexIndex)
@@ -252,6 +271,8 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 				for weightIndex, boneIndex in enumerate(boneIndexList):
 					if vertexGroupWeightList[vertexIndex][weightIndex] > 0:
 						boneName = boneNameList[boneIndex]
+						if len(boneName) > 63:
+							boneName = f"#HASHED_{str(hash(boneName))}"
 						meshObj.vertex_groups[boneName].add([vertexIndex],vertexGroupWeightList[vertexIndex][weightIndex],'ADD')
 		else:#No bone remap table edge case
 			vg = meshObj.vertex_groups.new(name=boneNameList[0])
@@ -318,6 +339,7 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 			boneNameList = [parsedMesh.skeleton.boneList[0].boneName]
 	else:
 		boneNameList = []
+	
 	
 	if not importAllLODs and targetLODList != []:
 		targetLODList = [targetLODList[0]]
@@ -393,9 +415,13 @@ def importBoundingBox(bbox,bboxName,meshCollection,armatureObj = None,boneParent
 	meshCollection.objects.link(bboxObj)
 	
 	if armatureObj != None and boneParent != None:
+		if len(boneParent) > 63:
+			boneName = f"#HASHED_{str(hash(boneParent))}"
+		else:
+			boneName = boneParent
 		constraint = bboxObj.constraints.new(type = "CHILD_OF")
 		constraint.target = armatureObj
-		constraint.subtarget = boneParent
+		constraint.subtarget = boneName
 		constraint.name = "BoneName"
 		constraint.inverse_matrix =  Matrix()
 		bboxObj["~TYPE"] = "RE_MESH_BONE_BOUNDING_BOX"
@@ -498,8 +524,11 @@ def importREMeshFile(filePath,options):
 		
 
 	print("\033[96m__________________________________\nRE Mesh import started.\033[0m")
-		
-	reMesh = readREMesh(filePath)
+	if options["importAllLODs"]:
+		lodTarget = None
+	else:
+		lodTarget = 0
+	reMesh = readREMesh(filePath,lodTarget)
 	meshFileName = os.path.splitext(os.path.split(filePath)[1])[0]
 	meshParseStartTime = time.time()
 	parsedMesh = ParsedREMesh()
@@ -541,7 +570,7 @@ def importREMeshFile(filePath,options):
 	
 	
 	meshOffsetDict.clear()
-	if options["loadMaterials"] and not options["importArmatureOnly"]:
+	if options["loadMaterials"] or options["loadMDFData"]:
 		#print(filePath.split(".mesh")[1])
 		if options["mdfPath"] != "":
 			mdfPath = options["mdfPath"]
@@ -556,17 +585,27 @@ def importREMeshFile(filePath,options):
 				else:
 					chunkPath = ""
 				mdfImportStartTime = time.time()
-				mdfFile = readMDF(mdfPath)
-				importMDF(mdfFile,materialDict,options["materialLoadLevel"],options["reloadCachedTextures"],chunkPath = chunkPath)
-				
-				mdfImportEndTime = time.time()
-				mdfImportTime =  mdfImportEndTime - mdfImportStartTime
-				print(f"Material importing took {timeFormat%(mdfImportTime * 1000)} ms.")
+				if options["loadMDFData"]:#MDF gets read twice when importing mdf data, could fix it but reading is fast enough that it's not really noticable.
+					print("Loading MDF Data...")
+					try:
+						importMDFFile(mdfPath)
+					except Exception as err:
+						raiseWarning("Could not import MDF data from " + mdfPath +":" + str(err))
+						warningList.append("Could not import MDF data from " + mdfPath +":" + str(err))
+				if options["loadMaterials"] and not options["importArmatureOnly"]:
+					if options["loadMDFData"]:
+						print("Loading Mesh Materials From MDF...")
+					mdfFile = readMDF(mdfPath)
+					importMDF(mdfFile,materialDict,options["loadUnusedTextures"],options["loadUnusedProps"],options["useBackfaceCulling"],options["reloadCachedTextures"],chunkPath = chunkPath,gameName = gameName,arrangeNodes = True)
+					
+					mdfImportEndTime = time.time()
+					mdfImportTime =  mdfImportEndTime - mdfImportStartTime
+					print(f"Material importing took {timeFormat%(mdfImportTime * 1000)} ms.")
 			else:
 				warningList.append("MDF file not found.")
 		except Exception as err:
-			print(str(err))
-			warningList.append("Could not import " + mdfPath +":" + str(err))
+			#print(str(err))
+			warningList.append("Could not import mesh materials from " + mdfPath +":" + str(err))
 	if options["createCollections"]:
 		bpy.context.scene["REMeshLastImportedCollection"] = meshCollection.name
 	bpy.context.scene["REMeshLastImportedMeshVersion"] = meshVersion	
@@ -660,7 +699,8 @@ def exportREMeshFile(filePath,options):
 	if gameName == "SF6":
 		maxWeightsPerVertex = 6
 		maxWeightedBones = 1024
-	MAX_VERTICES = 65535
+	MAX_VERTICES = 65536
+	MAX_VERTICES_EXTENDED = 4294967295
 	MAX_FACES = 4294967295
 	
 	subMeshCount = 0
@@ -703,6 +743,7 @@ def exportREMeshFile(filePath,options):
 				addErrorToDict(errorDict, "MoreThanOneArmature", None)
 	
 	exportArmatureData = None
+	hashedBoneNameDict = dict()
 	if armatureObj != None:
 		print(f"Armature: {armatureObj.name}")
 		parsedMesh.skeleton = Skeleton()
@@ -718,6 +759,10 @@ def exportREMeshFile(filePath,options):
 			parsedBone = ParsedBone()
 			#Get hierarchy
 			parsedBone.boneName = bone.name
+			unHashedName = bone.get("unhashedBoneName",None)
+			if unHashedName != None:
+				#parsedBone.boneName = unHashedName
+				hashedBoneNameDict[bone.name] = unHashedName
 			parsedBone.boneIndex = boneIndexDict[bone.name]
 			parsedBone.nextSiblingIndex = -1
 			parsedBone.nextChildIndex = -1
@@ -789,6 +834,7 @@ def exportREMeshFile(filePath,options):
 			parsedMesh.skeleton.boneList.append(parsedBone)
 			
 			#print(bone.name)
+		
 	#Get previously imported bounding boxes if option enabled
 	if boundingBoxCollection != None and options["exportBoundingBoxes"]:
 		for obj in boundingBoxCollection.objects:
@@ -1024,7 +1070,13 @@ def exportREMeshFile(filePath,options):
 					evaluatedSubMeshData.calc_tangents()
 				except:
 					pass
+				if len(evaluatedSubMeshData.vertices) > MAX_VERTICES_EXTENDED:
+					addErrorToDict(errorDict, "MaxVerticesExceeded", rawsubmesh.name)
+				if len(evaluatedSubMeshData.vertices) > MAX_VERTICES:
+					parsedMesh.bufferHasIntFaces = True
+					raiseWarning(f"{rawsubmesh.name} exceeded the standard limit of {str(MAX_VERTICES)} vertices. Enabling extended vertex limit of {str(MAX_VERTICES_EXTENDED)}.")
 				vertexCount += len(evaluatedSubMeshData.vertices)
+				
 				faceCount += len(evaluatedSubMeshData.polygons)
 				
 				vertexGroupIndexToRemapDict = {vgroup.index: remapDict[vgroup.name] for vgroup in rawsubmesh.vertex_groups}
@@ -1041,6 +1093,8 @@ def exportREMeshFile(filePath,options):
 					parsedSubMesh.weightIndicesList = np.zeros((len(evaluatedSubMeshData.vertices),8),dtype="<H")#ushort because of SF6
 				#Get Faces
 				parsedSubMesh.faceList = [tuple(f.vertices) for f in evaluatedSubMeshData.polygons]
+				if len(parsedSubMesh.faceList) > MAX_FACES:
+					addErrorToDict(errorDict, "MaxFacesExceeded", rawsubmesh.name)
 				if any([len(face) != 3 for face in parsedSubMesh.faceList]):
 					addErrorToDict(errorDict, "NonTriangulatedFace", rawsubmesh.name)
 				if len(evaluatedSubMeshData.uv_layers) > 0:
@@ -1280,9 +1334,24 @@ def exportREMeshFile(filePath,options):
 		addErrorToDict(errorDict, "NoMeshesInCollection", None)
 	
 	if errorDict != {}:
-		showErrorMessageBox("Mesh contains errors and can not be exported. Check the console (Window > Toggle System Console) for info on how to fix it.")
+		#showErrorMessageBox("Mesh contains errors and can not be exported. Check the console (Window > Toggle System Console) for info on how to fix it.")
 		printErrorDict(errorDict)
+		
+		showREMeshErrorWindow(targetCollection.name,armatureObj,errorDict)
 		return False
+	
+	if hashedBoneNameDict:#Translate hashed bone names to their original names
+		print("Translating hashed bone names...")
+		for bone in parsedMesh.skeleton.boneList:
+			if bone.boneName in hashedBoneNameDict:
+				print(f"Translated {bone.boneName} to {hashedBoneNameDict[bone.boneName]}")
+				bone.boneName = hashedBoneNameDict[bone.boneName]
+				
+				
+		for index,boneName in enumerate(parsedMesh.skeleton.weightedBones):
+			if boneName in hashedBoneNameDict:
+				parsedMesh.skeleton.weightedBones[index] = hashedBoneNameDict[boneName]
+		
 	
 	meshWriteStartTime = time.time()
 	reMesh = ParsedREMeshToREMesh(parsedMesh, meshVersion)

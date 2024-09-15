@@ -156,6 +156,31 @@ class Texconv:
             self.__cube_to_image(file, name, args, cubemap_layout=cubemap_layout, verbose=verbose)
 
         return name
+    def fix_mip_count(self, file, outDir,mipCount):
+        """Convert dds to tga."""
+        if self.dll is None:
+            raise RuntimeError("texconv is unloaded.")
+
+        dds_header = DDSHeader.read_from_file(file)
+
+        if not dds_header.is_supported():
+            raise RuntimeError(
+                f"DDS converter does NOT support {dds_header.get_format_as_str()}.\n"
+                "Use '.dds' as an export format."
+            )
+
+        if dds_header.is_3d() or dds_header.is_array():
+            raise RuntimeError("DDS converter does Not support non-2D textures.")
+
+        if dds_header.is_partial_cube():
+            raise RuntimeError("Partial cubemaps are unsupported.")
+
+
+        args = ['-m',str(mipCount),'-ft',"dds"]
+
+        out = self.__texconv(file, args, out=outDir,verbose=False,allow_slow_codec=True)
+
+
     def convert_to_png(self, file, out=None, cubemap_layout="h-cross", invert_normals=False, verbose=True):
         #NOTE:Texconv is very tempermental about saving pngs for some reason, it gives access denied errors in appdata where other texture formats don't
 		#tif is used instead because of this

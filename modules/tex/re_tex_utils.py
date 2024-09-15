@@ -1,10 +1,13 @@
 #Author: NSA Cloud
 #Credit to Asterisk Ampersand, code borrowed from Tex Chopper
-from ..dds.file_dds import DDS,DX10_Header,DDSFile
+from ..dds.file_dds import DDS,DX10_Header,DDSFile,getDDSHeader
+
 from .file_re_tex import RE_TexFile,Tex,MipData
+from ..gen_functions import raiseWarning
+from ..ddsconv.directx.texconv import Texconv, unload_texconv
 import math
 import re
-
+import os
 ddsBpps = {
 	"UNKNOWN":0,
 	"R32G32B32A32TYPELESS":128,
@@ -633,14 +636,15 @@ formatStringToTexFormatDict = {
 	'ASTC8X5TYPELESS': 1040,
 	'ASTC8X5UNORM': 1041,
 }
-def TexToDDS(tex):
+def TexToDDS(tex,imageIndex):
 	dds = DDS()
 	dds.header.dwSize = 124
 	dds.header.dwFlags = 0x00000001 | 0x00000002 | 0x00000004 | 0x00001000 | 0x00020000 | 0x00080000 #DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT | DDSD_MIPMAPCOUNT | DDSD_LINEARSIZE
 	dds.header.dwHeight = tex.header.height
 	dds.header.dwWidth = tex.header.width
 	dds.header.dwPitchOrLinearSize = (dds.header.dwWidth * dds.header.dwHeight * ddsBpps[texFormatToDXGIStringDict[tex.header.format]]) // 8
-	dds.header.dwDepth = tex.header.depth
+	#dds.header.dwDepth = tex.header.depth
+	dds.header.dwDepth = 1
 	dds.header.dwMipMapCount = tex.header.mipCount
 	dds.header.ddpfPixelFormat.dwSize = 32
 	dds.header.ddpfPixelFormat.dwFlags = 0x4#DDPF_FOURCC
@@ -663,20 +667,51 @@ def TexToDDS(tex):
 	dds.header.dx10Header = DX10_Header()
 	dds.header.dx10Header.dxgiFormat = formatStringToDXGIDict[texFormatToDXGIStringDict[tex.header.format]]
 	dds.header.dx10Header.resourceDimension = 3#D3D10_RESOURCE_DIMENSION_TEXTURE2D
+	"""
 	if tex.header.cubemapMarker != 0:
 		dds.header.dx10Header.arraySize = tex.header.imageCount // 6
 	else:
 		dds.header.dx10Header.arraySize = tex.header.imageCount
+	"""
+	dds.header.dx10Header.arraySize = 1
 	dds.header.dx10Header.miscFlags2 = 0
-	dds.data = tex.GetTextureData()
+	dds.data = tex.GetTextureData(imageIndex)
 	return dds
 
 def convertTexFileToDDS(texPath,outputPath):
 	texFile = RE_TexFile()
 	texFile.read(texPath)
-	ddsFile = DDSFile()
-	ddsFile.dds = TexToDDS(texFile.tex)
-	ddsFile.write(outputPath)
+	
+	if texFile.tex.header.depth != 1:
+		if texFile.tex.header.depth == 32 and texFile.tex.header.width == 32 and texFile.tex.header.height == 32:
+			isLUT = True
+			#TODO
+			raiseWarning("Color cube textures are not supported yet")
+		else:
+			raiseWarning("Textures with depth are not supported")
+	texInfo = {"isArray":texFile.tex.header.imageCount > 1,"arrayNum":texFile.tex.header.imageCount}
+	if texFile.tex.header.imageCount == 1:
+		ddsFile = DDSFile()
+		ddsFile.dds = TexToDDS(texFile.tex,0)
+		ddsFile.write(outputPath)
+	else:
+		digitCount = 2
+		if texFile.tex.header.imageCount > 99:
+			digitCount = 3
+		elif texFile.tex.header.imageCount > 999:#Highest possible image count is technically 4095 but I'm going to pretend nobody will try to make something that unholy
+			digitCount = 4
+		#print("TEX ARRAY FOUND")
+		newOutPathRoot = os.path.splitext(outputPath)[0]+ " #ARRAY_"
+		for i in range(texFile.tex.header.imageCount):
+			newOutputPath = f"{newOutPathRoot}{str(i).zfill(digitCount)}.dds"
+			ddsFile = DDSFile()
+			ddsFile.dds = TexToDDS(texFile.tex,i)
+			ddsFile.write(newOutputPath)
+			#print(f"Wrote {newOutputPath}")
+		
+	return texInfo
+	
+	
 
 
 
@@ -684,20 +719,20 @@ def convertTexFileToDDS(texPath,outputPath):
 #DDS To Tex
 packetSize = 16
 ruD = lambda x,y: (x+y-1)//y
-DXT1 = "DXT1"  # 0x31545844
-DXT2 = "DXT2"  # 0x32545844
-DXT3 = "DXT3"  # 0x33545844
-DXT4 = "DXT4"  # 0x34545844
-DXT5 = "DXT5"  # 0x35545844
-ATI1 = "ATI1"
-ATI2 = "ATI2"
-BC4U = "BC4U"
-BC4S = "BC4S"
-BC5U = "BC5U"
-BC5S = "BC5S"
-DX10 = "DX10"  # 0x30315844
-CCCC = "CCCC"
-NULL = "\x00\x00\x00\x00"
+DXT1 = 827611204  # 0x31545844
+DXT2 = 844388420  # 0x32545844
+DXT3 = 861165636  # 0x33545844
+DXT4 = 877942852  # 0x34545844
+DXT5 = 894720068  # 0x35545844
+ATI1 = 826889281
+ATI2 = 843666497
+BC4U = 1429488450
+BC4S = 1395934018
+BC5U = 1429553986
+BC5S = 1395999554
+DX10 = 808540228  # 0x30315844
+CCCC = 1128481603
+NULL = 0
 legacyMapping = {
     DXT1: "BC1UNORM",
     DXT2: "BC2UNORM",
@@ -805,8 +840,8 @@ def formatTexelParse(formatString):
         return (channels,xpacketlen,ypacketlen,rgb.groups()[-1])
     raise ValueError("Unparseable Format Error")
 
-def getTexFileFromDDS(dds,texVersion,streamingFlag = False):
-	ddsHeader = dds.header
+def getTexFileFromDDS(ddsList,texVersion,streamingFlag = False):
+	ddsHeader = ddsList[0].header
 	
 	newTexFile = RE_TexFile()
 	texHeader = newTexFile.tex.header
@@ -817,7 +852,7 @@ def getTexFileFromDDS(dds,texVersion,streamingFlag = False):
 	
 	cubemap = (ddsHeader.ddsCaps2 & 0x00000200 != 0)*1#DDSCAPS2_CUBEMAP
 	
-	imageCount = 1 if not ddsHeader.ddpfPixelFormat.dwFourCC == 808540228 else ddsHeader.dx10Header.arraySize * (6 if cubemap else 1)
+	imageCount = len(ddsList)
 	texHeader.imageCount = imageCount
 	texHeader.mipCount = ddsHeader.dwMipMapCount#For DMC5/RE2
 	texHeader.imageMipHeaderSize = ddsHeader.dwMipMapCount * 16
@@ -839,15 +874,21 @@ def getTexFileFromDDS(dds,texVersion,streamingFlag = False):
 	superBlockSize = (0,0)
 	
 	miptex = []
-	offset = 0
+	
 	for tex in range(imageCount):
+		offset = 0
+		dds = ddsList[tex]
+		#print(f"image {tex}")
 		mips = []
 		for mip in range(ddsHeader.dwMipMapCount):
+			#print(f"mip {mip}")
 			xcount, ycount = ruD(
 				ruD(ddsHeader.dwWidth, 2**mip), mtx), ruD(ruD(ddsHeader.dwHeight, 2**mip), mty)
 			mpacketSize = ruD(packetSize, round(
 				product(dotDivide(texelSize, mTexelSize))))
 			bytelen = xcount*ycount*mpacketSize
+			#print(f"mip offset {offset}")
+			#print(f"mip size {bytelen}")
 			parsel = (dds.data[offset:offset+bytelen], (xcount, ycount))
 			mips.append(parsel)
 			offset += bytelen
@@ -880,8 +921,53 @@ def getTexFileFromDDS(dds,texVersion,streamingFlag = False):
 	
 	return newTexFile
 
-def DDSToTex(ddsPath,texVersion,outPath,streamingFlag = False):
-	ddsFile = DDSFile()
-	ddsFile.read(ddsPath)
-	texFile = getTexFileFromDDS(ddsFile.dds,texVersion,streamingFlag)
-	texFile.write(outPath)
+def DDSToTex(ddsPathList,texVersion,outPath,streamingFlag = False):
+	if len(ddsPathList) == 1:
+		ddsFile = DDSFile()
+		ddsFile.read(ddsPathList[0])
+		texFile = getTexFileFromDDS([ddsFile.dds],texVersion,streamingFlag)
+		texFile.write(outPath)
+	else:#Array texture
+		baseHeader = getDDSHeader(ddsPathList[0])
+		#Preparse dds files to make sure they have the same height,width,format and mip count as the first
+		valid = True
+		fixDDSMipList = []#Force mip counts to match first dds in array
+		for ddsPath in ddsPathList:
+			
+			currentHeader = getDDSHeader(ddsPath)
+			if currentHeader.dwWidth != baseHeader.dwWidth:
+				raiseWarning(f"{os.path.split(ddsPath)[1]} - Width does not match first array texture.")
+				valid = False
+			if currentHeader.dwHeight != baseHeader.dwHeight:
+				raiseWarning(f"{os.path.split(ddsPath)[1]} - Height does not match first array texture.")
+				valid = False
+			if currentHeader.dwMipMapCount != baseHeader.dwMipMapCount:
+				raiseWarning(f"{os.path.split(ddsPath)[1]} - Mipmap count does not match first array texture.")
+				fixDDSMipList.append(ddsPath)
+				#valid = False
+			if currentHeader.dx10Header == None:
+				raiseWarning(f"{os.path.split(ddsPath)[1]} - DX10 header is missing, save the DDS file using Photoshop with the Intel DDS plugin.")
+				valid = False
+			else:
+				if baseHeader.dx10Header != None:
+					if currentHeader.dx10Header.dxgiFormat != baseHeader.dx10Header.dxgiFormat:
+						raiseWarning(f"{os.path.split(ddsPath)[1]} - DDS format ({DXGIToFormatStringDict.get(currentHeader.dx10Header.dxgiFormat)}) does not match first array texture ({DXGIToFormatStringDict.get(baseHeader.dx10Header.dxgiFormat)}).")
+						valid = False
+			
+		if valid:
+			if fixDDSMipList != []:
+				texConv = Texconv()
+				for fixPath in fixDDSMipList:
+					print(f"Fixing mip count on {os.path.split(fixPath)[1]}")
+					texConv.fix_mip_count(fixPath,os.path.split(fixPath)[0],baseHeader.dwMipMapCount)
+				unload_texconv()
+			
+			ddsList = []
+			for ddsPath in ddsPathList:
+				ddsFile = DDSFile()
+				ddsFile.read(ddsPath)
+				ddsList.append(ddsFile.dds)
+			
+			texFile = getTexFileFromDDS(ddsList,texVersion,streamingFlag)
+			texFile.write(outPath)
+			

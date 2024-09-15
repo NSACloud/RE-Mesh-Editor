@@ -3,6 +3,7 @@ import bpy
 import os
 
 from bpy.types import Operator
+from ..gen_functions import raiseWarning
 
 from .blender_re_mdf import createEmpty,reindexMaterials,createMDFCollection,checkNameUsage,buildMDF
 from .blender_re_mesh_mdf import importMDF
@@ -62,40 +63,49 @@ class WM_OT_AddPresetMaterial(Operator):
 			return {'CANCELLED'}
 class WM_OT_ApplyMDFToMeshCollection(Operator):
 	bl_label = "Apply Active MDF"
-	bl_description = "Applies the Active MDF Collection to the specified Mesh Collection.\nThis will remove all materials on the mesh and rebuild them using the active MDF.\nAll textures will be reloaded.\nThe Mod Natives Directory must be set"
+	bl_description = "Applies the Active MDF Collection to the specified Mesh Collection.\nThis will remove all materials on the mesh and rebuild them using the active MDF.\nTextures will be fetched from the chunk path set in the addon preferences"
 	bl_idname = "re_mdf.apply_mdf"
 
 	def execute(self, context):
 		#reindexMaterials()
 		mdfCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.mdfCollection,None)
 		meshCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.meshCollection,None)
+		
+		
+		
 		modDir = os.path.realpath(bpy.context.scene.re_mdf_toolpanel.modDirectory)
-		removedMaterialSet = set()
+		#removedMaterialSet = set()
 		if mdfCollection != None and meshCollection != None and os.path.isdir(modDir):
 			mdfFile = buildMDF(mdfCollection.name)
 			meshMaterialDict = dict()
 			for obj in meshCollection.all_objects:
 				if obj.type == "MESH" and not obj.get("MeshExportExclude"):
+					materialName = None
 					if "__" in obj.name:
 						materialName = obj.name.split("__",1)[1].split(".")[0]
 						for material in obj.data.materials:
-							removedMaterialSet.add(material)
-						if len(obj.data.materials) == 0 or materialName != obj.data.materials[0].name.split(".")[0]:
-							obj.data.materials.clear()
-							if materialName not in meshMaterialDict:
-								newMat = bpy.data.materials.new(name=materialName)
-								newMat.use_nodes = True
-								obj.data.materials.append(newMat)
-								meshMaterialDict[materialName] = newMat
-							else:
-								obj.data.materials.append(meshMaterialDict[materialName])
-									
+							if material.name.split(".")[0] == materialName:
+								meshMaterialDict[materialName] = material
+							#removedMaterialSet.add(material)
+					obj.data.materials.clear()
+					if materialName not in meshMaterialDict:
+						if materialName != None:
+							newMat = bpy.data.materials.new(name=materialName)
+							newMat.use_nodes = True
+							obj.data.materials.append(newMat)
+							meshMaterialDict[materialName] = newMat
+						else:
+							raiseWarning(f"No material in mesh name, cannot apply materials: {obj.name}")
+					else:
+						obj.data.materials.append(meshMaterialDict[materialName])
+			"""						
 			#If the removed materials have no more users, remove them
 			for material in removedMaterialSet:
 				if material.users == 0:
 					print(f"Removed {material.name}")
 					bpy.data.materials.remove(material)
-			importMDF(mdfFile, meshMaterialDict,materialLoadLevel = "3", reloadCachedTextures=True,chunkPath = modDir,gameName = bpy.context.scene.re_mdf_toolpanel.activeGame)
+			"""
+			importMDF(mdfFile, meshMaterialDict,bpy.context.scene.re_mdf_toolpanel.loadUnusedTextures,bpy.context.scene.re_mdf_toolpanel.loadUnusedProps,bpy.context.scene.re_mdf_toolpanel.useBackfaceCulling,bpy.context.scene.re_mdf_toolpanel.reloadCachedTextures,chunkPath = modDir,gameName = bpy.context.scene.re_mdf_toolpanel.activeGame,arrangeNodes = True)
 			self.report({"INFO"},"Applied MDF to mesh collection.")
 		else:
 			self.report({"ERROR"},"Invalid mesh or MDF collection.")

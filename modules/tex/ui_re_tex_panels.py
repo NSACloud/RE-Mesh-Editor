@@ -23,7 +23,10 @@ class OBJECT_PT_TexConversionPanel(Panel):
 		layout = self.layout
 		scene = context.scene
 		re_mdf_toolpanel = scene.re_mdf_toolpanel
-		layout.label(text = "Image Directory")
+		
+		layout.operator("re_tex.convert_tex_dds_files")
+		
+		layout.label(text = "Convert Image Directory")
 		layout.prop(re_mdf_toolpanel, "textureDirectory")
 		layout.operator("re_tex.convert_tex_directory")
 		#layout.prop(re_mdf_toolpanel, "createStreamingTextures")

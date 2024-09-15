@@ -258,6 +258,14 @@ def importMDFFile(filePath):
 		materialObj.re_mdf_material.flags.ver32Unknown2 = material.ver32Unkn2
 		
 		getMDFFlags(materialObj,material.flags)
+		if gameName == "SF6":
+			for prop in material.propertyList:
+				if "CustomizeRoughness" in prop.propName or "CustomizeMetal" in prop.propName:#Fix for imported SF6 materials, this shouldn't matter in game since it gets overriden by the cmd files
+					if prop.propValue[0] == 0.0:
+						prop.propValue = [1.0]
+				elif "CustomizeColor"  in prop.propName:
+					if prop.propValue == [0.501960813999176, 0.501960813999176, 0.501960813999176, 1.0]:
+						prop.propValue = [1.0,1.0,1.0,1.0]
 		addPropsToPropList(materialObj,material.propertyList)
 		addTextureBindingsToBindingList(materialObj, material.textureList)
 		if material.mmtrsData != None:
@@ -415,6 +423,7 @@ def buildMDF(mdfCollectionName,mdfVersion = None):
 				propertyEntry.propName = prop.prop_name
 				propertyEntry.propValue = getPropValue(prop)
 				propertyEntry.padding = prop.padding
+				propertyEntry.paramCount = len(propertyEntry.propValue)
 				materialEntry.propertyList.append(propertyEntry)
 				
 			if len(materialObj.re_mdf_material.mmtrsData_items) != 0:

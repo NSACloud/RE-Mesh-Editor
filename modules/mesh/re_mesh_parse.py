@@ -2,7 +2,7 @@ import numpy as np
 import struct
 from .file_re_mesh import Matrix4x4,AABB,Sphere,CompressedSixWeightIndices,CompressedBlendShapeVertexInt
 
-typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color"]
+typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color","SF6UnknownVertexDataType"]
 typeStrideDict = {
 	"Position":12,
 	"NorTan":8,
@@ -76,7 +76,20 @@ def ReadColorBuffer(colorBuffer,tags):
 def ReadFaceBuffer(faceBuffer):
 	faceBuffer = np.frombuffer(faceBuffer,dtype="<3H",)
 	return faceBuffer.tolist()
-
+def ReadIntFaceBuffer(faceBuffer):
+	faceBuffer = np.frombuffer(faceBuffer,dtype="<3I",)
+	return faceBuffer.tolist()
+def readPackedBitsVec3Array(packedIntArray, numBits):
+	#for packedInt in packedIntArray:
+		#print(packedInt)
+	limit = 2**numBits-1
+	vec3Array = np.zeros(len(packedIntArray),np.dtype("<3f"))
+	vec3Array[:,0] = ((packedIntArray >> 0) & limit) / limit
+	vec3Array[:,1] = ((packedIntArray >> (numBits*1)) & limit) / limit
+	vec3Array[:,2] = ((packedIntArray >> (numBits*2)) & limit) / limit
+	#for val in vec3Array:
+		#print(val)
+	return vec3Array
 
 BufferReadDict = {
 	"Position":ReadPosBuffer,
@@ -85,17 +98,18 @@ BufferReadDict = {
 	"UV2":ReadUVBuffer,
 	"Weight":ReadWeightBuffer,
 	"Color":ReadColorBuffer,
+	"SF6UnknownVertexDataType":ReadColorBuffer,#Read as color data for now until what it is can be determined
 	}
 
 def ReadBlendShapeByteBuffer(blendShapeBuffer,tags):
-	blendShapeIntArray = np.frombuffer(blendShapeBuffer,dtype="<L")
+	blendShapeIntArray = np.frombuffer(blendShapeBuffer,dtype="<I")
 	
-	blendShapeArray = np.empty((len(blendShapeIntArray),3),dtype = "<f")
-	bf = CompressedBlendShapeVertexInt()
-	
-	for index, value in enumerate(blendShapeIntArray):
-		bf.asUInt32 = value
-		blendShapeArray[index] = np.asarray((bf.pos.x,bf.pos.y,bf.pos.z))
+	#blendShapeArray = np.empty((len(blendShapeIntArray),3),dtype = "<f")
+	#bf = CompressedBlendShapeVertexInt()
+	blendShapeArray = readPackedBitsVec3Array(blendShapeIntArray, 10)
+	#for index, value in enumerate(blendShapeIntArray):
+	#	bf.asUInt32 = value
+	#	blendShapeArray[index] = np.asarray((bf.pos.x,bf.pos.y,bf.pos.z))
 	
 	#print(blendShapeArray)
 	"""
@@ -163,6 +177,7 @@ def ReadVertexElementBuffers(vertexElementList,vertexBuffer,tagSet):
 		"UV2":None,
 		"Weight":None,
 		"Color":None,
+		"SF6UnknownVertexDataType":None,
 		}
 	lastIndex = len(vertexElementList)-1
 	importedElementsSet = set()
@@ -214,7 +229,6 @@ class SubMesh:
 		self.linkedSubMesh = None
 		self.subMeshIndex = 0
 		self.blendShapeList = []
-
 class ParsedBone:
 	def __init__(self):
 		self.boneName = "BONE"
@@ -295,9 +309,9 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 							blendShapeEntry = BlendShape()
 							blendShapeEntry.blendShapeName = blendShapeName
 							blendShapeEntry.deltas = blendShapeDeltas[currentBlendDeltaOffset:currentBlendDeltaOffset+subMeshEntry.vertCount]
-							blendShapeEntry.deltas[:,0] *= step_size_x
-							blendShapeEntry.deltas[:,1] *= step_size_y
-							blendShapeEntry.deltas[:,2] *= step_size_z
+							blendShapeEntry.deltas[:,0] = blendShapeLODData.aabbList[blendTargetIndex].max.x * blendShapeEntry.deltas[:,0] + blendShapeLODData.aabbList[blendTargetIndex].min.x
+							blendShapeEntry.deltas[:,1] = blendShapeLODData.aabbList[blendTargetIndex].max.y * blendShapeEntry.deltas[:,1] + blendShapeLODData.aabbList[blendTargetIndex].min.y
+							blendShapeEntry.deltas[:,2] = blendShapeLODData.aabbList[blendTargetIndex].max.z * blendShapeEntry.deltas[:,2] + blendShapeLODData.aabbList[blendTargetIndex].min.z
 							
 							#blendShapeEntry.deltas[:,0] -= blendShapeLODData.aabbList[blendTargetIndex].max.x
 							#blendShapeEntry.deltas[:,1] -= blendShapeLODData.aabbList[blendTargetIndex].max.y
@@ -316,9 +330,9 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 						blendShapeEntry.blendShapeName = blendShapeName
 						blendShapeEntry.deltas = blendShapeDeltas[currentBlendDeltaOffset:currentBlendDeltaOffset+blendTarget.vertCount]
 						
-						blendShapeEntry.deltas[:,0] *= step_size_x
-						blendShapeEntry.deltas[:,1] *= step_size_y
-						blendShapeEntry.deltas[:,2] *= step_size_z
+						blendShapeEntry.deltas[:,0] = blendShapeLODData.aabbList[blendTargetIndex].max.x * blendShapeEntry.deltas[:,0] + blendShapeLODData.aabbList[blendTargetIndex].min.x
+						blendShapeEntry.deltas[:,1] = blendShapeLODData.aabbList[blendTargetIndex].max.y * blendShapeEntry.deltas[:,1] + blendShapeLODData.aabbList[blendTargetIndex].min.y
+						blendShapeEntry.deltas[:,2] = blendShapeLODData.aabbList[blendTargetIndex].max.z * blendShapeEntry.deltas[:,2] + blendShapeLODData.aabbList[blendTargetIndex].min.z
 						
 						currentBlendDeltaOffset += blendTarget.vertCount
 						if blendTarget.subMeshVertexStartIndex in blendShapeDict:
@@ -360,7 +374,10 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 				if vertexDict["Position"] != None:
 					submesh.vertexPosList = vertexDict["Position"][meshInfo.vertexStartIndex:bufferEnd]
 				#print(f"{meshInfo.faceStartIndex*2} - {meshInfo.faceStartIndex*2+meshInfo.faceCount*2}")
-				submesh.faceList = ReadFaceBuffer(reMesh.meshBufferHeader.faceBuffer[meshInfo.faceStartIndex*2:meshInfo.faceStartIndex*2+meshInfo.faceCount*2])
+				if reMesh.lodHeader.has32BitIndexBuffer:
+					submesh.faceList = ReadIntFaceBuffer(reMesh.meshBufferHeader.faceBuffer[meshInfo.faceStartIndex*4:meshInfo.faceStartIndex*4+meshInfo.faceCount*4])
+				else:
+					submesh.faceList = ReadFaceBuffer(reMesh.meshBufferHeader.faceBuffer[meshInfo.faceStartIndex*2:meshInfo.faceStartIndex*2+meshInfo.faceCount*2])
 				if vertexDict["NorTan"] != None:
 					submesh.normalList = vertexDict["NorTan"][0][meshInfo.vertexStartIndex:bufferEnd]
 					submesh.tangentList = vertexDict["NorTan"][1][meshInfo.vertexStartIndex:bufferEnd]
@@ -429,6 +446,7 @@ class ParsedREMesh:
 		self.bufferHasUV2 = False
 		self.bufferHasWeight = False
 		self.bufferHasColor = False
+		self.bufferHasIntFaces = False
 	def ParseREMesh(self,reMesh,importOptions = {"importAllLOD":True,"importShadowMesh":True,"importOcclusionMesh":True,"importBlendShapes":True}):
 		vertexDict = None
 		usedVertexOffsetDict = dict()
@@ -442,6 +460,13 @@ class ParsedREMesh:
 		if reMesh.skeletonHeader != None:
 			self.skeleton = Skeleton()
 			self.skeleton.weightedBones = []
+			
+			#I hope this doesn't cause weird issues somewhere, the root bone isn't counted in the remap table but it is used by some meshes and that causes issues
+			#EX F:\RE2RT_EXTRACT\re_chunk_000\natives\STM\ObjectRoot\SetModel\sm4x_Gimmick\sm42\sm42_253_Switch01A\sm42_253_Switch01A_00md.mesh.2109108288
+			#Check if the root bone is weighted and add it to the weighted bone list
+			if reMesh.skeletonHeader.remapCount != reMesh.boneBoundingBoxHeader.count:
+				self.skeleton.weightedBones.append(reMesh.rawNameList[reMesh.boneNameRemapList[0]])
+			
 			
 			for remapIndex in reMesh.skeletonHeader.boneRemapList:
 				self.skeleton.weightedBones.append(reMesh.rawNameList[reMesh.boneNameRemapList[remapIndex]])
@@ -489,6 +514,8 @@ class ParsedREMesh:
 				
 		#Parse Main Meshes
 		if reMesh.lodHeader != None and vertexDict != None:
+			if reMesh.lodHeader.has32BitIndexBuffer:
+				self.bufferHasIntFaces = True
 			self.boundingSphere = reMesh.lodHeader.sphere
 			self.boundingBox = reMesh.lodHeader.bbox
 			self.mainMeshLODList = parseLODStructure(reMesh,reMesh.lodHeader.lodGroupList,vertexDict,usedVertexOffsetDict,blendShapeBuffer)

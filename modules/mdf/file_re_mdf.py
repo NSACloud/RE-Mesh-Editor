@@ -270,6 +270,9 @@ class Material():
 		self.mmtrsData = None
 		self.gpbfBufferNameList = []
 		self.gpbfBufferPathList = []
+		
+	def getPropertyDict(self):
+		return {prop.propName : prop for prop in self.propertyList}
 	def read(self,file,version):
 		self.matNameOffset = read_uint64(file)
 		debugprint("matNameOffset:"+str(self.matNameOffset))
@@ -447,10 +450,7 @@ class MDFFile():
 			self.materialList.append(materialEntry)
 	
 	def getMaterialDict(self):
-		materialDict = {}
-		for material in self.materialList:
-			materialDict[material.materialName] = material
-		return materialDict
+		return {material.materialName: material for material in self.materialList}
 	
 	def recalculateHashesAndOffsets(self,version):
 		self.Header.materialCount = len(self.materialList)

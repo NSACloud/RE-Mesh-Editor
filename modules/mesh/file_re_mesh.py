@@ -334,7 +334,7 @@ class MainMeshHeader():
 		self.lodGroupOffsetList = []
 		self.lodGroupList = []
 		#padding align 16
-	def read(self,file,version):
+	def read(self,file,version,lodTarget = None):
 		self.lodGroupCount = read_byte(file)
 		self.materialCount = read_byte(file)
 		self.uvCount = read_byte(file)
@@ -352,12 +352,17 @@ class MainMeshHeader():
 			self.lodGroupOffsetList.append(read_uint64(file))
 		self.lodGroupList = []
 		startPos = file.tell()
-		for offset in self.lodGroupOffsetList:
-			
-			file.seek(offset)
-			entry = LODGroupHeader()
-			entry.read(file,version)
-			self.lodGroupList.append(entry)
+		
+		if lodTarget != None:
+			lodTarget = abs(lodTarget)
+			if lodTarget >= self.lodGroupCount:#If the chosen LOD target isn't on the mesh, use the lowest quality LOD possible
+				lodTarget = self.lodGroupCount - 1
+		for lodIndex, offset in enumerate(self.lodGroupOffsetList):
+			if lodTarget == None or lodTarget == lodIndex:#Read only the target lod if specified
+				file.seek(offset)
+				entry = LODGroupHeader()
+				entry.read(file,version)
+				self.lodGroupList.append(entry)
 		file.seek(startPos)
 		file.seek(getPaddedPos(file.tell(), 16))
 	def write(self,file,version):
@@ -1161,20 +1166,20 @@ class REMesh():
 		self.materialNameRemapList = []
 		self.boneNameRemapList = []
 		self.blendShapeNameRemapList = []
-	def read(self,file,version):
+	def read(self,file,version,lodTarget = None):#LOD target is an int that determines what lod level to import, the rest get ignored
 		self.fileHeader.read(file,version)
 		
 		if self.fileHeader.meshGroupOffset:
 			file.seek(self.fileHeader.meshGroupOffset)
 			self.lodHeader = MainMeshHeader()
-			self.lodHeader.read(file,version)
+			self.lodHeader.read(file,version,lodTarget)
 			
-		if self.fileHeader.shadowMeshGroupOffset:
+		if self.fileHeader.shadowMeshGroupOffset and lodTarget == None:
 			file.seek(self.fileHeader.shadowMeshGroupOffset)
 			self.shadowHeader = ShadowHeader()
 			self.shadowHeader.read(file,version)
 		
-		if self.fileHeader.occlusionMeshGroupOffset:
+		if self.fileHeader.occlusionMeshGroupOffset and lodTarget == None:
 			file.seek(self.fileHeader.occlusionMeshGroupOffset)
 			self.occlusionHeader = LODGroupHeader()
 			self.occlusionHeader.read(file,version)
@@ -1472,8 +1477,14 @@ def WriteToColorBuffer(bufferStream,colorList):
 def WriteToFaceBuffer(bufferStream,faceList):
 	data = struct.pack(f'{len(faceList)*3}H', *chain.from_iterable(faceList))
 	
-	if (len(data)*-1)%4 != 0:#Align face buffer to 4 bytes per submesh
+	if (len(data))%4 != 0:#Align face buffer to 4 bytes per submesh
 		data += b'\x00\x00'
+	bufferStream.write(data)
+def WriteToIntFaceBuffer(bufferStream,faceList):
+	data = struct.pack(f'{len(faceList)*3}I', *chain.from_iterable(faceList))
+	
+	#if (len(data))%4 != 0:#Align face buffer to 4 bytes per submesh
+		#data += b'\x00\x00\x00\x00'
 	bufferStream.write(data)
 
 class sizeData:
@@ -1549,6 +1560,8 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 			reMesh.lodHeader.uvCount = 2
 		else:
 			reMesh.lodHeader.uvCount = 1
+		if parsedMesh.bufferHasIntFaces:
+			reMesh.lodHeader.has32BitIndexBuffer = 1
 		reMesh.lodHeader.offsetOffset = sd.MESH_HEADER_SIZE+sd.LOD_HEADER_OFFSET_LIST_OFFSET
 		
 		#currentOffset = LOD Group 0 offset
@@ -1578,7 +1591,10 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 					subMesh = MaterialSubdivision()
 					subMesh.materialIndex = parsedSubMesh.materialIndex
 					subMesh.faceCount = len(parsedSubMesh.faceList) * 3
-					paddedFaceCount = getPaddedPos(subMesh.faceCount, 2)
+					if parsedMesh.bufferHasIntFaces:
+						paddedFaceCount = subMesh.faceCount
+					else:
+						paddedFaceCount = getPaddedPos(subMesh.faceCount, 2)
 					meshGroup.faceCount += paddedFaceCount
 					
 					vertCount = len(parsedSubMesh.vertexPosList)
@@ -1615,8 +1631,10 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 						
 						if parsedSubMesh.colorList is not None:
 							WriteToColorBuffer(colorBuffer,parsedSubMesh.colorList)
-						
-						WriteToFaceBuffer(faceBuffer,parsedSubMesh.faceList)
+						if parsedMesh.bufferHasIntFaces:
+							WriteToIntFaceBuffer(faceBuffer,parsedSubMesh.faceList)
+						else:
+							WriteToFaceBuffer(faceBuffer,parsedSubMesh.faceList)
 					else:
 						linkedMeshData = parsedSubMeshToSubMeshDataDict[parsedSubMesh.linkedSubMesh]
 						subMesh.faceStartIndex = linkedMeshData.faceStartIndex
@@ -1867,7 +1885,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 			reMesh.meshBufferHeader.vertexBuffer.extend(colorBuffer.getvalue())
 			currentBufferOffset+=colorBuffer.tell()
 	reMesh.meshBufferHeader.faceBuffer = faceBuffer.getvalue()
-	
+	#print(len(reMesh.meshBufferHeader.faceBuffer))
 	reMesh.meshBufferHeader.vertexElementCount = len(reMesh.meshBufferHeader.vertexElementList)
 	reMesh.meshBufferHeader.mainVertexElementCount = reMesh.meshBufferHeader.vertexElementCount
 	reMesh.meshBufferHeader.vertexElementOffset = reMesh.fileHeader.meshOffset + sd.VERTEX_ELEMENT_OFFSET
@@ -1922,7 +1940,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 	return reMesh
 #---RE MESH IO FUNCTIONS---#
 
-def readREMesh(filepath):
+def readREMesh(filepath,lodTarget = None):
 	print("Opening " + filepath)
 	try:  
 		file = open(filepath,"rb",buffering=8192)
@@ -1939,7 +1957,7 @@ def readREMesh(filepath):
 		print(f"Nearest Remap Version: {str(version)} ({meshFileVersionToGameNameDict[newVersionToMeshFileVersion[version]]})")
 	reMeshFile = REMesh()
 	reMeshFile.meshVersion = meshVersion
-	reMeshFile.read(file,version)
+	reMeshFile.read(file,version,lodTarget)
 	file.close()
 	return reMeshFile
 def writeREMesh(reMeshFile,filepath):

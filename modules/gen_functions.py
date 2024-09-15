@@ -192,6 +192,10 @@ def wildCardFileSearch(wildCardFilePath):#Returns first file found matching wild
 		search = [None]
 	return search[0]
 
+def wildCardFileSearchList(wildCardFilePath):#Returns all files matching wildcard
+	search = glob.glob(wildCardFilePath)
+	return search
+
 def splitNativesPath(filePath):#Splits file path of RE Engine natives/platform folder, returns none if there's no natives folder
 	path = Path(filePath)	
 	parts = path.parts

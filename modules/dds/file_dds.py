@@ -3,7 +3,6 @@ import os
 
 from ..gen_functions import textColors,raiseWarning,raiseError,getPaddingAmount,read_uint,read_int,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte
 
-#TODO Add support for multi image textures like RE4R's terrain textures
 
 class DX10_Header():
 	def __init__(self):
@@ -152,3 +151,13 @@ class DDSFile:
 		except Exception as err:
 			raiseError("Failed to write " + filePath + str(err))
 		file.close()
+
+def getDDSHeader(ddsPath):
+	try:  
+		file = open(ddsPath,"rb")
+	except Exception as err:
+		raiseError("Failed to open " + ddsPath + str(err))
+	header = DDSHeader()
+	header.read(file)
+	file.close()
+	return header
