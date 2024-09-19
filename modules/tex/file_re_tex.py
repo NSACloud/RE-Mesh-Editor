@@ -19,6 +19,7 @@ gameNameToTexVersionDict = {
 	"SF6":143230113,
 	"DD2":760230703,
 	"KG":231106777,
+	"DR":240606151,
 	}
 
 ddsBpps = {

@@ -531,6 +531,7 @@ missingTexTypeDict = {
 	"ALBA":(1.0,0.0,1.0,1.0),
 	"NRMR":(.502,.502,1.0,1.0),
 	"NRRT":(.502,.502,1.0,.502),
+	"NRRA":(.502,.502,1.0,.502),
 	"NRRC":(.502,.502,1.0,.502),
 	"NRRO":(.502,.502,1.0,.502),
 	"ATOS":(1.0,0.0,1.0,1.0),
@@ -749,8 +750,11 @@ def newNRRTNode (nodeTree,textureType,matInfo):
 		
 	elif textureType == "NormalRoughnessOcclusionMap":
 		matInfo["aoNodeLayerGroup"].addMixLayer(nodeGroupNode.outputs["BlueChannel"])
+	elif textureType == "NormalRoughnessAlphaMap":
+		matInfo["alphaSocket"] = nodeGroupNode.outputs["BlueChannel"]
 	else:
 		matInfo["translucentSocket"] = nodeGroupNode.outputs["BlueChannel"]
+		
 	return imageNode
 	
 def newALPNode (nodeTree,textureType,matInfo):
@@ -1055,6 +1059,22 @@ def newATOSNode (nodeTree,textureType,matInfo):
 			matInfo["subsurfaceSocket"] = imageNode.outputs["Alpha"]
 	
 	return imageNode
+
+def newOCTDNode (nodeTree,textureType,matInfo):
+	imageNode = nodeTree.nodes[textureType]
+	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
+	
+	
+	separateNode = nodeTree.nodes.new('ShaderNodeSeparateRGB')
+	separateNode.location = currentPos
+	currentPos[0] += 300
+	nodeTree.links.new(imageNode.outputs["Color"],separateNode.inputs["Image"])
+	
+	matInfo["translucentSocket"] = separateNode.outputs["B"]
+	matInfo["aoNodeLayerGroup"].addMixLayer(separateNode.outputs["R"])
+	matInfo["cavityNodeLayerGroup"].addMixLayer(separateNode.outputs["G"])
+	
+	return imageNode
 """
 def newUNKNNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes.new('ShaderNodeTexImage')
@@ -1084,6 +1104,7 @@ nodeDict = {
 	"CMASK":newCMASKNode,
 	"EMI":newEMINode,
 	"ATOS":newATOSNode,
+	"OCTD":newOCTDNode,
 	"NAM":newNAMNode,
 	#"UNKN":newUNKNNode,
 	

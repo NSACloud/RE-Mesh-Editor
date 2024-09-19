@@ -27,16 +27,17 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - **Street Fighter 6**
  - **Dragon's Dogma 2**
  - **Kunitsu-Gami: Path of the Goddess**
+ - **Dead Rising Deluxe Remaster**
  
 Support for more games may be added in the future.
 
 ## Requirements
 * [Blender 2.93 or higher (4.2.1 or higher recommended)](https://www.blender.org/download/)
-* [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
+
   
 **Not required but strongly recommended:**
 * [RE Chain Editor](https://github.com/NSACloud/RE-Chain-Editor) - Blender addon for creation of chain files. Used to add physics to models.
-
+* [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
 ## Installation
 Download the addon from the "Download RE Mesh Editor" link at the top or click Code > Download Zip.
 
@@ -52,24 +53,28 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.27 - 9/18/2024
+* Added Dead Rising support.
+* RE Toolbox is no longer a requirement.
+* Disabled translucency shader temporarily since it doesn't work correctly.
+
 ### V0.26 - 9/14/2024
 * Material importing has been improved. Imported materials now more closely resemble how they appear in game.
 * MDF files will now be imported along with the mesh file, this can be disabled by unchecking "Load MDF Material Data" in the import options.
 * Added drag and drop mesh importing - drag and drop a .mesh or .mdf2 file into the 3D view to import it. (Blender 4.1 and higher only)
   
-https://github.com/user-attachments/assets/c0286b80-8860-47b5-a03a-25c4249d9cb1
+https://github.com/user-attachments/assets/32875930-ff5f-4a61-8dd3-d421e05461d3
+
 
 * Added drag and drop tex conversion - drag and drop a .tex or .dds file into the 3D view to convert it. (Blender 4.1 and higher only)
 
 
-https://github.com/user-attachments/assets/96181373-aa36-4ff2-820a-f4bbc4180c1f
-
+https://github.com/user-attachments/assets/21f04c05-2837-4384-822b-5846e64f5f1b
 
 
 * Changes made to certain MDF material properties now reflect in Blender. MDF properties that have a wrench icon next to them are previewable.
 
-
-https://github.com/user-attachments/assets/ff3e918d-641e-4e78-ae5a-43ecab1a4a6b
+https://github.com/user-attachments/assets/8da89fd4-c307-4385-9db2-ba73b6d04eff
 
 
 * Blender 4.2 and above now cache textures as DDS files instead of TIF. This massively decreases material importing time. (Approximately 6x faster)

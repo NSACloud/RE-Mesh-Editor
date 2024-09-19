@@ -59,17 +59,21 @@ def resolveMDFGameNameConflict(gameName,mdfFile,filePath):
 		if realGameName == None:
 			meshVersion = getAdjacentFileVersion(rootPath,".mesh")
 			if meshVersion != -1:
-				if meshVersion != 231011879: #RE2:
+				if meshVersion == 240306278:
 					realGameName = "KG"
-				else:
+				elif meshVersion == 231011879:
 					realGameName = "DD2"
+				elif meshVersion == 240424828:
+					realGameName = "DR"
 		if realGameName == None:
 			texVersion = getAdjacentFileVersion(rootPath,".tex")
 			if texVersion != -1:
-				if texVersion != 760230703:
+				if texVersion == 231106777:
 					realGameName = "KG"
-				else:
+				elif texVersion == 760230703:
 					realGameName = "DD2"
+				elif texVersion == 240606151:
+					realGameName = "DR"
 	if realGameName == None:
 		realGameName = gameName
 	return realGameName

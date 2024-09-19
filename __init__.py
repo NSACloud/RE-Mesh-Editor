@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 26),
+	"version": (0, 27),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -123,6 +123,7 @@ class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
 		("RE4", "Resident Evil 4", ""),
 		("DD2", "Dragon's Dogma 2", ""),
 		("KG", "Kunitsu-Gami", ""),
+		("DR", "Dead Rising", ""),
 		]
     )
     path: StringProperty(
@@ -495,6 +496,7 @@ class ExportREMesh(Operator, ExportHelper):
 				(".230110883", "Street Fighter 6", "Street Fighter 6"),
 				(".231011879", "Dragon's Dogma 2", "Dragon's Dogma 2"),
 				(".240306278", "Kunitsu-Gami", "Kunitsu-Gami"),
+				(".240424828", "Dead Rising", "Dead Rising"),
 			   ]
 		)
 	targetCollection: bpy.props.StringProperty(
@@ -522,11 +524,11 @@ class ExportREMesh(Operator, ExportHelper):
 	   default = True)
 	autoSolveRepeatedUVs : BoolProperty(
 	   name = "Auto Solve Repeated UVs",
-	   description = "(RE Toolbox Required)\nSplits connected UV islands if present. The mesh format does not allow for multiple uvs assigned to a vertex.\nNOTE: This will modify the exported mesh. If auto smooth is disabled on the mesh, the normals may change",
+	   description = "Splits connected UV islands if present. The mesh format does not allow for multiple uvs assigned to a vertex.\nNOTE: This will modify the exported mesh. If auto smooth is disabled on the mesh, the normals may change",
 	   default = True)
 	preserveSharpEdges : BoolProperty(
 	   name = "Split Sharp Edges",
-	   description = "(RE Toolbox Required)\nEdge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the exported mesh",
+	   description = "Edge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the exported mesh",
 	   default = False)
 	useBlenderMaterialName : BoolProperty(
 	   name = "Use Blender Material Names",
@@ -561,12 +563,12 @@ class ExportREMesh(Operator, ExportHelper):
 		layout.label(text = "Advanced Options")
 		layout.prop(self, "exportAllLODs")
 		#layout.prop(self, "exportBlendShapes")
-		hasREToolbox = hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel")
+		#hasREToolbox = hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel")
 		row = layout.row()
-		row.enabled = hasREToolbox
+		#row.enabled = hasREToolbox
 		row.prop(self,"autoSolveRepeatedUVs")
 		row2 = layout.row()
-		row2.enabled = hasREToolbox
+		#row2.enabled = hasREToolbox
 		row2.prop(self,"preserveSharpEdges")
 		
 
@@ -683,7 +685,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				(".23", "Monster Hunter Rise", ""),
 				(".32", "Resident Evil 4", ""),
 				(".31", "Street Fighter 6", ""),
-				(".40", "Dragon's Dogma 2 / Kunitsu-Gami", "Dragon's Dogma 2 and Kunitsu-Gami"),
+				(".40", "Dragon's Dogma 2 / Kunitsu-Gami \ Dead Rising", "Dragon's Dogma 2, Kunitsu-Gami, Dead Rising"),
 			  ]
 		)
 	targetCollection : StringProperty(

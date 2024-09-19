@@ -46,6 +46,8 @@ VERSION_SF6 = 105#file:230110883,internal:220705151
 VERSION_RE4 = 110#file:221108797,internal:220822879
 VERSION_DD2 = 115#file:230517984,internal:230517984
 VERSION_KG = 120#file:240306278,internal:230727984
+VERSION_DR = 125#file:240424828,internal:240423829
+
 meshFileVersionToNewVersionDict = {
 	1808282334:VERSION_DMC5,
 	1808312334:VERSION_RE2,
@@ -58,6 +60,7 @@ meshFileVersionToNewVersionDict = {
 	221108797:VERSION_RE4,
 	231011879:VERSION_DD2,
 	240306278:VERSION_KG,
+	240424828:VERSION_DR,
 	}
 newVersionToMeshFileVersion = {
 	VERSION_DMC5:1808282334,
@@ -71,6 +74,7 @@ newVersionToMeshFileVersion = {
 	VERSION_RE4:221108797,
 	VERSION_DD2:231011879,
 	VERSION_KG:240306278,
+	VERSION_DR:240424828,
 	}
 meshFileVersionToInternalVersionDict = {
 	1808282334:386270720,#VERSION_DMC5
@@ -83,6 +87,7 @@ meshFileVersionToInternalVersionDict = {
 	221108797:220822879,#VERSION_RE4
 	231011879:230517984,#VERSION_DD2
 	240306278:230727984,#VERSION_KG
+	240424828:240423829,#VERSION_DR
 	}
 internalVersionToMeshFileVersionDict = {
 	386270720:1808282334,#VERSION_DMC5
@@ -95,6 +100,7 @@ internalVersionToMeshFileVersionDict = {
 	220822879:221108797,#VERSION_RE4
 	230517984:231011879,#VERSION_DD2
 	230727984:240306278,#VERSION_KG
+	240423829:240424828,#VERSION_KG
 	}
 meshFileVersionToGameNameDict = {
 	1808282334:"DMC5",#VERSION_DMC5
@@ -107,6 +113,7 @@ meshFileVersionToGameNameDict = {
 	221108797:"RE4",#VERSION_RE4
 	231011879:"DD2",#VERSION_DD2
 	240306278:"KG",#VERSION_KG
+	240424828:"DR",#VERSION_DR
 	}
 
 #Used for unmapped mesh versions, potentially allows for importing
@@ -224,31 +231,41 @@ class MaterialSubdivision():
 		self.materialIndex = 0
 		self.isQuad = 0
 		self.padding = 0
+		self.dr_unkn0 = 0
 		self.faceCount = 0
 		self.faceStartIndex = 0
 		self.vertexStartIndex = 0
 		self.streamingOffsetBytes = 0
 		self.streamingPlatormSpecificOffsetBytes = 0
+		self.dr_unkn1 = 0
 	def read(self,file,version):
-		self.materialIndex = read_ubyte(file)
+		self.materialIndex = read_ubyte(file)	
 		self.isQuad = read_ubyte(file)
 		self.padding = read_ushort(file)
+		if version >= VERSION_DR:
+			self.dr_unkn0 = read_uint(file)
 		self.faceCount = read_uint(file)
 		self.faceStartIndex = read_uint(file)
 		self.vertexStartIndex = read_uint(file)
 		if version >= VERSION_RE8:
 			self.streamingOffsetBytes = read_uint(file)
 			self.streamingPlatormSpecificOffsetBytes = read_uint(file)
+		if version >= VERSION_DR:
+			self.dr_unkn1 = read_uint(file)
 	def write(self,file,version):
 		write_ubyte(file, self.materialIndex)
 		write_ubyte(file, self.isQuad)
 		write_ushort(file, self.padding)
+		if version >= VERSION_DR:
+			write_uint(file, self.dr_unkn0)
 		write_uint(file, self.faceCount)
 		write_uint(file, self.faceStartIndex)
 		write_uint(file, self.vertexStartIndex)
 		if version >= VERSION_RE8:
 			write_uint(file, self.streamingOffsetBytes)
 			write_uint(file, self.streamingPlatormSpecificOffsetBytes)
+		if version >= VERSION_DR:
+			write_uint(file, self.dr_unkn1)
 
 class MeshGroup():
 	def __init__(self):
@@ -1513,6 +1530,8 @@ class sizeData:
 		if version >= VERSION_SF6:
 			self.VERTEX_ELEMENT_OFFSET = 80
 		
+		if version >= VERSION_DR:
+			self.MATERIAL_SUBDIVISION_SIZE = 32
 		self.VERTEX_ELEMENT_SIZE = 8
 
 def ParsedREMeshToREMesh(parsedMesh,meshVersion):

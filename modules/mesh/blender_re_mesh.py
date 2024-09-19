@@ -639,6 +639,147 @@ def checkObjForUVDoubling(obj):
 				UVPoints[currentVertIndex] = uv
 	return hasUVDoubling
 
+#RE Toolbox Solve Repeated UVs
+
+def cloneMesh(mesh):
+    new_obj = mesh.copy()
+    new_obj.data = mesh.data.copy()
+    bpy.context.scene.collection.objects.link(new_obj)
+    return new_obj
+
+def bad_iter(blenderCrap):
+	#This might look stupid but it's actually necessary, blender will throw errors if you loop directly over the uv layers
+    i = 0
+    while (True):
+        try:
+            yield(blenderCrap[i])
+            i+=1
+        except:
+            return
+def selectRepeated(bm):
+    bm.verts.index_update()
+    bm.verts.ensure_lookup_table()
+    targetVert = set()
+    for uv_layer in bad_iter(bm.loops.layers.uv):
+        uvMap = {}
+        for face in bm.faces:
+            for loop in face.loops:
+                uvPoint = tuple(loop[uv_layer].uv)
+                if loop.vert.index in uvMap and uvMap[loop.vert.index] != uvPoint:
+                    targetVert.add(bm.verts[loop.vert.index])
+                else:
+                    uvMap[loop.vert.index] = uvPoint
+    return targetVert
+
+def solveRepeatedVertex(op,mesh):
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bm = bmesh.from_edit_mesh(mesh.data)
+    oldmode = bm.select_mode
+    bm.select_mode = {'VERT'}    
+    targets = selectRepeated(bm)
+    for target in targets:
+        bmesh.utils.vert_separate(target,target.link_edges)
+        bm.verts.ensure_lookup_table()    
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bm.select_mode = oldmode
+    bm.verts.ensure_lookup_table()
+    bm.verts.index_update()
+    bmesh.update_edit_mesh(mesh.data) 
+    mesh.data.update()       
+    return
+def transferNormals(clone,mesh):
+	m = mesh.modifiers.new("Normals Transfer","DATA_TRANSFER")
+	m.use_loop_data = True
+	m.loop_mapping = "TOPOLOGY"#"POLYINTERP_NEAREST"#
+	m.data_types_loops = {'CUSTOM_NORMAL'}
+	m.object = clone
+	bpy.ops.object.modifier_move_to_index(modifier=m.name, index=0)
+	bpy.ops.object.modifier_apply(modifier = m.name)
+    
+
+def deleteClone(clone):
+    objs = bpy.data.objects
+    objs.remove(objs[clone.name], do_unlink=True)	
+
+def solveRepeatedUVs():
+	context = bpy.context
+	if context.selected_objects != []:
+		selection = context.selected_objects	
+	else:
+		selection = bpy.context.scene.objects
+	for selectedObj in selection:
+		if selectedObj.type == "MESH":
+			context.view_layer.objects.active  = selectedObj
+			if bpy.app.version < (4,0,0):
+				if selectedObj.data.use_auto_smooth == False:
+					selectedObj.data.use_auto_smooth = True
+					selectedObj.data.auto_smooth_angle = .785 #45 degrees, try to preserve normals if auto smooth was disabled
+			selectedObj.data.polygons.foreach_set("use_smooth", [True] * len(selectedObj.data.polygons))
+			clone = cloneMesh(selectedObj)
+			bpy.ops.object.mode_set(mode='EDIT')
+			obj = context.edit_object
+			me = obj.data
+			bm = bmesh.from_edit_mesh(me)
+			# old seams
+			old_seams = [e for e in bm.edges if e.seam]
+			# unmark
+			for e in old_seams:
+			    e.seam = False
+			# mark seams from uv islands
+			bpy.ops.mesh.select_all(action='SELECT')
+			bpy.ops.uv.select_all(action='SELECT')
+			bpy.ops.uv.seams_from_islands()
+			seams = [e for e in bm.edges if e.seam]
+			bmesh.ops.split_edges(bm, edges=seams)
+			for e in old_seams:
+			    e.seam = True
+			bmesh.update_edit_mesh(me)
+			solveRepeatedVertex(None, obj)
+			bpy.ops.object.mode_set(mode='OBJECT')
+			transferNormals(clone,selectedObj)
+			if bpy.app.version < (4,0,0):
+				selectedObj.data.calc_normals_split()
+			deleteClone(clone)
+			
+			
+			
+			print(f"Solved Repeated UVs on {selectedObj.name}")
+
+
+#End solve repeated UVs
+
+
+#RE Toolbox Split Sharp Edges
+def splitSharpEdges():
+	context = bpy.context
+	if context.selected_objects != []:
+		selection = context.selected_objects	
+	else:
+		selection = bpy.context.scene.objects
+	for selectedObj in selection:
+		if selectedObj.type == "MESH":
+			isHidden = selectedObj.hide_viewport
+			if isHidden:
+				selectedObj.hide_viewport = False
+			context.view_layer.objects.active  = selectedObj
+			
+			
+			bpy.ops.object.mode_set(mode='EDIT')
+			obj = bpy.context.edit_object
+			me = obj.data
+			bm = bmesh.from_edit_mesh(me)
+			# old seams
+			sharp = [e for e in bm.edges if not e.smooth]
+			if sharp != []:
+				print(f"Split Sharp Edges on {selectedObj.name}")
+			bmesh.ops.split_edges(bm, edges=sharp)
+			bmesh.update_edit_mesh(me)
+			bpy.ops.object.mode_set(mode='OBJECT')
+			selectedObj.hide_viewport = isHidden
+
+
+#End split sharp edges
+
 
 
 def exportREMeshFile(filePath,options):
@@ -971,11 +1112,19 @@ def exportREMeshFile(filePath,options):
 			bpy.ops.object.select_all(action='DESELECT')
 			for obj in doubledUVList:
 				obj.select_set(True)
+				
+			try:
+				solveRepeatedUVs()
+			except Exception as err:
+				raiseWarning(f"Failed to solve repeated UVs.")
+			
+			"""
 			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):#RE Toolbox installed
 				bpy.ops.re_toolbox.solve_repeated_uvs()
 			else:
 				raiseWarning("RE Toolbox is not installed. Cannot solve repeated UVs automatically.")
 			bpy.ops.object.select_all(action='DESELECT')
+			"""
 			for obj in previousSelection:
 				obj.select_set(True)
 		
@@ -984,6 +1133,12 @@ def exportREMeshFile(filePath,options):
 			bpy.ops.object.select_all(action='DESELECT')
 			for obj in sharpEdgeSplitList:
 				obj.select_set(True)
+			try:
+				splitSharpEdges()
+			except Exception as err:
+				raiseWarning(f"Failed to split sharp edges.")
+			
+			"""
 			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):#RE Toolbox installed
 				try:	
 					bpy.ops.re_toolbox.split_sharp_edges()
@@ -991,6 +1146,7 @@ def exportREMeshFile(filePath,options):
 					raiseWarning(f"Failed to split sharp edges. RE Toolbox may be outdated. Update to the latest version in Edit > Preferences > Addons > RE Toolbox\n{str(err)}")
 			else:
 				raiseWarning("RE Toolbox is not installed. Cannot split sharp edges.")
+			"""
 			bpy.ops.object.select_all(action='DESELECT')
 			for obj in previousSelection:
 				obj.select_set(True)

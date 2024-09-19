@@ -202,6 +202,7 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 				("SF6", "Street Fighter 6", ""),
 				("DD2", "Dragon's Dogma 2", ""),
 				("KG", "Kunitsu-Gami", ""),
+				("DR", "Dead Rising", ""),
 			  ]
 		)
 	materialPresets: EnumProperty(

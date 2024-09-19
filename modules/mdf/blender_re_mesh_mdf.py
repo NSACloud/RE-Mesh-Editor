@@ -102,6 +102,7 @@ normalTypeSet = set([
 	#"NormalRoughnessCavityMapBase",
 	"NormalRoughnessOcclusionMap",
 	"NormalRoughnessTranslucencyMap",
+	"NormalRoughnessAlphaMap",
 	"NRRTMap",
 	])
 
@@ -148,6 +149,7 @@ NRRTTypes = set([
 	"NormalRoughnessOcclusionMap",
 	"NormalRoughnessTranslucencyMap",
 	"NormalRoughnessTranslucentMap",
+	"NormalRoughnessAlphaMap",
 	"NRRTMap",
 	])
 ATOSTypes = set([
@@ -156,6 +158,9 @@ ATOSTypes = set([
 	])
 NAMTypes = set([
 	"Stitch_NAM",
+	])
+OCTDTypes = set([
+	"OcclusionCavityTranslucentDetailMap",
 	])	
 usedTextureSet.update(albedoVertexColorTypeSet)
 usedTextureSet.update(normalVertexColorTypeSet)
@@ -166,6 +171,7 @@ usedTextureSet.update(emissionTypeSet)
 usedTextureSet.update(normalTypeSet)
 usedTextureSet.update(alphaTypeSet)
 usedTextureSet.update(ATOSTypes)
+usedTextureSet.update(OCTDTypes)
 usedTextureSet.update(NAMTypes)
 
 #print(sorted(list(usedTextureSet)))
@@ -212,6 +218,7 @@ def findMDFPathFromMeshPath(meshPath):
 		".221108797":".32",#RE4
 		".230110883":".31",#SF6
 		".231011879":".40",#DD2
+		".240424828":".40",#DR
 		
 		}
 	mdfVersion = mdfVersionDict.get(meshVersion,None)
@@ -392,6 +399,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						textureNodeInfoList.append(("ATOS",textureType,imageList,outputPath))
 					elif textureType in NAMTypes:
 						textureNodeInfoList.append(("NAM",textureType,imageList,outputPath))
+					elif textureType in OCTDTypes:
+						textureNodeInfoList.append(("OCTD",textureType,imageList,outputPath))
 					elif autoDetectedAlbedo:
 						textureNodeInfoList.append(("ALB",textureType,imageList,outputPath))
 					else:
@@ -465,7 +474,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 			if matInfo["shaderType"] in alphaBlendShaderTypes:
 				matInfo["isAlphaBlend"] = True
 				blenderMaterial.shadow_method = "NONE"
-			
+			elif matInfo["mmtrName"] == "Env_Decal.mmtr":
+				matInfo["isAlphaBlend"] = True
 			for (_,textureType,imageList,texturePath) in textureNodeInfoList:
 				try:
 					newNode = addImageNode(blenderMaterial.node_tree,textureType,imageList,texturePath,(currentXPos,currentYPos))
@@ -767,6 +777,11 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					MaskMapSeparateNode = nodes.new("ShaderNodeSeparateRGB")
 					MaskMapSeparateNode.location = (MaskMapNode.location[0] + 300,MaskMapNode.location[1])
 					links.new(MaskMapNode.outputs["Color"],MaskMapSeparateNode.inputs["Image"])
+				elif "OcclusionCavityTranslucentDetailMap" in matInfo["textureNodeDict"]:
+					MaskMapNode = matInfo["textureNodeDict"]["OcclusionCavityTranslucentDetailMap"]
+					MaskMapSeparateNode = nodes.new("ShaderNodeSeparateRGB")
+					MaskMapSeparateNode.location = (MaskMapNode.location[0] + 300,MaskMapNode.location[1])
+					links.new(MaskMapNode.outputs["Alpha"],MaskMapSeparateNode.inputs["Image"])
 				if "DetailMap_Level" in matInfo["mPropDict"] and "ARRAY_DetailMap_SELECTOR" in nodes:
 					detailMapLevelNode = addPropertyNode(matInfo["mPropDict"]["DetailMap_Level"], matInfo["currentPropPos"], nodeTree)
 					subtractNode = nodes.new("ShaderNodeMath")
@@ -1197,7 +1212,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 			currentPos = [nodeBSDF.location[0]+300,nodeBSDF.location[1]]
 			
 			#Only enabled for hair and MHR wing materials atm since it doesn't look right on much else
-			if IMPORT_TRANSLUCENT and matInfo["translucentSocket"] != None and ("Translucency" in matInfo["mPropDict"] or "Translucency_Param" in matInfo["mPropDict"]) and ("wing" in matInfo["mmtrName"].lower() or "hair" in matInfo["mmtrName"].lower()):
+			if IMPORT_TRANSLUCENT and matInfo["translucentSocket"] != None and ("Translucency" in matInfo["mPropDict"] or "Translucency_Param" in matInfo["mPropDict"]) and ("wing" in matInfo["mmtrName"].lower() or "hair" in matInfo["mmtrName"].lower()) and matInfo["gameName"] != "DMC5":
 				
 				gammaNode = nodes.new("ShaderNodeGamma")#Needs a gamma change for the mixed shader nodes to look right
 				gammaNode.location = currentPos
