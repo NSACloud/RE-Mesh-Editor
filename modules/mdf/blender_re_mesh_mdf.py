@@ -161,6 +161,7 @@ NAMTypes = set([
 	])
 OCTDTypes = set([
 	"OcclusionCavityTranslucentDetailMap",
+	"OcclusionCavitySSSDetailMap",
 	])	
 usedTextureSet.update(albedoVertexColorTypeSet)
 usedTextureSet.update(normalVertexColorTypeSet)
@@ -244,7 +245,12 @@ def findMDFPathFromMeshPath(meshPath):
 		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
 			
 			mdfPath = f"{fileRoot[:-1] + 'm'}.mdf2{mdfVersion}"#DD2 female armor uses male mdf, so replace _f with _m
+		
+		if not os.path.isfile(mdfPath) and os.path.split(fileRoot)[1].startswith("SM_"):
+			split = os.path.split(fileRoot)
+			mdfPath = f"{os.path.join(split[0],split[1][1::])}.mdf2{mdfVersion}"#DR Stage meshes, SM_ to M_
 			
+		
 		if not os.path.isfile(mdfPath):
 			print(f"Could not find {mdfPath}.")
 			mdfPath = None

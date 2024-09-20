@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 27),
+	"version": (0, 28),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -461,10 +461,12 @@ class ImportREMesh(Operator, ImportHelper):
 				self.report({"INFO"},"Imported RE Mesh file.")
 			else:
 				self.report({"INFO"},f"Imported {str(len(self.files))} RE Mesh files.")
+			
 			return {"FINISHED"}
 		else:
 			self.report({"INFO"},"Failed to import RE Mesh. Check the console for errors.")
 			return {"CANCELLED"}
+	
 	def invoke(self, context, event):
 		if self.directory:
 			if bpy.context.preferences.addons[__name__].preferences.dragDropImportOptions:
@@ -685,7 +687,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				(".23", "Monster Hunter Rise", ""),
 				(".32", "Resident Evil 4", ""),
 				(".31", "Street Fighter 6", ""),
-				(".40", "Dragon's Dogma 2 / Kunitsu-Gami \ Dead Rising", "Dragon's Dogma 2, Kunitsu-Gami, Dead Rising"),
+				(".40", "Dragon's Dogma 2 / Kunitsu-Gami / Dead Rising", "Dragon's Dogma 2, Kunitsu-Gami, Dead Rising"),
 			  ]
 		)
 	targetCollection : StringProperty(

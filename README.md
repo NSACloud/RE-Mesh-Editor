@@ -5,7 +5,7 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-![MeshEditorPreview](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/e488c6d5-6e15-4dff-9ae2-815d0a1bb142)
+![meshEditorPreview](https://github.com/user-attachments/assets/2cc32d0f-d52e-4d04-a242-d3d884b1c6cd)
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
@@ -53,6 +53,11 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.28 - 9/19/2024
+* Fixed issue that caused Blender to crash when importing certain Dead Rising meshes.
+* Minor bug fixes.
+* Added license.
+
 ### V0.27 - 9/18/2024
 * Added Dead Rising support.
 * RE Toolbox is no longer a requirement.
@@ -63,19 +68,16 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * MDF files will now be imported along with the mesh file, this can be disabled by unchecking "Load MDF Material Data" in the import options.
 * Added drag and drop mesh importing - drag and drop a .mesh or .mdf2 file into the 3D view to import it. (Blender 4.1 and higher only)
   
-https://github.com/user-attachments/assets/32875930-ff5f-4a61-8dd3-d421e05461d3
-
+https://github.com/user-attachments/assets/fa1ba74e-8a57-4115-b6cd-9585a2a92a21
 
 * Added drag and drop tex conversion - drag and drop a .tex or .dds file into the 3D view to convert it. (Blender 4.1 and higher only)
 
 
-https://github.com/user-attachments/assets/21f04c05-2837-4384-822b-5846e64f5f1b
-
+https://github.com/user-attachments/assets/cf99e5f2-2aa6-4a6f-b170-1e5beb3bcec4
 
 * Changes made to certain MDF material properties now reflect in Blender. MDF properties that have a wrench icon next to them are previewable.
 
-https://github.com/user-attachments/assets/8da89fd4-c307-4385-9db2-ba73b6d04eff
-
+https://github.com/user-attachments/assets/48be61bc-7c40-440f-881b-534809d3232f
 
 * Blender 4.2 and above now cache textures as DDS files instead of TIF. This massively decreases material importing time. (Approximately 6x faster)
 * Extended max vertex limit per sub mesh from 65535 to 4294967295.

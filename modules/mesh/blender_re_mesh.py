@@ -214,6 +214,8 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
 	meshData = bpy.data.meshes.new(meshName)
 	#Import vertices and faces
+	if vertexList == []:
+		raise Exception("Invalid mesh, submesh has no vertices")
 	meshData.from_pydata(vertexList, [], faceList)
 	
 	#Import vertex normals

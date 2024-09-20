@@ -518,8 +518,8 @@ class MeshBufferHeader():
 		#SF6
 		self.totalBufferSize = 0
 		self.sf6unkn0 = 0
-		self.sf6unkn1 = 0
-		self.sf6unkn2 = 0
+		self.sf6unkn1 = 0#vectorStructSize
+		self.sf6unkn2 = 0#vectorStructOffset
 	def read(self,file,version):
 		self.vertexElementOffset = read_uint64(file)
 		self.vertexBufferOffset = read_uint64(file)
@@ -554,8 +554,10 @@ class MeshBufferHeader():
 			self.sf6unkn1 = read_uint64(file)
 			self.sf6unkn2 = read_uint64(file)
 		self.vertexElementList = []
+		file.seek(self.vertexElementOffset)
 		for i in range(0,self.vertexElementCount):
 			entry = VertexElementStruct()
+			#print(f"element {i} {file.tell()}")
 			entry.read(file)
 			self.vertexElementList.append(entry)
 		

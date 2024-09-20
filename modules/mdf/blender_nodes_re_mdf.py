@@ -1070,7 +1070,13 @@ def newOCTDNode (nodeTree,textureType,matInfo):
 	currentPos[0] += 300
 	nodeTree.links.new(imageNode.outputs["Color"],separateNode.inputs["Image"])
 	
-	matInfo["translucentSocket"] = separateNode.outputs["B"]
+	
+	if textureType == "OcclusionCavityTranslucentDetailMap":
+		matInfo["translucentSocket"] = separateNode.outputs["B"]
+	
+	elif textureType == "OcclusionCavitySSSDetailMap":
+		matInfo["subsurfaceSocket"] = separateNode.outputs["B"]
+		
 	matInfo["aoNodeLayerGroup"].addMixLayer(separateNode.outputs["R"])
 	matInfo["cavityNodeLayerGroup"].addMixLayer(separateNode.outputs["G"])
 	
