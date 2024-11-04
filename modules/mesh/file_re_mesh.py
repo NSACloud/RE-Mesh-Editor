@@ -830,7 +830,10 @@ class FileHeader():
 	def read(self,file,version):
 		self.magic = read_uint(file)
 		if self.magic != 1213416781:
-			raise Exception("File is not an RE mesh file.")
+			if self.magic == 1498173517:#MPLY
+				raise Exception("MPLY formatted mesh files (stage meshes mostly) are not supported yet.")
+			else:
+				raise Exception("File is not an RE mesh file.")
 		self.version = read_uint(file)
 		self.fileSize = read_uint(file)
 		self.unknHash = read_uint(file)
@@ -1403,8 +1406,7 @@ class REMesh():
 	def read(self,file,version,lodTarget = None,streamingBuffer = None):#LOD target is an int that determines what lod level to import, the rest get ignored
 		self.streamingBuffer = streamingBuffer
 		if streamingBuffer != None:
-			lodTarget = None#Disable lod target optimization since all lods are needed
-			
+			lodTarget = None#Disable lod target optimization since all lods are needed	
 		self.fileHeader.read(file,version)
 		
 		if self.fileHeader.meshGroupOffset:
@@ -1448,7 +1450,9 @@ class REMesh():
 				file.seek(self.fileHeader.streamingInfoOffset)
 				self.streamingInfoHeader = StreamingInfo()
 				self.streamingInfoHeader.read(file)
-				
+				if self.streamingInfoHeader.entryCount != 0 and streamingBuffer == None:
+					raiseError("The corresponding streaming mesh file is missing. Cannot import mesh.\nCheck that you're using the most up to date list file when extracting files.")
+					raise Exception("Streaming mesh file is missing. Check that you're using the most up to date list file when extracting game files.")
 		if self.fileHeader.meshOffset:
 			file.seek(self.fileHeader.meshOffset)
 			self.meshBufferHeader = MeshBufferHeader()
@@ -2209,6 +2213,14 @@ def readREMesh(filepath,lodTarget = None):
 	
 	streamingBuffer = None#WILDS
 	#if version >= VERSION_MHWILDS:
+		
+	#Precheck to see if user imported a headerless streaming mesh
+	magic = read_uint(file)
+	if magic != 1213416781 and "streaming" in filepath:
+		raiseError("Attempted to import a streaming mesh file. Streaming mesh files cannot be imported directly.\nImport the mesh file that has same path and name that's not in the streaming folder.")
+		raise Exception("Streaming meshes can't be imported directly. Import the non streaming mesh instead.")
+	file.seek(0)
+	
 	if version >= VERSION_SF6:
 		paths = splitNativesPath(filepath)
 		if paths != None:#Returns none if path does not contain a natives folder

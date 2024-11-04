@@ -54,6 +54,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.30 - 11/4/2024
+* Added error messages for streaming file related issues.
+
 ### V0.29 - 11/3/2024
 * Added Monster Hunter Wilds support.
   
