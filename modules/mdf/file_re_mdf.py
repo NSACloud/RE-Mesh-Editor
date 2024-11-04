@@ -17,6 +17,7 @@ gameNameMDFVersionDict = {
 	32:"RE4",
 	40:"DD2",
 	#40:"DR",
+	45:"MHWILDS",
 	
 	"DMC5":10,
 	"RE2":10,
@@ -30,6 +31,7 @@ gameNameMDFVersionDict = {
 	"DD2":40,#KG
 	"KG":40,
 	"DR":40,
+	"MHWILDS":45,
 	}
 def getMDFVersionToGameName(gameName):
 	return gameNameMDFVersionDict.get(gameName,-1)
@@ -94,7 +96,7 @@ class MDFHeader():
 	def read(self,file):
 		self.magic = read_uint(file)
 		if self.magic != 4605005:
-			raiseError("File is not an MDF file.")
+			raise Exception("File is not an MDF file.")
 		self.version = read_ushort(file)
 		self.materialCount = read_ushort(file)
 		file.seek(8,1)

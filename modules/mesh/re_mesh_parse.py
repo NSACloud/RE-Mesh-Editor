@@ -2,7 +2,7 @@ import numpy as np
 import struct
 from .file_re_mesh import Matrix4x4,AABB,Sphere,CompressedSixWeightIndices,CompressedBlendShapeVertexInt
 
-typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color","SF6UnknownVertexDataType"]
+typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color","SF6UnknownVertexDataType","MHWildsUnknownVertexDataType"]
 typeStrideDict = {
 	"Position":12,
 	"NorTan":8,
@@ -10,6 +10,7 @@ typeStrideDict = {
 	"UV2":4,
 	"Weight":16,
 	"Color":4,
+	"MHWildsUnknownVertexDataType":16,
 	}
 
 blendShapeNameMapping =["BlendShapeByte","BlendShapeShort"]
@@ -99,6 +100,7 @@ BufferReadDict = {
 	"Weight":ReadWeightBuffer,
 	"Color":ReadColorBuffer,
 	"SF6UnknownVertexDataType":ReadColorBuffer,#Read as color data for now until what it is can be determined
+	"MHWildsUnknownVertexDataType":ReadColorBuffer,#Read as color data for now until what it is can be determined
 	}
 
 def ReadBlendShapeByteBuffer(blendShapeBuffer,tags):
@@ -178,6 +180,7 @@ def ReadVertexElementBuffers(vertexElementList,vertexBuffer,tagSet):
 		"Weight":None,
 		"Color":None,
 		"SF6UnknownVertexDataType":None,
+		"MHWildsUnknownVertexDataType":None,
 		}
 	lastIndex = len(vertexElementList)-1
 	importedElementsSet = set()
@@ -370,7 +373,8 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 					usedVertexOffsetDict[meshInfo.vertexStartIndex] = submesh
 				submesh.meshVertexOffset = meshInfo.vertexStartIndex
 				
-				
+				#print("vertex pool size")
+				#print(len(vertexDict["Position"]))
 				if vertexDict["Position"] != None:
 					submesh.vertexPosList = vertexDict["Position"][meshInfo.vertexStartIndex:bufferEnd]
 				#print(f"{meshInfo.faceStartIndex*2} - {meshInfo.faceStartIndex*2+meshInfo.faceCount*2}")
@@ -427,7 +431,68 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 			lod.visconGroupList.append(group)
 		lodList.append(lod)
 	return lodList
+
+def debug_Generate010StreamingTemplate(templateLODList):
+	#Yes this is driving me insane to the point to where I'm generating an 010 template to check if the buffers are being read correctly
+	print("//Auto generated streaming mesh template")
+	print("""
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+}Position<bgcolor=0x0000FF>;
+
+typedef struct
+{
+    ubyte normal[4];
+    ubyte tangent[4];
+}NorTan<bgcolor=0x00FF00>;
+
+typedef struct
+{
+    hfloat u;
+    hfloat v;
+}UV1<bgcolor=0xFF0000>;
+
+typedef struct
+{
+    hfloat u;
+    hfloat v;
+}UV2<bgcolor=0xCC0000>;
+typedef struct
+{
+    uint64 w0:10;;
+    uint64 w1:10;
+    uint64 w2:10;
+    uint64 pad0:2;
+    uint64 w3:10;
+    uint64 w4:10;
+    uint64 w5:10;
+    uint64 pad1:2;
+}Weight<bgcolor=0x00FFFF>;
+
+typedef struct
+{
+    ubyte r;
+    ubyte g;
+    ubyte b;
+    ubyte a;
+}Color<bgcolor=0xFFFF00>;
+
+	""")
+	for index, elementList in enumerate(templateLODList):
+		print("struct")
+		print("{")
+		for element in elementList:
+			print("\tFSeek("+str(element["start"])+")\n\t struct\n\t{")
+			print("\t\t"+element["type"] + " entry["+str((element["end"]-element["start"])//element["stride"])+"];")
+			print("\t}element;")
+		print("}LOD"+str(index)+";")
 		
+		print("//EOF")
+		
+
 class ParsedREMesh:
 	def __init__(self):
 		self.skeleton = None
@@ -447,6 +512,93 @@ class ParsedREMesh:
 		self.bufferHasWeight = False
 		self.bufferHasColor = False
 		self.bufferHasIntFaces = False
+	def MergeStreamedBuffers(self,reMesh):#WILDS
+		print("Merging streamed vertex buffers...")
+			
+		newVertBuffer = bytearray()
+		bufferArrayList = []
+		vertexSize = 0
+		for vertexElement in reMesh.meshBufferHeader.vertexElementList:
+			vertexSize += vertexElement.stride
+			bufferArrayList.append(bytearray())
+		
+		lodVertexCountList = []
+		lodFaceCountList = []
+		for lod in reMesh.lodHeader.lodGroupList:
+			vertexTotal = 0
+			faceTotal = 0
+			for group in lod.meshGroupList:
+				vertexTotal += group.vertexCount
+				faceTotal += group.faceCount
+			lodVertexCountList.append(vertexTotal)
+			lodFaceCountList.append(faceTotal)
+			
+		#templateLODList = []
+			
+		for index, streamInfo in enumerate(reMesh.streamingInfoHeader.streamingInfoEntryList):
+			
+			#templateElementList = []
+			
+			currentBufferOffset = streamInfo.bufferStart
+			streamBufferHeader = reMesh.meshBufferHeader.streamingBufferHeaderList[index]
+			for vertexElementIndex,vertexElement in enumerate(reMesh.meshBufferHeader.vertexElementList):
+				elementLength = lodVertexCountList[index] * vertexElement.stride
+				elementBytes = reMesh.streamingBuffer[currentBufferOffset:currentBufferOffset+elementLength]
+				
+				#print(f"element {vertexElementIndex} bytes: {len(elementBytes)}")
+				bufferArrayList[vertexElementIndex].extend(elementBytes)
+				"""
+				templateEntry = dict()
+				templateEntry["type"] = typeNameMapping[vertexElement.typing]
+				templateEntry["stride"] = vertexElement.stride
+				templateEntry["start"] = currentBufferOffset
+				templateEntry["end"] = currentBufferOffset+elementLength
+				templateElementList.append(templateEntry)
+				"""
+				currentBufferOffset+=elementLength
+				
+			#templateLODList.append(templateElementList)
+			#print(f"vertex range {i} {streamInfo.bufferStart}:{streamInfo.bufferStart+entry.vertexBufferLength}")
+			#print(f"face range {i} {streamInfo.bufferStart+entry.vertexBufferLength}:{streamInfo.bufferStart+entry.unpaddedBufferSize}")
+		#print(f"current vertex buffer size {i} {len(self.vertexBuffer)}")
+		#print(f"current face buffer size {i} {len(self.faceBuffer)}")
+		
+		#debug_Generate010StreamingTemplate(templateLODList)
+		
+		#Add non streamed LOD
+		currentBufferOffset = 0
+		for vertexElementIndex,vertexElement in enumerate(reMesh.meshBufferHeader.vertexElementList): 
+			elementLength = lodVertexCountList[-1] * vertexElement.stride
+			elementBytes = reMesh.meshBufferHeader.vertexBuffer[currentBufferOffset:currentBufferOffset+elementLength]
+			
+			#print(f"element {vertexElementIndex} bytes: {len(elementBytes)}")
+			bufferArrayList[vertexElementIndex].extend(elementBytes)
+			
+			currentBufferOffset+=elementLength
+		
+		
+		#TODO Refactor this to not change the loaded file in the future
+		
+		#Modify the imported file to use the new vertex buffer offsets
+		#This isn't ideal but a lot of other things would need to be changed otherwise
+		for arrayIndex,array in enumerate(bufferArrayList):
+			reMesh.meshBufferHeader.vertexElementList[arrayIndex].posStartOffset = len(newVertBuffer)
+			newVertBuffer.extend(array)		#TODO Add LOD from non stream file
+		
+		
+		print("Fixing streamed lod start indices...")
+		currentVertexOffset = 0
+		currentFaceOffset = 0
+		for lodIndex,lod in enumerate(reMesh.lodHeader.lodGroupList[1::]):
+			currentVertexOffset += lodVertexCountList[lodIndex]
+			currentFaceOffset += lodFaceCountList[lodIndex]
+			for group in lod.meshGroupList: 
+				for submesh in group.vertexInfoList:
+					submesh.vertexStartIndex += currentVertexOffset
+					submesh.faceStartIndex += currentFaceOffset
+		
+		return newVertBuffer
+			
 	def ParseREMesh(self,reMesh,importOptions = {"importAllLOD":True,"importShadowMesh":True,"importOcclusionMesh":True,"importBlendShapes":True}):
 		vertexDict = None
 		usedVertexOffsetDict = dict()
@@ -493,11 +645,16 @@ class ParsedREMesh:
 		#Parse Vertex Buffer
 		if reMesh.meshBufferHeader != None:
 			tags = set()
-			if reMesh.meshVersion == 230110883:#Street Fighter 6 mesh version
+			if reMesh.meshVersion == 230110883 or reMesh.meshVersion == 240820143:#Street Fighter 6 mesh version + MH Wilds
 				tags.add("SixWeightCompressed")#Add tag to parse compressed weights
 			#if duplicate in vertexelementlist, add shadowLOD tag
 			
-			vertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
+			
+			if reMesh.streamingInfoHeader != None and reMesh.streamingInfoHeader.entryCount != 0 and reMesh.streamingBuffer != None:
+				mainVertexBuffer = self.MergeStreamedBuffers(reMesh)
+			else:
+				mainVertexBuffer = reMesh.meshBufferHeader.vertexBuffer
+			vertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, mainVertexBuffer,tags)
 			#TODO
 			#tags.add("shadowLOD")
 			#shadowVertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
@@ -505,7 +662,7 @@ class ParsedREMesh:
 		vertexCount = len(vertexDict["Position"])
 		lastElement = reMesh.meshBufferHeader.vertexElementList[-1]
 		blendShapeStartPos = lastElement.posStartOffset + vertexCount * lastElement.stride
-		blendShapeBuffer = reMesh.meshBufferHeader.vertexBuffer[blendShapeStartPos:]
+		blendShapeBuffer = mainVertexBuffer[blendShapeStartPos:]
 		if reMesh.blendShapeHeader != None:
 			
 			print(f"blendShape buffer start pos {str(reMesh.meshBufferHeader.vertexBufferOffset+blendShapeStartPos)}")

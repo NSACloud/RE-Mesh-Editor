@@ -20,7 +20,7 @@ IMPORT_BLEND_SHAPES = False#Disabled by default because it's broken at the momen
 #SF6 chun li body "J:\SF6_EXTRACT\re_chunk_000\natives\stm\product\model\esf\esf004\001\01\esf004_001_01.mesh.230110883"
 
 
-from ..gen_functions import getPaddedPos,getBit,setBit,getPaddingAmount,textColors,raiseWarning,raiseError,read_uint,read_int,read_int64,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_int64,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte,read_string,write_string
+from ..gen_functions import splitNativesPath,getPaddedPos,getBit,setBit,getPaddingAmount,textColors,raiseWarning,raiseError,read_uint,read_int,read_int64,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_int64,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte,read_string,write_string
 import os
 import numpy as np
 import struct
@@ -47,6 +47,7 @@ VERSION_RE4 = 110#file:221108797,internal:220822879
 VERSION_DD2 = 115#file:230517984,internal:230517984
 VERSION_KG = 120#file:240306278,internal:230727984
 VERSION_DR = 125#file:240424828,internal:240423829
+VERSION_MHWILDS = 130#file:240820143,internal:240704828
 
 meshFileVersionToNewVersionDict = {
 	1808282334:VERSION_DMC5,
@@ -61,6 +62,7 @@ meshFileVersionToNewVersionDict = {
 	231011879:VERSION_DD2,
 	240306278:VERSION_KG,
 	240424828:VERSION_DR,
+	240820143:VERSION_MHWILDS,
 	}
 newVersionToMeshFileVersion = {
 	VERSION_DMC5:1808282334,
@@ -75,6 +77,7 @@ newVersionToMeshFileVersion = {
 	VERSION_DD2:231011879,
 	VERSION_KG:240306278,
 	VERSION_DR:240424828,
+	VERSION_MHWILDS:240820143,
 	}
 meshFileVersionToInternalVersionDict = {
 	1808282334:386270720,#VERSION_DMC5
@@ -88,6 +91,7 @@ meshFileVersionToInternalVersionDict = {
 	231011879:230517984,#VERSION_DD2
 	240306278:230727984,#VERSION_KG
 	240424828:240423829,#VERSION_DR
+	240820143:240704828,#VERSION_MHWILDS
 	}
 internalVersionToMeshFileVersionDict = {
 	386270720:1808282334,#VERSION_DMC5
@@ -100,7 +104,8 @@ internalVersionToMeshFileVersionDict = {
 	220822879:221108797,#VERSION_RE4
 	230517984:231011879,#VERSION_DD2
 	230727984:240306278,#VERSION_KG
-	240423829:240424828,#VERSION_KG
+	240423829:240424828,#VERSION_DR
+	240704828:240820143,#VERSION_MHWILDS
 	}
 meshFileVersionToGameNameDict = {
 	1808282334:"DMC5",#VERSION_DMC5
@@ -114,6 +119,7 @@ meshFileVersionToGameNameDict = {
 	231011879:"DD2",#VERSION_DD2
 	240306278:"KG",#VERSION_KG
 	240424828:"DR",#VERSION_DR
+	240820143:"MHWILDS",#VERSION_MHWILDS
 	}
 
 #Used for unmapped mesh versions, potentially allows for importing
@@ -481,6 +487,98 @@ class ShadowHeader():
 				#print("wrote shadow lod structure")
 				entry.write(file)
 		"""
+#WILDS
+class StreamingInfoEntry():
+	def __init__(self):
+		self.bufferStart = 0
+		self.bufferLength = 0
+	def read(self,file):
+		self.bufferStart = read_uint(file)
+		self.bufferLength = read_uint(file)
+
+	def write(self,file):
+		write_uint(file, self.bufferStart)
+		write_uint(file, self.bufferLength)
+
+class StreamingInfo():
+	def __init__(self):
+		self.entryCount = 0
+		self.unkn1 = 0
+		self.entryOffset = 0
+		self.streamingInfoEntryList = []
+	def read(self,file):
+		self.entryCount = read_uint(file)
+		self.unkn1 = read_uint(file)
+		self.entryOffset = read_uint64(file)
+		
+		currentPos = file.tell()
+		file.seek(self.entryOffset)
+		for i in range(0,self.entryCount):
+			entry = StreamingInfoEntry()
+			entry.read(file)
+			self.streamingInfoEntryList.append(entry)
+		file.seek(currentPos)
+	def write(self,file):
+		write_uint(file, self.entryCount)
+		write_uint(file, self.unkn1)
+		write_uint64(file, self.entryOffset)
+		
+class StreamingBufferHeaderEntry():
+	def __init__(self):
+		self.unkn0 = 0
+		self.totalBufferSize = 0
+		self.vertexBufferLength = 0
+		self.mainVertexElementCount = 0
+		self.vertexElementCount = 0
+		self.unpaddedBufferSize = 0
+		self.unpaddedBufferSize2 = 0
+		self.unkn7 = 0
+		self.unkn8 = 0
+		self.unkn9 = 0
+		self.unkn10 = 0
+		self.unkn11 = 0
+		self.unkn12 = 0
+		self.unkn13 = 0
+		self.nextBufferOffset = 0
+		self.unkn15 = 0
+		
+	def read(self,file):
+		self.unkn0 = read_uint64(file)
+		self.totalBufferSize = read_uint(file)
+		self.vertexBufferLength = read_uint(file)
+		self.mainVertexElementCount = read_ushort(file)
+		self.vertexElementCount = read_ushort(file)
+		self.unpaddedBufferSize = read_uint(file)
+		self.unpaddedBufferSize2 = read_uint(file)
+		self.unkn7 = read_uint(file)
+		self.unkn8 = read_uint(file)
+		self.unkn9 = read_uint(file)
+		self.unkn10 = read_uint(file)
+		self.unkn11 = read_uint(file)
+		self.unkn12 = read_uint(file)
+		self.unkn13 = read_uint(file)
+		self.nextBufferOffset = read_uint(file)
+		self.unkn15 = read_uint(file)
+
+
+	def write(self,file):
+		write_uint64(file, self.unkn0)
+		write_uint(file, self.totalBufferSize)
+		write_uint(file, self.vertexBufferLength)
+		write_ushort(file, self.mainVertexElementCount)
+		write_ushort(file, self.vertexElementCount)
+		write_uint(file, self.unpaddedBufferSize)
+		write_uint(file, self.unpaddedBufferSize2)
+		write_uint(file, self.unkn7)
+		write_uint(file, self.unkn8)
+		write_uint(file, self.unkn9)
+		write_uint(file, self.unkn10)
+		write_uint(file, self.unkn11)
+		write_uint(file, self.unkn12)
+		write_uint(file, self.unkn13)
+		write_uint(file, self.nextBufferOffset)
+		write_uint(file, self.unkn15)
+#
 
 class VertexElementStruct():
 	def __init__(self):
@@ -512,15 +610,16 @@ class MeshBufferHeader():
 		self.unkn1 = -1
 		self.sunbreakSecondUnknown = 0
 		self.vertexElementList = []
-		self.vertexBuffer = bytes()
-		self.faceBuffer = None#NOTE: Face buffer is padded to 4 byte alignment per sub mesh
+		self.streamingBufferHeaderList = []#WILDS
+		self.vertexBuffer = bytearray()
+		self.faceBuffer = bytearray()#NOTE: Face buffer is padded to 4 byte alignment per sub mesh
 		
 		#SF6
 		self.totalBufferSize = 0
 		self.sf6unkn0 = 0
 		self.sf6unkn1 = 0#vectorStructSize
-		self.sf6unkn2 = 0#vectorStructOffset
-	def read(self,file,version):
+		self.sf6unkn2 = 0#vectorStructOffset #TODO FIX - sf6unkn2 is vertexElementStreamInfoOffset
+	def read(self,file,version,streamingHeader = None,streamingBuffer = None):
 		self.vertexElementOffset = read_uint64(file)
 		self.vertexBufferOffset = read_uint64(file)
 		if version < VERSION_SF6:
@@ -553,6 +652,33 @@ class MeshBufferHeader():
 			self.sf6unkn0 = read_uint64(file)
 			self.sf6unkn1 = read_uint64(file)
 			self.sf6unkn2 = read_uint64(file)
+		
+		if streamingHeader != None and streamingHeader.entryCount != 0 and streamingBuffer != None:
+			#Made a bit of a miscalculation, this doesn't account for the fact that the vertex buffers can't just be stacked since the elements won't be grouped together correctly
+			#Moved into re_mesh_parse
+			
+			print("Merging streamed face buffers...")
+			#print(f"Streamed buffer size {len(streamingBuffer)}")
+			elementArrayList = []
+			
+			for i in range(0,streamingHeader.entryCount):
+				
+				entry = StreamingBufferHeaderEntry()
+				entry.read(file)
+				streamInfo = streamingHeader.streamingInfoEntryList[i]
+				#vertexBytes = streamingBuffer[streamInfo.bufferStart:streamInfo.bufferStart+entry.vertexBufferLength]
+				faceBytes = streamingBuffer[streamInfo.bufferStart+entry.vertexBufferLength:streamInfo.bufferStart+entry.unpaddedBufferSize]
+				#self.vertexBuffer.extend(vertexBytes)
+				self.faceBuffer.extend(faceBytes)
+				
+				self.streamingBufferHeaderList.append(entry)
+				
+				#print(f"vertex range {i} {streamInfo.bufferStart}:{streamInfo.bufferStart+entry.vertexBufferLength}")
+				#print(f"face range {i} {streamInfo.bufferStart+entry.vertexBufferLength}:{streamInfo.bufferStart+entry.unpaddedBufferSize}")
+				
+				#print(f"current vertex buffer size {i} {len(self.vertexBuffer)}")
+				#print(f"current face buffer size {i} {len(self.faceBuffer)}")
+				
 		self.vertexElementList = []
 		file.seek(self.vertexElementOffset)
 		for i in range(0,self.vertexElementCount):
@@ -563,11 +689,12 @@ class MeshBufferHeader():
 		
 		file.seek(self.vertexBufferOffset)
 		#print(f"Vertex buffer start {str(file.tell())}")
-		self.vertexBuffer = file.read(self.vertexBufferSize)
+		self.vertexBuffer.extend(file.read(self.vertexBufferSize))
 		#print(f"Vertex buffer end {str(file.tell())}")
 		file.seek(self.faceBufferOffset)
 		#print(f"Face buffer start {str(file.tell())}")
-		self.faceBuffer = file.read(self.faceBufferSize)
+		self.faceBuffer.extend(file.read(self.faceBufferSize))
+		#print(f"full face buffer size {len(self.faceBuffer)}")
 		#print(f"Face buffer end {str(file.tell())}")
 	def write(self,file,version):
 		write_uint64(file, self.vertexElementOffset)
@@ -600,6 +727,8 @@ class MeshBufferHeader():
 			write_uint64(file, self.sf6unkn0)
 			write_uint64(file, self.sf6unkn1)
 			write_uint64(file, self.sf6unkn2)
+			
+		#TODO WILDS STREAMING INFO WRITE
 		for entry in self.vertexElementList:
 			entry.write(file)
 		file.seek(getPaddedPos(file.tell(), 16))
@@ -687,16 +816,28 @@ class FileHeader():
 		#DD2
 		self.dd2HashOffset = 0
 		self.verticesOffset = 0
+		
+		#MHWilds
+		#TODO Update offset calculation for wilds meshes
+		#TODO Fix write for wilds changes
+		self.wilds_unkn1 = 0#TODO Clean these variables up and figure out if they're not actually new, just shifted
+		self.wilds_unkn2 = 0
+		self.wilds_unkn3 = 0
+		self.wilds_unkn4 = 0
+		self.wilds_unkn5 = 0
+		self.streamingInfoOffset = 0
+		
 	def read(self,file,version):
 		self.magic = read_uint(file)
 		if self.magic != 1213416781:
-			raiseError("File is not an RE mesh file.")
+			raise Exception("File is not an RE mesh file.")
 		self.version = read_uint(file)
 		self.fileSize = read_uint(file)
 		self.unknHash = read_uint(file)
-		self.contentFlag.read(file)
+		
 		
 		if version < VERSION_SF6:
+			self.contentFlag.read(file)
 			self.nameCount = read_short(file)
 			self.unkn = read_uint(file)
 			self.meshGroupOffset = read_uint64(file)
@@ -712,10 +853,13 @@ class FileHeader():
 			self.boneNameRemapOffset = read_uint64(file)
 			self.blendShapeNameOffset = read_uint64(file)
 			self.nameOffsetsOffset = read_uint64(file)
-		elif version >= VERSION_SF6:
+		elif version >= VERSION_SF6 and version < VERSION_MHWILDS:
+			self.contentFlag.read(file)
 			self.sf6UnknCount = read_short(file)
 			self.nameCount = read_short(file)
+			
 			self.sf6unkn3 = read_short(file)#new
+			
 			self.unkn = read_uint(file)
 			self.sf6unkn0 = read_uint(file)#new
 			self.meshGroupOffset = read_uint64(file)
@@ -735,6 +879,8 @@ class FileHeader():
 			self.materialNameRemapOffset = read_uint64(file)
 			self.boneNameRemapOffset = read_uint64(file)
 			self.blendShapeNameOffset = read_uint64(file)
+			
+			
 			if version < VERSION_DD2:
 				self.sf6unkn2 = read_uint64(file)#vertex ElementOffset New with sf6
 				self.nameOffsetsOffset = read_uint64(file)
@@ -744,14 +890,49 @@ class FileHeader():
 				self.sf6unkn2 = read_uint64(file)#vertex ElementOffset New with sf6
 			self.verticesOffset = read_uint64(file)#new
 			self.sf6unkn4 = read_uint64(file)#new
+			
+		elif version >= VERSION_MHWILDS:
+			self.wilds_unkn1 = read_uint(file)
+			self.nameCount = read_short(file)
+			self.contentFlag.read(file)
+			self.sf6UnknCount = read_short(file)
+			
+			self.wilds_unkn2 = read_uint(file)
+			self.wilds_unkn3 = read_uint(file)
+			self.wilds_unkn4 = read_uint(file)
+			self.wilds_unkn5 = read_short(file)
+				
+			self.verticesOffset = read_uint64(file)
+			self.meshGroupOffset = read_uint64(file)
+			self.shadowMeshGroupOffset = read_uint64(file)
+			self.occlusionMeshGroupOffset = read_uint64(file)
+			self.normalRecalcOffset = read_uint64(file)
+			self.blendShapesOffset = read_uint64(file)
+			self.meshOffset = read_uint64(file)
+			self.sf6unkn1 = read_uint64(file)#new
+			
+			
+			
+			
+			self.floatsOffset = read_uint64(file)
+			self.aabbOffset = read_uint64(file)
+			self.skeletonOffset = read_uint64(file)
+			self.materialNameRemapOffset = read_uint64(file)
+			self.boneNameRemapOffset = read_uint64(file)
+			self.blendShapeNameOffset = read_uint64(file)
+			self.nameOffsetsOffset = read_uint64(file)
+			self.streamingInfoOffset = read_uint64(file)#new with wilds
+			self.sf6unkn4 = read_uint64(file)#new
+			
 	def write(self,file,version):
 		write_uint(file, self.magic)
 		write_uint(file, self.version)
 		write_uint(file, self.fileSize)
 		write_uint(file, self.unknHash)
-		self.contentFlag.write(file)
+		
 		
 		if version < VERSION_SF6:
+			self.contentFlag.write(file)
 			write_short(file, self.nameCount)
 			write_uint(file, self.unkn)
 			write_uint64(file, self.meshGroupOffset)
@@ -767,7 +948,8 @@ class FileHeader():
 			write_uint64(file, self.boneNameRemapOffset)
 			write_uint64(file, self.blendShapeNameOffset)
 			write_uint64(file, self.nameOffsetsOffset)
-		elif version >= VERSION_SF6:
+		elif version >= VERSION_SF6 and version < VERSION_MHWILDS:
+			self.contentFlag.write(file)
 			write_short(file, self.sf6UnknCount)
 			write_short(file, self.nameCount)
 			write_short(file, self.sf6unkn3)#new
@@ -797,6 +979,32 @@ class FileHeader():
 				
 			write_uint64(file, self.verticesOffset)#new
 			write_uint64(file, self.sf6unkn4)#new
+		elif version >= VERSION_MHWILDS:
+			write_uint(file, self.wilds_unkn1)
+			write_short(file, self.nameCount)
+			self.contentFlag.write(file)
+			write_short(file, self.sf6UnknCount)
+			write_uint(file, self.wilds_unkn2)
+			write_uint(file, self.wilds_unkn3)
+			write_uint(file, self.wilds_unkn4)
+			write_short(file, self.wilds_unkn5)
+			write_uint64(file, self.verticesOffset)
+			write_uint64(file, self.meshGroupOffset)
+			write_uint64(file, self.shadowMeshGroupOffset)
+			write_uint64(file, self.occlusionMeshGroupOffset)
+			write_uint64(file, self.normalRecalcOffset)
+			write_uint64(file, self.blendShapesOffset)
+			write_uint64(file, self.meshOffset)
+			write_uint64(file, self.sf6unkn1)
+			write_uint64(file, self.floatsOffset)
+			write_uint64(file, self.aabbOffset)
+			write_uint64(file, self.skeletonOffset)
+			write_uint64(file, self.materialNameRemapOffset)
+			write_uint64(file, self.boneNameRemapOffset)
+			write_uint64(file, self.blendShapeNameOffset)
+			write_uint64(file, self.nameOffsetsOffset)
+			write_uint64(file, self.streamingInfoOffset)
+			write_uint64(file, self.sf6unkn4)
 class IndexNormalRecalc():
 	def __init__(self):
 		self.index = 0
@@ -995,11 +1203,16 @@ class BlendShapeHeader():
 		self.hash = 0
 		self.blendShapeOffsetList = []
 		self.blendShapeList = []	
+		#TODO Blend shapes are different in wilds, fix
 		
 	def read(self,file,version):
 		self.count = read_uint64(file)
-		self.mainOffset = read_uint64(file)
-		self.zero = read_uint64(file)
+		if version < VERSION_MHWILDS:
+			self.mainOffset = read_uint64(file)
+			self.zero = read_uint64(file)
+		else:
+			self.zero = read_uint64(file)
+			self.mainOffset = read_uint64(file)
 		self.hash = read_uint64(file)
 		self.blendShapeOffsetList = []
 		for i in range(0,self.count):
@@ -1178,6 +1391,8 @@ class REMesh():
 		self.normalRecalcHeader = None
 		self.blendShapeHeader = None
 		self.boneBoundingBoxHeader = None
+		self.streamingInfoHeader = None#WILDS
+		self.streamingBuffer = None#WILDS
 		self.meshBufferHeader = None
 		self.floatsHeader = None
 		self.rawNameOffsetList = []
@@ -1185,7 +1400,11 @@ class REMesh():
 		self.materialNameRemapList = []
 		self.boneNameRemapList = []
 		self.blendShapeNameRemapList = []
-	def read(self,file,version,lodTarget = None):#LOD target is an int that determines what lod level to import, the rest get ignored
+	def read(self,file,version,lodTarget = None,streamingBuffer = None):#LOD target is an int that determines what lod level to import, the rest get ignored
+		self.streamingBuffer = streamingBuffer
+		if streamingBuffer != None:
+			lodTarget = None#Disable lod target optimization since all lods are needed
+			
 		self.fileHeader.read(file,version)
 		
 		if self.fileHeader.meshGroupOffset:
@@ -1207,12 +1426,13 @@ class REMesh():
 			file.seek(self.fileHeader.skeletonOffset)
 			self.skeletonHeader = Skeleton()
 			self.skeletonHeader.read(file)
-			
+		#TODO - Normal recalc is changed or offset is different in mhwilds
+		"""
 		if self.fileHeader.normalRecalcOffset:
 			file.seek(self.fileHeader.normalRecalcOffset)
 			self.normalRecalcHeader = NormalRecalc()
 			self.normalRecalcHeader.read(file,sum([i.vertexCount for i in self.lodHeader.lodGroupList[0].meshGroupList]),sum([i.faceCount for i in self.lodHeader.lodGroupList[0].meshGroupList]))
-		
+		"""
 		if self.fileHeader.blendShapesOffset and IMPORT_BLEND_SHAPES:
 			file.seek(self.fileHeader.blendShapesOffset)
 			self.blendShapeHeader = BlendShapeHeader()
@@ -1222,11 +1442,17 @@ class REMesh():
 			file.seek(self.fileHeader.aabbOffset)
 			self.boneBoundingBoxHeader = BoneAABBGroup()
 			self.boneBoundingBoxHeader.read(file)
-			
+		
+		if version >= VERSION_MHWILDS:
+			if self.fileHeader.streamingInfoOffset:
+				file.seek(self.fileHeader.streamingInfoOffset)
+				self.streamingInfoHeader = StreamingInfo()
+				self.streamingInfoHeader.read(file)
+				
 		if self.fileHeader.meshOffset:
 			file.seek(self.fileHeader.meshOffset)
 			self.meshBufferHeader = MeshBufferHeader()
-			self.meshBufferHeader.read(file,version)
+			self.meshBufferHeader.read(file,version,self.streamingInfoHeader,streamingBuffer)
 				
 		if self.fileHeader.floatsOffset:
 			file.seek(self.fileHeader.floatsOffset)
@@ -1523,6 +1749,7 @@ class sizeData:
 		self.AABB_OFFSET = 16
 		self.AABB_SIZE = 32
 		self.VERTEX_ELEMENT_OFFSET = 64
+		self.STREAMING_HEADER_SIZE = 16#WILDS
 		if version < VERSION_RE8:
 			self.LOD_HEADER_OFFSET_LIST_OFFSET = 72
 			self.MATERIAL_SUBDIVISION_SIZE = 16
@@ -1589,7 +1816,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		currentOffset = reMesh.lodHeader.offsetOffset + 8*reMesh.lodHeader.lodGroupCount + getPaddingAmount(reMesh.lodHeader.offsetOffset+(8*reMesh.lodHeader.lodGroupCount),16)
 		
 		#SF6 uses six weights with higher possible bone index values
-		isSixWeight = version == VERSION_SF6
+		isSixWeight = version == VERSION_SF6 or version == VERSION_MHWILDS
 		
 		#Main Meshes
 		#TODO Move lod parsing into a function and call it for both main and shadow mesh
@@ -1835,6 +2062,8 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		
 	#Mesh Buffer
 	reMesh.fileHeader.meshOffset = currentOffset
+	
+	
 	reMesh.meshBufferHeader = MeshBufferHeader()
 	reMesh.meshBufferHeader.vertexBuffer = bytearray()
 	currentBufferOffset = 0
@@ -1932,6 +2161,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		reMesh.meshBufferHeader.vertexElementSize = 27104
 		reMesh.fileHeader.verticesOffset = reMesh.meshBufferHeader.vertexBufferOffset
 		reMesh.fileHeader.sf6unkn2 =  reMesh.fileHeader.meshOffset + sd.VERTEX_ELEMENT_OFFSET - 16
+		reMesh.fileHeader.streamingInfoOffset = reMesh.fileHeader.meshOffset + sd.VERTEX_ELEMENT_OFFSET - 16
 		reMesh.meshBufferHeader.block2FaceBufferOffset = reMesh.meshBufferHeader.vertexBufferSize + reMesh.meshBufferHeader.faceBufferSize
 		reMesh.meshBufferHeader.NULL = reMesh.meshBufferHeader.block2FaceBufferOffset
 		reMesh.meshBufferHeader.totalBufferSize = getPaddedPos(reMesh.meshBufferHeader.block2FaceBufferOffset,16)
@@ -1976,9 +2206,28 @@ def readREMesh(filepath,lodTarget = None):
 	if meshVersion not in meshFileVersionToNewVersionDict:
 		raiseWarning(f"Mesh Version ({str(meshVersion)}) not supported! Attempting import...")
 		print(f"Nearest Remap Version: {str(version)} ({meshFileVersionToGameNameDict[newVersionToMeshFileVersion[version]]})")
+	
+	streamingBuffer = None#WILDS
+	#if version >= VERSION_MHWILDS:
+	if version >= VERSION_SF6:
+		paths = splitNativesPath(filepath)
+		if paths != None:#Returns none if path does not contain a natives folder
+			rootPath = paths[0]#The path to the natives\STM folder from the root
+			nativesPath = paths[1]#The path to the file inside the natives\STM folder
+			streamingMeshPath = os.path.join(rootPath,"streaming",nativesPath)
+			if os.path.isfile(streamingMeshPath):
+				
+				try:  
+					streamFile = open(streamingMeshPath,"rb")
+					streamingBuffer = streamFile.read()
+					streamFile.close()
+					print(f"Loaded {len(streamingBuffer)} bytes from streaming mesh at {streamingMeshPath}")
+				except:
+					raiseError("Failed to open " + filepath)
+		
 	reMeshFile = REMesh()
 	reMeshFile.meshVersion = meshVersion
-	reMeshFile.read(file,version,lodTarget)
+	reMeshFile.read(file,version,lodTarget,streamingBuffer)
 	file.close()
 	return reMeshFile
 def writeREMesh(reMeshFile,filepath):

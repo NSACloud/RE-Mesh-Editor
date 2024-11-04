@@ -1,12 +1,11 @@
 #Author: NSA Cloud
-#TODO Redo material importing
 import os
 import bpy
 import re
 
 from mathutils import Vector
 from ..blender_utils import arrangeNodeTree
-IMPORT_TRANSLUCENT = True#Disabled since it's not quite right yet
+IMPORT_TRANSLUCENT = False#Disabled since it's not quite right yet
 
 
 def getUsedTextureNodes(propFileList):
@@ -197,9 +196,18 @@ def getChunkPathList(gameName):
 	
 	ADDON_PREFERENCES = bpy.context.preferences.addons[ADDON_NAME].preferences
 	#print(gameName)
-	chunkPathList = [item.path for item in ADDON_PREFERENCES.chunkPathList_items if item.gameName == gameName ]
+	chunkPathList = [bpy.path.abspath(item.path) for item in ADDON_PREFERENCES.chunkPathList_items if item.gameName == gameName ]
 	#print(chunkPathList)
 	return chunkPathList
+
+def addChunkPath(chunkPath,gameName):
+
+	ADDON_PREFERENCES = bpy.context.preferences.addons[ADDON_NAME].preferences
+	item = ADDON_PREFERENCES.chunkPathList_items.add()
+	item.gameName = gameName
+	item.path = chunkPath
+	print(f"Saved chunk path for {gameName}: {chunkPath}")
+	 
 
 def findMDFPathFromMeshPath(meshPath):
 	split = meshPath.split(".mesh")
@@ -220,6 +228,8 @@ def findMDFPathFromMeshPath(meshPath):
 		".230110883":".31",#SF6
 		".231011879":".40",#DD2
 		".240424828":".40",#DR
+		".240820143":".45",#MHWILDS
+		
 		
 		}
 	mdfVersion = mdfVersionDict.get(meshVersion,None)
@@ -230,7 +240,7 @@ def findMDFPathFromMeshPath(meshPath):
 			mdfPath = wildCardFileSearch(f"{fileRoot}_Mat.mdf2.*")
 		if mdfPath == None:
 			mdfPath = wildCardFileSearch(f"{fileRoot}_v00.mdf2.*")
-		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
+		if mdfPath == None and fileRoot.endswith("_f"):
 			
 			mdfPath = wildCardFileSearch(f"{fileRoot[:-1] + 'm'}.mdf2.*")#DD2 female armor uses male mdf, so replace _f with _m
 	else:	
@@ -242,16 +252,16 @@ def findMDFPathFromMeshPath(meshPath):
 			print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
 			mdfPath = f"{fileRoot}_v00.mdf2{mdfVersion}"
 			
-		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
+		if mdfPath == None and fileRoot.endswith("_f"):
 			
 			mdfPath = f"{fileRoot[:-1] + 'm'}.mdf2{mdfVersion}"#DD2 female armor uses male mdf, so replace _f with _m
 		
-		if not os.path.isfile(mdfPath) and os.path.split(fileRoot)[1].startswith("SM_"):
+		if mdfPath == None and os.path.split(fileRoot)[1].startswith("SM_"):
 			split = os.path.split(fileRoot)
 			mdfPath = f"{os.path.join(split[0],split[1][1::])}.mdf2{mdfVersion}"#DR Stage meshes, SM_ to M_
 			
 		
-		if not os.path.isfile(mdfPath):
+		if mdfPath == None or not os.path.isfile(mdfPath):
 			print(f"Could not find {mdfPath}.")
 			mdfPath = None
 			
@@ -265,6 +275,7 @@ texVersionDict = {
 	".23":".28",
 	".32":".143221013",
 	".40":".760230703",
+	".45":".240701001",
   }	
 def getTexPath(baseTexturePath,chunkPathList,mdfVersion):
 	
@@ -301,7 +312,10 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 	
 	chunkPathList = [chunkPath]
 	chunkPathList.extend(getChunkPathList(gameName))
-	
+	if bpy.context.preferences.addons[ADDON_NAME].preferences.saveChunkPaths == True:
+		if ("re_chunk_000" in chunkPath or "re_dlc_stm" in chunkPath) and not (len(chunkPathList) > 1 and chunkPath in chunkPathList[1::]) and gameName != -1:	 
+			addChunkPath(chunkPath,gameName)
+	#print(chunkPathList)
 	texConv = Texconv()
 
 	for materialName in meshMaterialDict.keys():

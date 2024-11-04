@@ -139,7 +139,7 @@ def findHeaderObj():
 def createMDFCollection(collectionName,parentCollection = None):
 	collection = bpy.data.collections.new(collectionName)
 	collection.color_tag = "COLOR_05"
-	collection["~TYPE"] = "RE_CHAIN_COLLECTION"
+	collection["~TYPE"] = "RE_MDF_COLLECTION"
 	if parentCollection != None:
 		parentCollection.children.link(collection)
 	else:

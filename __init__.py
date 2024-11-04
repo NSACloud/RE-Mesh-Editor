@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 28),
+	"version": (0, 29),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -124,6 +124,7 @@ class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
 		("DD2", "Dragon's Dogma 2", ""),
 		("KG", "Kunitsu-Gami", ""),
 		("DR", "Dead Rising", ""),
+		("MHWILDS", "Monster Hunter Wilds", ""),
 		]
     )
     path: StringProperty(
@@ -206,6 +207,12 @@ class REMeshPreferences(AddonPreferences):
 		description = "Use DDS textures instead of converting to TIF.\nThis greatly improves mesh import speed but is only usable on Blender 4.2 or higher.\nIf the Blender version is less than 4.2, this option will do nothing",
 		default = False if bpy.app.version < (4,2,0) else True
 	)
+	
+	saveChunkPaths: BoolProperty(
+		name="Save Chunk Paths Automatically",
+		description = "If a chunk path is detected when a mesh is imported, add it to the chunk path list automatically",
+		default = True
+	)
 	chunkPathList_items: CollectionProperty(type=ChunkPathPropertyGroup)
 	chunkPathList_index: IntProperty(name="")
 	# addon updater preferences
@@ -261,7 +268,10 @@ class REMeshPreferences(AddonPreferences):
 		
 		op.url = 'https://ko-fi.com/nsacloud'
 		
+		
+		
 		layout.label(text = "Chunk Path List")
+		layout.prop(self, "saveChunkPaths")
 		layout.template_list("MESH_UL_ChunkPathList", "", self, "chunkPathList_items", self, "chunkPathList_index",rows = 3)
 		row = layout.row(align=True)
 		row.operator("re_mesh.chunk_path_list_add_item")
@@ -331,6 +341,10 @@ class ImportREMesh(Operator, ImportHelper):
 	   name = "",
 	   description = "Merges the imported mesh's armature with the selected armature. Leave this blank if not merging with an armature",
 	   default = "")
+	mergeImportedArmatures : BoolProperty(
+	   name = "Merge All New Armatures",
+	   description = "If multiple mesh files are selected, merge the armatures of all newly imported mesh files into one",
+	   default = False)
 	importArmatureOnly : BoolProperty(
 	   name = "Only Import Armature",
 	   description = "Imports the armature of the mesh file, but not any of the meshes",
@@ -384,8 +398,12 @@ class ImportREMesh(Operator, ImportHelper):
 		
 		layout.label(text = "Merge With Armature")
 		
+		
 		layout.prop_search(self, "mergeArmature",bpy.data,"armatures")
 		
+		row = layout.row()
+		row.prop(self, "mergeImportedArmatures")
+		row.enabled = len(self.files) > 1
 		
 		row = layout.row()
 		icon = 'DOWNARROW_HLT' if self.showMaterialOptions else 'RIGHTARROW'
@@ -438,11 +456,21 @@ class ImportREMesh(Operator, ImportHelper):
 		
 		multiFileImport = len(self.files) > 1
 		hasImportErrors = False
-		
+		mergeArmatureName = ""
+		mergeArmatureNameIndex = 1
+		if multiFileImport and self.mergeImportedArmatures:
+			mergeArmatureName = self.files[0].name.split(".mesh")[0] + " Armature"
+			baseMergeArmatureName = mergeArmatureName
+			while mergeArmatureName in bpy.data.armatures:#Get the name of armature that will be imported, this accounts for if there's already an armature with that name imported
+				mergeArmatureName = baseMergeArmatureName + "." + str(mergeArmatureNameIndex).zfill(3)
+				mergeArmatureNameIndex += 1
+			
 		for index, file in enumerate(self.files):
 			filepath = os.path.join(self.directory,file.name)
 			if multiFileImport:
 				print(f"Multi Mesh Import ({index+1}/{len(self.files)})")
+				if index != 0:
+					options["mergeArmature"] = mergeArmatureName
 			if os.path.isfile(filepath):
 				success = importREMeshFile(filepath,options)
 				options["clearScene"] = False#Disable clear scene after first mesh is imported
@@ -499,6 +527,7 @@ class ExportREMesh(Operator, ExportHelper):
 				(".231011879", "Dragon's Dogma 2", "Dragon's Dogma 2"),
 				(".240306278", "Kunitsu-Gami", "Kunitsu-Gami"),
 				(".240424828", "Dead Rising", "Dead Rising"),
+				(".240820143", "Monster Hunter Wilds", "Monster Hunter Wilds"),
 			   ]
 		)
 	targetCollection: bpy.props.StringProperty(
@@ -670,7 +699,7 @@ class ImportREMDF(bpy.types.Operator, ImportHelper):
 			return self.execute(context)
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
-supportedMDFVersions = set([23,19,21,32,31,40])		
+supportedMDFVersions = set([23,19,21,32,31,40,45])		
 class ExportREMDF(bpy.types.Operator, ExportHelper):
 	'''Export RE Engine MDF File'''
 	bl_idname = "re_mdf.exportfile"
@@ -688,6 +717,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				(".32", "Resident Evil 4", ""),
 				(".31", "Street Fighter 6", ""),
 				(".40", "Dragon's Dogma 2 / Kunitsu-Gami / Dead Rising", "Dragon's Dogma 2, Kunitsu-Gami, Dead Rising"),
+				(".45", "Monster Hunter Wilds", "Monster Hunter Wilds"),
 			  ]
 		)
 	targetCollection : StringProperty(

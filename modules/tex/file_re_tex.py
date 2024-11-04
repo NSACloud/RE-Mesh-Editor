@@ -3,7 +3,7 @@ import os
 
 from ..gen_functions import textColors,raiseWarning,raiseError,getPaddingAmount,read_uint,read_int,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte
 
-#TODO Add support for multi image textures like RE4R's terrain textures
+VERSION_MHWILDS = 240606151#mhwilds tex version
 
 gameNameToTexVersionDict = {
 	"DMC5":11,
@@ -20,6 +20,7 @@ gameNameToTexVersionDict = {
 	"DD2":760230703,
 	"KG":231106777,
 	"DR":240606151,
+	"MHWILDS":240701001,
 	}
 
 ddsBpps = {
@@ -380,8 +381,13 @@ class MipData():
 		self.mipOffset = 0
 		self.compressedSize  = 0
 		self.uncompressedSize = 0
+		
+		#WILDS
+		self.imageSize = 0
+		self.imageOffset = 0
+		
 		self.textureData = bytearray()
-	def read(self,file,expectedMipSize,width,height,ddsBPPs):
+	def read(self,file,expectedMipSize,width,height,ddsBPPs,texVersion):
 
 		self.mipOffset = read_uint64(file)
 		self.compressedSize = read_uint(file)
@@ -389,8 +395,16 @@ class MipData():
 		currentPos = file.tell()
 		file.seek(self.mipOffset)
 		
+		if texVersion >= VERSION_MHWILDS:
+			raise Exception("MH Wilds textures are not supported. The oodle texture compression has not been solved yet.")
+			self.imageSize = read_uint(file)
+			self.imageOffset = read_uint(file)
+			
+			file.seek(self.imageOffset)
+			
+			
 		#print(f"expected mip size: {expectedMipSize}\nactual mip size: {self.uncompressedSize}")
-		if self.uncompressedSize != expectedMipSize:
+		if self.uncompressedSize != expectedMipSize :
 
 			pitch = self.uncompressedSize
 			#print(f"{width},{height}")
@@ -433,6 +447,7 @@ class Tex():
 	def __init__(self):
 		self.header = TexHeader()
 		self.imageMipDataList = []
+		self.imageHeaderList = []#WILDS
 	def read(self,file):
 
 		self.header.read(file)
@@ -449,9 +464,10 @@ class Tex():
 				mipBitSize = (mipX*mipY) * self.header.ddsBitsPerPixel
 				pad = 8 - mipBitSize if mipBitSize < 8 else 0
 				expectedMipSize = (mipBitSize + pad) // 8
-				mipEntry.read(file,expectedMipSize,mipX,mipY,self.header.ddsBitsPerPixel)
+				mipEntry.read(file,expectedMipSize,mipX,mipY,self.header.ddsBitsPerPixel,self.header.version)
 				imageMipDataListEntry.append(mipEntry)
 			self.imageMipDataList.append(imageMipDataListEntry)
+			
 	def write(self,file):
 		self.header.write(file)
 		#Write mip offsets and sizes

@@ -5,7 +5,7 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-![meshEditorPreview](https://github.com/user-attachments/assets/2cc32d0f-d52e-4d04-a242-d3d884b1c6cd)
+![meshEditorPreview](https://github.com/user-attachments/assets/2158f003-d50e-42e0-aacd-eaa20f66de97)
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
@@ -28,6 +28,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - **Dragon's Dogma 2**
  - **Kunitsu-Gami: Path of the Goddess**
  - **Dead Rising Deluxe Remaster**
+ - **Monster Hunter Wilds**
  
 Support for more games may be added in the future.
 
@@ -52,6 +53,18 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.29 - 11/3/2024
+* Added Monster Hunter Wilds support.
+  
+**MH Wilds textures are not supported yet due to file format changes. See the [issues page](https://github.com/NSACloud/RE-Mesh-Editor/issues/4) for details.**
+* Added support for streamed meshes.
+* Chunk paths are now saved automatically when importing meshes. This can be disabled in the addon preferences.
+* Textures that were not imported appear red now instead of pink. This is for differentiating between textures that were once present but later moved.
+* Added "Merge All New Armatures" import option. When multiple meshes are selected during import, using this option will merge all newly imported armatures into one.
+* Minor bug fixes.
+<details>
+  <summary>Older Version Change Logs</summary>
 
 ### V0.28 - 9/19/2024
 * Fixed issue that caused Blender to crash when importing certain Dead Rising meshes.
@@ -89,8 +102,6 @@ https://github.com/user-attachments/assets/48be61bc-7c40-440f-881b-534809d3232f
 * Fixed issue where certain textures didn't convert correctly.
 * Many minor bug fixes
 
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.25 - 7/26/2024
 * Fixed issue where Blender could give out of bound vertex group indices and cause an error.
@@ -191,7 +202,17 @@ NOTE: RE Toolbox has also been updated. Be sure to update it as well as it conta
 
 Video guide coming soon. Images will be added to the text guide once the video is done.
 
-**Quick Model Import Guide**
+[Written Model Importing Guide (WIP)](https://github.com/Modding-Haven/REEngine-Modding-Documentation/wiki/Custom-Model-Importing-Guide)
+
+Click the link above for a full written walkthrough of importing a custom model into an RE Engine game.
+
+Note that the guide is currently a work in progress and is not yet complete.
+
+For a short version of the guide, see below.
+
+<details>
+  <summary>TLDR Model Importing Guide</summary>
+
 
 1. Find the mesh you want to replace inside the extracted .pak files.
 2. Create a folder for your mod, then recreate the folder structure leading to the mesh file inside your mod folder starting from the "natives" folder.
@@ -215,6 +236,9 @@ Video guide coming soon. Images will be added to the text guide once the video i
 20. (Optional) Add bones to the armature to be used as physics bones. Create chains using RE Chain Editor.
 21. Export from File > Export > RE Mesh/MDF and put them in the mod folder at their original chunk path.
 22. Install the mod folder using Fluffy Manager or use FirstNatives.
+
+ </details>
+
 ## FAQ / Troubleshooting
 * **The model has a checkerboard texture or is invisible in game.**
 

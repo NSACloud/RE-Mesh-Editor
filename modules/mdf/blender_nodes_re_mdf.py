@@ -524,11 +524,11 @@ class dynamicArrayTextureSelectorNodeGroup():
 			self.currentOutAlphaSocket = mixAlphaNode.outputs["Color"]
 
 missingTexTypeDict = {
-	"ALBD":(1.0,0.0,1.0,1.0),
-	"ALBM":(1.0,0.0,1.0,0.0),
+	"ALBD":(1.0,0.0,0.0,1.0),
+	"ALBM":(1.0,0.0,0.0,0.0),
 	"ALB":(1.0,0.0,1.0,1.0),
 	"ALP":(1.0,1.0,1.0,1.0),
-	"ALBA":(1.0,0.0,1.0,1.0),
+	"ALBA":(1.0,0.0,0.0,1.0),
 	"NRMR":(.502,.502,1.0,1.0),
 	"NRRT":(.502,.502,1.0,.502),
 	"NRRA":(.502,.502,1.0,.502),

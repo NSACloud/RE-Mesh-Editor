@@ -212,10 +212,28 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 	return armatureObj
 
 def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
+	#print(f"\n{meshName}, Vertex Count: {len(vertexList)}, Face Count: {len(faceList)}\n")
+	#print(vertexList)
+	#print()
+	#print()
+	#print(faceList)
+	"""
+	for face in faceList:
+		for index in face:
+			if index >= len(vertexList):
+				raise Exception("Invalid mesh, face index exceeded vertex count")
+				
+	for indices in vertexGroupBoneIndicesList:
+		for index in indices:
+			if index >= len(boneNameList):
+				raise Exception("Invalid mesh, bone weight index is invalid")
+	"""
 	meshData = bpy.data.meshes.new(meshName)
 	#Import vertices and faces
 	if vertexList == []:
 		raise Exception("Invalid mesh, submesh has no vertices")
+	if faceList == []:
+		raise Exception("Invalid mesh, submesh has no faces")
 	meshData.from_pydata(vertexList, [], faceList)
 	
 	#Import vertex normals
@@ -543,6 +561,7 @@ def importREMeshFile(filePath,options):
 	if options["createCollections"]:
 		meshCollection = getCollection(meshFileName,makeNew = True)
 		meshCollection.color_tag = "COLOR_01"
+		meshCollection["~TYPE"] = "RE_MESH_COLLECTION"
 		bpy.context.scene.re_mdf_toolpanel.meshCollection = meshCollection.name
 	else:
 		meshCollection = bpy.context.scene.collection
@@ -839,7 +858,7 @@ def exportREMeshFile(filePath,options):
 	
 	maxWeightsPerVertex = 8
 	maxWeightedBones = 256
-	if gameName == "SF6":
+	if gameName == "SF6" or gameName == "MHWILDS":
 		maxWeightsPerVertex = 6
 		maxWeightedBones = 1024
 	MAX_VERTICES = 65536
@@ -1118,7 +1137,7 @@ def exportREMeshFile(filePath,options):
 			try:
 				solveRepeatedUVs()
 			except Exception as err:
-				raiseWarning(f"Failed to solve repeated UVs.")
+				raiseWarning(f"Failed to solve repeated UVs. {str(err)}")
 			
 			"""
 			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):#RE Toolbox installed
@@ -1138,7 +1157,7 @@ def exportREMeshFile(filePath,options):
 			try:
 				splitSharpEdges()
 			except Exception as err:
-				raiseWarning(f"Failed to split sharp edges.")
+				raiseWarning(f"Failed to split sharp edges. {str(err)}")
 			
 			"""
 			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):#RE Toolbox installed
