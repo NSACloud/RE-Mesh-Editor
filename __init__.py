@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 30),
+	"version": (0, 31),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -524,7 +524,7 @@ class ExportREMesh(Operator, ExportHelper):
 			    (".2109148288", "Monster Hunter Rise", "Monster Hunter Rise"),
 				(".221108797", "Resident Evil 4", "Resident Evil 4"),
 				(".230110883", "Street Fighter 6", "Street Fighter 6"),
-				(".231011879", "Dragon's Dogma 2", "Dragon's Dogma 2"),
+				(".240423143", "Dragon's Dogma 2", "Dragon's Dogma 2"),
 				(".240306278", "Kunitsu-Gami", "Kunitsu-Gami"),
 				(".240424828", "Dead Rising", "Dead Rising"),
 				(".240820143", "Monster Hunter Wilds", "Monster Hunter Wilds"),
@@ -581,6 +581,10 @@ class ExportREMesh(Operator, ExportHelper):
 			if ".mesh" in prevCollection:#Remove blender suffix after .mesh if it exists
 				self.filepath = prevCollection.split(".mesh")[0]+".mesh" + self.filename_ext
 		if context.scene.get("REMeshLastImportedMeshVersion",0) in meshFileVersionToGameNameDict:
+			if context.scene["REMeshLastImportedMeshVersion"] == 231011879:
+				#DD2 version update fix
+				context.scene["REMeshLastImportedMeshVersion"] = 240423143
+				
 			self.filename_ext = "."+str(context.scene["REMeshLastImportedMeshVersion"])
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}

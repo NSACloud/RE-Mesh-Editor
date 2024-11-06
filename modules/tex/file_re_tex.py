@@ -395,7 +395,7 @@ class MipData():
 		currentPos = file.tell()
 		file.seek(self.mipOffset)
 		
-		if texVersion >= VERSION_MHWILDS:
+		if texVersion == VERSION_MHWILDS:
 			raise Exception("MH Wilds textures are not supported. The oodle texture compression has not been solved yet.")
 			self.imageSize = read_uint(file)
 			self.imageOffset = read_uint(file)

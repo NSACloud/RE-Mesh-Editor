@@ -254,7 +254,7 @@ class BlendShape:
 		self.blendShapeName = "newBlendShape"
 		self.deltas = []
 
-def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blendShapeBuffer = None):
+def parseLODStructure(reMesh,targetLODList,vertexDictList,faceBufferList,usedVertexOffsetDictList, blendShapeBuffer = None):
 	lodList = []
 	currentBlendShapeOffset = 0
 	blendShapeDict = {}
@@ -272,7 +272,7 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 		if blendShapeLODData != None:
 			blendShapeTags = set()#Unused currently but there if needed in the future
 			#identifier = [reMesh.lodHeader.lodGroupOffsetList[lodIndex]]
-			print(f"LOD Index {str(lodIndex)}")
+			#print(f"LOD Index {str(lodIndex)}")
 			bufferType = blendShapeNameMapping[blendShapeLODData.typing]
 			bufferStride = blendShapeStrideDict[bufferType]
 			
@@ -347,6 +347,7 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 				
 		lod = LODLevel()
 		lod.lodDistance = lodGroup.distance
+		#print(f"lod {lodIndex}")
 		for visconGroup in lodGroup.meshGroupList:
 			
 			
@@ -357,6 +358,8 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 			for index,meshInfo in enumerate(visconGroup.vertexInfoList):
 				#print(f"submesh {index},face count {meshInfo.faceCount},face start {meshInfo.faceStartIndex} start offset {meshInfo.faceStartIndex*2} end offset {meshInfo.faceStartIndex*2+meshInfo.faceCount*2},")
 				
+				
+				
 				if index == lastSubmeshIndex:
 					bufferEnd = visconGroup.vertexInfoList[0].vertexStartIndex+visconGroup.vertexCount
 				else:
@@ -365,35 +368,37 @@ def parseLODStructure(reMesh,targetLODList,vertexDict,usedVertexOffsetDict, blen
 				submesh.materialIndex = meshInfo.materialIndex
 				submesh.subMeshIndex = index
 				
-				if meshInfo.vertexStartIndex in usedVertexOffsetDict:
+				if meshInfo.vertexStartIndex in usedVertexOffsetDictList[meshInfo.vertexBufferIndex]:
 					#print(f"REUSED MESH OFFSET AT Group {str(group.visconGroupNum)} Sub{str(index)}")
 					submesh.isReusedMesh = True
-					submesh.linkedSubMesh = usedVertexOffsetDict[meshInfo.vertexStartIndex]
+					submesh.linkedSubMesh = usedVertexOffsetDictList[meshInfo.vertexBufferIndex][meshInfo.vertexStartIndex]
 				else:
-					usedVertexOffsetDict[meshInfo.vertexStartIndex] = submesh
+					usedVertexOffsetDictList[meshInfo.vertexBufferIndex][meshInfo.vertexStartIndex] = submesh
 				submesh.meshVertexOffset = meshInfo.vertexStartIndex
 				
 				#print("vertex pool size")
 				#print(len(vertexDict["Position"]))
-				if vertexDict["Position"] != None:
-					submesh.vertexPosList = vertexDict["Position"][meshInfo.vertexStartIndex:bufferEnd]
+				if vertexDictList[meshInfo.vertexBufferIndex]["Position"] != None:
+					submesh.vertexPosList = vertexDictList[meshInfo.vertexBufferIndex]["Position"][meshInfo.vertexStartIndex:bufferEnd]
 				#print(f"{meshInfo.faceStartIndex*2} - {meshInfo.faceStartIndex*2+meshInfo.faceCount*2}")
+				#print(f"faceBufferLength {len(faceBufferList[meshInfo.vertexBufferIndex])}")
 				if reMesh.lodHeader.has32BitIndexBuffer:
-					submesh.faceList = ReadIntFaceBuffer(reMesh.meshBufferHeader.faceBuffer[meshInfo.faceStartIndex*4:meshInfo.faceStartIndex*4+meshInfo.faceCount*4])
+					submesh.faceList = ReadIntFaceBuffer(faceBufferList[meshInfo.vertexBufferIndex][meshInfo.faceStartIndex*4:meshInfo.faceStartIndex*4+meshInfo.faceCount*4])
 				else:
-					submesh.faceList = ReadFaceBuffer(reMesh.meshBufferHeader.faceBuffer[meshInfo.faceStartIndex*2:meshInfo.faceStartIndex*2+meshInfo.faceCount*2])
-				if vertexDict["NorTan"] != None:
-					submesh.normalList = vertexDict["NorTan"][0][meshInfo.vertexStartIndex:bufferEnd]
-					submesh.tangentList = vertexDict["NorTan"][1][meshInfo.vertexStartIndex:bufferEnd]
-				if vertexDict["UV"] != None:
-					submesh.uvList = vertexDict["UV"][meshInfo.vertexStartIndex:bufferEnd]
-				if vertexDict["UV2"] != None:
-					submesh.uv2List = vertexDict["UV2"][meshInfo.vertexStartIndex:bufferEnd]
-				if vertexDict["Weight"] != None:
-					submesh.weightIndicesList = vertexDict["Weight"][0][meshInfo.vertexStartIndex:bufferEnd]
-					submesh.weightList = vertexDict["Weight"][1][meshInfo.vertexStartIndex:bufferEnd]
-				if vertexDict["Color"] != None:
-					submesh.colorList = vertexDict["Color"][meshInfo.vertexStartIndex:bufferEnd]
+					#print(f"{str(meshInfo.faceStartIndex*2)}:{str(meshInfo.faceStartIndex*2+meshInfo.faceCount*2)}")
+					submesh.faceList = ReadFaceBuffer(faceBufferList[meshInfo.vertexBufferIndex][meshInfo.faceStartIndex*2:meshInfo.faceStartIndex*2+meshInfo.faceCount*2])
+				if vertexDictList[meshInfo.vertexBufferIndex]["NorTan"] != None:
+					submesh.normalList = vertexDictList[meshInfo.vertexBufferIndex]["NorTan"][0][meshInfo.vertexStartIndex:bufferEnd]
+					submesh.tangentList = vertexDictList[meshInfo.vertexBufferIndex]["NorTan"][1][meshInfo.vertexStartIndex:bufferEnd]
+				if vertexDictList[meshInfo.vertexBufferIndex]["UV"] != None:
+					submesh.uvList = vertexDictList[meshInfo.vertexBufferIndex]["UV"][meshInfo.vertexStartIndex:bufferEnd]
+				if vertexDictList[meshInfo.vertexBufferIndex]["UV2"] != None:
+					submesh.uv2List = vertexDictList[meshInfo.vertexBufferIndex]["UV2"][meshInfo.vertexStartIndex:bufferEnd]
+				if vertexDictList[meshInfo.vertexBufferIndex]["Weight"] != None:
+					submesh.weightIndicesList = vertexDictList[meshInfo.vertexBufferIndex]["Weight"][0][meshInfo.vertexStartIndex:bufferEnd]
+					submesh.weightList = vertexDictList[meshInfo.vertexBufferIndex]["Weight"][1][meshInfo.vertexStartIndex:bufferEnd]
+				if vertexDictList[meshInfo.vertexBufferIndex]["Color"] != None:
+					submesh.colorList = vertexDictList[meshInfo.vertexBufferIndex]["Color"][meshInfo.vertexStartIndex:bufferEnd]
 				
 				if blendShapeLODData != None:
 					"""
@@ -453,7 +458,7 @@ typedef struct
 {
     hfloat u;
     hfloat v;
-}UV1<bgcolor=0xFF0000>;
+}UV<bgcolor=0xFF0000>;
 
 typedef struct
 {
@@ -470,6 +475,7 @@ typedef struct
     uint64 w4:10;
     uint64 w5:10;
     uint64 pad1:2;
+	ubyte indices[8];
 }Weight<bgcolor=0x00FFFF>;
 
 typedef struct
@@ -485,12 +491,12 @@ typedef struct
 		print("struct")
 		print("{")
 		for element in elementList:
-			print("\tFSeek("+str(element["start"])+")\n\t struct\n\t{")
+			print("\tFSeek("+str(element["start"])+");\n\t struct\n\t{")
 			print("\t\t"+element["type"] + " entry["+str((element["end"]-element["start"])//element["stride"])+"];")
 			print("\t}element;")
 		print("}LOD"+str(index)+";")
 		
-		print("//EOF")
+	print("//EOF")
 		
 
 class ParsedREMesh:
@@ -513,6 +519,7 @@ class ParsedREMesh:
 		self.bufferHasColor = False
 		self.bufferHasIntFaces = False
 	def MergeStreamedBuffers(self,reMesh):#WILDS
+	#Unused now, refactored streaming mesh implementation
 		print("Merging streamed vertex buffers...")
 			
 		newVertBuffer = bytearray()
@@ -547,6 +554,7 @@ class ParsedREMesh:
 				
 				#print(f"element {vertexElementIndex} bytes: {len(elementBytes)}")
 				bufferArrayList[vertexElementIndex].extend(elementBytes)
+				
 				"""
 				templateEntry = dict()
 				templateEntry["type"] = typeNameMapping[vertexElement.typing]
@@ -600,8 +608,7 @@ class ParsedREMesh:
 		return newVertBuffer
 			
 	def ParseREMesh(self,reMesh,importOptions = {"importAllLOD":True,"importShadowMesh":True,"importOcclusionMesh":True,"importBlendShapes":True}):
-		vertexDict = None
-		usedVertexOffsetDict = dict()
+		usedVertexOffsetDictList = []
 		lodOffsetDict = dict()#Used for linking shadow mesh lods to main mesh lods
 		self.nameList = reMesh.rawNameList
 		self.boneNameRemapList = reMesh.boneNameRemapList
@@ -650,19 +657,28 @@ class ParsedREMesh:
 			#if duplicate in vertexelementlist, add shadowLOD tag
 			
 			
+			
+			vertexDictList = []
+			faceBufferList = []
+			
+			vertexDictList.append(ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList,  reMesh.meshBufferHeader.vertexBuffer,tags))
+			faceBufferList.append(reMesh.meshBufferHeader.faceBuffer)
+			
 			if reMesh.streamingInfoHeader != None and reMesh.streamingInfoHeader.entryCount != 0 and reMesh.streamingBuffer != None:
-				mainVertexBuffer = self.MergeStreamedBuffers(reMesh)
-			else:
-				mainVertexBuffer = reMesh.meshBufferHeader.vertexBuffer
-			vertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, mainVertexBuffer,tags)
+				for entry in reMesh.meshBufferHeader.streamingBufferHeaderList:
+					vertexDictList.append(ReadVertexElementBuffers(entry.vertexElementList,entry.vertexBuffer,tags))
+					faceBufferList.append(entry.faceBuffer)
+					usedVertexOffsetDictList.append(dict())
+			
+			usedVertexOffsetDictList.append(dict())
 			#TODO
 			#tags.add("shadowLOD")
 			#shadowVertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
 		#Parse Blend Shapes
-		vertexCount = len(vertexDict["Position"])
+		vertexCount = len(vertexDictList[-1]["Position"])
 		lastElement = reMesh.meshBufferHeader.vertexElementList[-1]
 		blendShapeStartPos = lastElement.posStartOffset + vertexCount * lastElement.stride
-		blendShapeBuffer = mainVertexBuffer[blendShapeStartPos:]
+		blendShapeBuffer =  reMesh.meshBufferHeader.vertexBuffer[blendShapeStartPos:]
 		if reMesh.blendShapeHeader != None:
 			
 			print(f"blendShape buffer start pos {str(reMesh.meshBufferHeader.vertexBufferOffset+blendShapeStartPos)}")
@@ -670,15 +686,15 @@ class ParsedREMesh:
 				
 				
 		#Parse Main Meshes
-		if reMesh.lodHeader != None and vertexDict != None:
+		if reMesh.lodHeader != None and len(vertexDictList) != 0:
 			if reMesh.lodHeader.has32BitIndexBuffer:
 				self.bufferHasIntFaces = True
 			self.boundingSphere = reMesh.lodHeader.sphere
 			self.boundingBox = reMesh.lodHeader.bbox
-			self.mainMeshLODList = parseLODStructure(reMesh,reMesh.lodHeader.lodGroupList,vertexDict,usedVertexOffsetDict,blendShapeBuffer)
+			self.mainMeshLODList = parseLODStructure(reMesh,reMesh.lodHeader.lodGroupList,vertexDictList,faceBufferList,usedVertexOffsetDictList,blendShapeBuffer)
 			for i in range(len(self.mainMeshLODList)):
 				lodOffsetDict[reMesh.lodHeader.lodGroupOffsetList[i]] = self.mainMeshLODList[i]
-		if reMesh.shadowHeader != None and vertexDict != None:
+		if reMesh.shadowHeader != None and len(vertexDictList) != 0:
 			for offset in reMesh.shadowHeader.lodGroupOffsetList:
 				if offset in lodOffsetDict:
 					self.shadowMeshLinkedLODList.append(lodOffsetDict[offset])

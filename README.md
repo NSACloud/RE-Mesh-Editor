@@ -54,6 +54,11 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.31 - 11/6/2024
+* Added support for Dragon's Dogma 2's new mesh version.
+* Added streaming mesh support for DD2 and Street Fighter 6.
+* Refactored streaming mesh implementation to fix some importing issues.
+
 ### V0.30 - 11/4/2024
 * Added error messages for streaming file related issues.
 
@@ -256,10 +261,12 @@ The mesh is not rigged to the armature correctly. Check the the mesh moves along
   
 You may be using an outdated .mdf2 file, be sure to extract from the latest patch pak as materials can change upon updates.
 
-## Credits
 [Monster Hunter Modding Discord](https://discord.gg/gJwMdhK)
 
 [Modding Haven Discord](https://discord.gg/modding-haven-718224210270617702)
+
+## Credits
+
 - [AsteriskAmpersand](https://github.com/AsteriskAmpersand) - Mesh format research and tex conversion code
 - [AlphaZomega](https://github.com/alphazolam/) - RE Mesh 010 Template and Noesis plugin
 - [CG Cookie](https://github.com/CGCookie) - Addon updater module

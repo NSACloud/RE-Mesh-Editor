@@ -227,6 +227,7 @@ def findMDFPathFromMeshPath(meshPath):
 		".221108797":".32",#RE4
 		".230110883":".31",#SF6
 		".231011879":".40",#DD2
+		".240423143":".40",#DD2NEW
 		".240424828":".40",#DR
 		".240820143":".45",#MHWILDS
 		
@@ -252,14 +253,17 @@ def findMDFPathFromMeshPath(meshPath):
 			print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
 			mdfPath = f"{fileRoot}_v00.mdf2{mdfVersion}"
 			
-		if mdfPath == None and fileRoot.endswith("_f"):
+		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
 			
 			mdfPath = f"{fileRoot[:-1] + 'm'}.mdf2{mdfVersion}"#DD2 female armor uses male mdf, so replace _f with _m
 		
-		if mdfPath == None and os.path.split(fileRoot)[1].startswith("SM_"):
+		if not os.path.isfile(mdfPath) and os.path.split(fileRoot)[1].startswith("SM_"):
 			split = os.path.split(fileRoot)
 			mdfPath = f"{os.path.join(split[0],split[1][1::])}.mdf2{mdfVersion}"#DR Stage meshes, SM_ to M_
 			
+		if not os.path.isfile(mdfPath) and "wcs" in fileRoot:#SF6 world tour models
+			split = os.path.split(fileRoot)
+			mdfPath = os.path.join(split[0],"00",split[1]+f"_00_v00.mdf2{mdfVersion}")
 		
 		if mdfPath == None or not os.path.isfile(mdfPath):
 			print(f"Could not find {mdfPath}.")
