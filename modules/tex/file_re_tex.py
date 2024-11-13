@@ -1,8 +1,11 @@
 #Author: NSA Cloud
 import os
+from io import BytesIO
 
 from ..gen_functions import textColors,raiseWarning,raiseError,getPaddingAmount,read_uint,read_int,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte
 from ..gdeflate.gdeflate import GDeflate
+
+
 
 VERSION_MHWILDS = 240701001#mhwilds tex version
 
@@ -398,10 +401,12 @@ class MipData():
 		#print(f"mip offset {self.mipOffset}")
 		#print(f"{file.tell()}")
 		endSize = self.uncompressedSize
+		
+		mipData = None#BytesIO for uncompressed texture data
+		
 		if texVersion == VERSION_MHWILDS:
 			file.seek(currentImageDataHeaderOffset)
 			self.imageSize = read_uint(file)
-			endSize = self.imageSize
 			self.imageOffset = read_uint(file)
 			
 			file.seek(imageDataOffset + self.imageOffset)
@@ -410,19 +415,23 @@ class MipData():
 			# Check if it's GDeflate compressed by the [0x04, 0xFB] header until we figure
 			# out if there is a flag somewhere else.
 			if len(rawImageData) >= 2 and rawImageData[0] == 0x04 and rawImageData[1] == 0xFB:
-				print("decompressing MH Wilds texture with GDeflate")
+				#print("Decompressing MH Wilds texture with GDeflate")
 				decompressor = GDeflate()
-				self.textureData = bytearray(decompressor.decompress(rawImageData, num_workers=4))
+				mipData = BytesIO(decompressor.decompress(rawImageData, num_workers=4))
+
 			else:
-				print("MH Wilds texture without GDeflate header - assuming uncompressed.")
-				self.textureData = bytearray(rawImageData)
+				#print("MH Wilds texture without GDeflate header - assuming uncompressed.")
+				mipData = BytesIO(rawImageData)
 			
-			return
+			endSize = mipData.getbuffer().nbytes
+			#print(f"Decompressed data size: {endSize}")
+			#print(f"Specified size: {self.uncompressedSize}")
+			
 
 		#print(f"expected mip size: {expectedMipSize}\nactual mip size: {self.uncompressedSize}")
 		if endSize != expectedMipSize:
-
-			pitch = self.uncompressedSize
+			if mipData == None:
+				mipData = BytesIO(file.read(self.uncompressedSize))
 			#print(f"{width},{height}")
 			if ddsBPPs == 4 or ddsBPPs == 8:
 				texelSize = 4
@@ -444,16 +453,26 @@ class MipData():
 			seekAmount = self.compressedSize - byteReadLength
 			#print(f"seekAmount: {seekAmount}")
 			#print(f"endSize: {endSize}")
+			#tempFile = open(r"D:\Modding\Monster Hunter Wilds\texDataTest\tempData"+str(currentImageDataHeaderOffset),"wb")
+			#tempFile.write(mipData.getvalue())
+			#tempFile.close()
 			while currentOffset != endSize:
 				#print(f"current block offset {file.tell()}")
-				self.textureData.extend(file.read(byteReadLength))
-				file.seek(seekAmount,1)
+				self.textureData.extend(mipData.read(byteReadLength))
+				mipData.seek(seekAmount,1)
 				currentOffset += self.compressedSize
 				#print(f"end block offset {file.tell()}")
 			#print(f"end mip read offset {file.tell()}")
+			
+			mipData.close()
+			
 		else:
 			
-			self.textureData = file.read(self.uncompressedSize)
+			if mipData != None:
+				self.textureData = mipData.getvalue()
+				mipData.close()
+			else:
+				self.textureData = file.read(self.uncompressedSize)
 		
 		file.seek(currentPos)
 		

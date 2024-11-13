@@ -5,7 +5,7 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-![meshEditorPreview](https://github.com/user-attachments/assets/2158f003-d50e-42e0-aacd-eaa20f66de97)
+![meshEditorPreview](https://github.com/user-attachments/assets/3490888d-f3b8-4590-9201-0f68bb166e16)
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
@@ -56,6 +56,10 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.33 - 11/13/2024
+* Added support for Monster Hunter Wilds textures. (Thanks Ando)
+NOTE: Conversion from DDS back to MH Wilds tex is not implemented yet.
+
 ### V0.32 - 11/12/2024
 * Added support for secondary weights used by Dragon's Dogma 2. These weights are labeled with "SHAPEKEY_" and control the scaling of armor meshes.
 * Fixed third person animation issue in Resident Evil 8 caused by incorrect symmetry indices.
@@ -71,7 +75,10 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 ### V0.29 - 11/3/2024
 * Added Monster Hunter Wilds support.
   
-**MH Wilds textures are not supported yet due to file format changes. See the [issues page](https://github.com/NSACloud/RE-Mesh-Editor/issues/4) for details.**
+~~MH Wilds textures are not supported yet due to file format changes. See the [issues page](https://github.com/NSACloud/RE-Mesh-Editor/issues/4) for details.~~
+
+UPDATE: MH Wilds Textures are now supported.
+
 * Added support for streamed meshes.
 * Chunk paths are now saved automatically when importing meshes. This can be disabled in the addon preferences.
 * Textures that were not imported appear red now instead of pink. This is for differentiating between textures that were once present but later moved.
@@ -273,6 +280,7 @@ You may be using an outdated .mdf2 file, be sure to extract from the latest patc
 
 ## Credits
 
+- [Ando](https://github.com/Andoryuuta) - Solving the compression format for MH Wilds textures.
 - [AsteriskAmpersand](https://github.com/AsteriskAmpersand) - Mesh format research and tex conversion code
 - [AlphaZomega](https://github.com/alphazolam/) - RE Mesh 010 Template and Noesis plugin
 - [CG Cookie](https://github.com/CGCookie) - Addon updater module

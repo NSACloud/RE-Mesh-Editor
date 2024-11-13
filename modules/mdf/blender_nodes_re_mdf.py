@@ -403,6 +403,61 @@ def getDualUVMappingNodeGroup():
 
 	return nodeGroup
 
+def getMHWildsSkinMappingNodeGroup():
+	if "MHWildsSkinMapping" in bpy.data.node_groups:
+		nodeGroup = bpy.data.node_groups["MHWildsSkinMapping"]
+	else:
+		nodeGroup = bpy.data.node_groups.new(type="ShaderNodeTree", name="MHWildsSkinMapping")
+	
+		if bpy.app.version < (4,0,0):
+			nodeGroup.inputs.new("NodeSocketFloat","X")
+			nodeGroup.inputs.new("NodeSocketFloat","Y")
+			nodeGroup.inputs.new("NodeSocketVector","UV")
+			
+		else:
+			nodeGroup.interface.new_socket(name="X",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="Y",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="UV",description="",in_out ="INPUT", socket_type="NodeSocketVector")
+		
+		nodes = nodeGroup.nodes
+		links = nodeGroup.links
+		
+		inNode = nodeGroup.nodes.new('NodeGroupInput')
+		#TODO Fix defaults / soft min max
+		
+		#inNode.inputs["X"].default_value = 0.0
+		#inNode.inputs["X"].min_value = 0.001
+		#inNode.inputs["X"].max_value = 0.999
+		
+		#inNode.inputs["Y"].default_value = 0.0
+		#inNode.inputs["Y"].min_value = 0.001
+		#inNode.inputs["Y"].max_value = 0.999
+		currentLoc = [300,0]
+		
+		combineXYZNode = nodes.new("ShaderNodeCombineXYZ")
+		combineXYZNode.location = currentLoc
+		links.new(inNode.outputs["X"],combineXYZNode.inputs["X"])
+		links.new(inNode.outputs["Y"],combineXYZNode.inputs["Y"])
+		
+		currentLoc[0] += 300
+		
+		mappingNode = nodes.new("ShaderNodeMapping")
+		mappingNode.location = currentLoc
+		links.new(combineXYZNode.outputs["Vector"],mappingNode.inputs["Location"])
+		mappingNode.inputs["Scale"].default_value = (0.01,0.01,1.0)
+		
+		
+		
+		outNode = nodeGroup.nodes.new('NodeGroupOutput')
+		if bpy.app.version < (4,0,0):
+			nodeGroup.outputs.new('NodeSocketVector', "Vector")
+			
+		else:
+			nodeGroup.interface.new_socket(name="Vector",description="",in_out ="OUTPUT", socket_type="NodeSocketVector")
+		
+		links.new(mappingNode.outputs["Vector"],outNode.inputs["Vector"])
+	return nodeGroup
+
 def addPropertyNode(prop,currentPos,node_tree):
 	if prop.propName in node_tree.nodes:
 		propNode = node_tree.nodes[prop.propName]
@@ -846,8 +901,23 @@ def newCMMNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]
 	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
 	
-	
-	
+	if "UseSecondaryUV_ColorLayer_MaskMap" in matInfo["mPropDict"]:
+		UVMap1Node = None
+		UVMap2Node = None
+		if "UVMap1Node" in nodeTree.nodes:
+			UVMap1Node = nodeTree.nodes["UVMap1Node"]
+		if "UVMap2Node" in nodeTree.nodes:
+			UVMap2Node = nodeTree.nodes["UVMap2Node"]
+		if UVMap1Node != None and UVMap2Node != None:
+			useSecondaryUVNode = addPropertyNode(matInfo["mPropDict"]["UseSecondaryUV_ColorLayer_MaskMap"], matInfo["currentPropPos"], nodeTree)
+			
+			uvMappingGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+			uvMappingGroupNode.node_tree = getDualUVMappingNodeGroup()
+			uvMappingGroupNode.location = useSecondaryUVNode.location + Vector((300,0))
+			nodeTree.links.new(UVMap1Node.outputs["UV"],uvMappingGroupNode.inputs["UV1"])
+			nodeTree.links.new(UVMap2Node.outputs["UV"],uvMappingGroupNode.inputs["UV2"])
+			nodeTree.links.new(useSecondaryUVNode.outputs["Value"],uvMappingGroupNode.inputs["UseSecondaryUV"])
+			nodeTree.links.new(uvMappingGroupNode.outputs["Vector"],imageNode.inputs["Vector"])
 	if "CMMSepNode" in nodeTree.nodes:
 		CMMSeparateNode = nodeTree.nodes["CMMSepNode"]
 	else:
@@ -862,6 +932,17 @@ def newCMMNode (nodeTree,textureType,matInfo):
 		if matInfo["albedoNodeLayerGroup"] != None:
 			matInfo["albedoNodeLayerGroup"].addMixLayer(RColorNode.outputs["Color"],CMMSeparateNode.outputs["R"],mixType = "MULTIPLY")
 			matInfo["albedoNodeLayerGroup"].addMixLayer(GColorNode.outputs["Color"],CMMSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			
+	elif "ColorLayer_R" in matInfo["mPropDict"] and "ColorLayer_G" in matInfo["mPropDict"] and "ColorLayer_B" in matInfo["mPropDict"] and "ColorLayer_A" in matInfo["mPropDict"]:
+		RColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_R"], matInfo["currentPropPos"], nodeTree)
+		GColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_G"], matInfo["currentPropPos"], nodeTree)
+		BColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_B"], matInfo["currentPropPos"], nodeTree)
+		AColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_A"], matInfo["currentPropPos"], nodeTree)
+		if matInfo["albedoNodeLayerGroup"] != None:
+			matInfo["albedoNodeLayerGroup"].addMixLayer(RColorNode.outputs["Color"],CMMSeparateNode.outputs["R"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(GColorNode.outputs["Color"],CMMSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(BColorNode.outputs["Color"],CMMSeparateNode.outputs["B"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(AColorNode.outputs["Color"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
 	return imageNode
 def newCMASKNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]

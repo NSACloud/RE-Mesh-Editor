@@ -111,7 +111,8 @@ alphaTypeSet = set([
 	])
 cmmTypeSet = set([
 	"UserColorchangeMap",
-	"ColormaskMap"
+	"ColormaskMap",
+	"ColorLayer_MaskMap"
 
 	])
 cmaskTypeSet = set([
@@ -161,7 +162,11 @@ NAMTypes = set([
 OCTDTypes = set([
 	"OcclusionCavityTranslucentDetailMap",
 	"OcclusionCavitySSSDetailMap",
-	])	
+	])
+
+SkinMapTypes = set([
+	"SkinMap",
+	])
 usedTextureSet.update(albedoVertexColorTypeSet)
 usedTextureSet.update(normalVertexColorTypeSet)
 usedTextureSet.update(albedoTypeSet)
@@ -173,6 +178,7 @@ usedTextureSet.update(alphaTypeSet)
 usedTextureSet.update(ATOSTypes)
 usedTextureSet.update(OCTDTypes)
 usedTextureSet.update(NAMTypes)
+usedTextureSet.update(SkinMapTypes)
 
 #print(sorted(list(usedTextureSet)))
 baseUVTilingList = set([#Node types that use UV_Tiling property
@@ -184,7 +190,7 @@ baseUVTilingList = set([#Node types that use UV_Tiling property
 from ..gen_functions import raiseWarning,getBit,wildCardFileSearch
 from .file_re_mdf import readMDF,getMDFVersionToGameName
 from ..tex.blender_re_tex import loadTex
-from .blender_nodes_re_mdf import addImageNode,addTextureNode,addPropertyNode,dynamicColorMixLayerNodeGroup,getBentNormalNodeGroup,getDualUVMappingNodeGroup
+from .blender_nodes_re_mdf import addImageNode,addTextureNode,addPropertyNode,dynamicColorMixLayerNodeGroup,getBentNormalNodeGroup,getDualUVMappingNodeGroup,getMHWildsSkinMappingNodeGroup
 from ..ddsconv.directx.texconv import Texconv, unload_texconv
 DEBUG_MODE = False
 def debugprint(string):
@@ -522,8 +528,18 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				if nodeType != "UNKN" and textureType in nodes:
 					addTextureNode(blenderMaterial.node_tree, nodeType, textureType, matInfo)
 			
-			
-			
+			#WILDS
+			if "SkinMap" in matInfo["textureNodeDict"]:
+				skinMapNode = matInfo["textureNodeDict"]["SkinMap"]
+				skinMappingGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+				skinMappingGroupNode.node_tree = getMHWildsSkinMappingNodeGroup()
+
+				skinMappingGroupNode.location = skinMapNode.location - Vector((300,0))
+				nodeTree.links.new(UVMap1Node.outputs["UV"],skinMappingGroupNode.inputs["UV"])
+				
+				nodeTree.links.new(skinMappingGroupNode.outputs["Vector"],skinMapNode.inputs["Vector"])
+				matInfo["albedoNodeLayerGroup"].addMixLayer(skinMapNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+				
 			#Base layer overrides
 			if "Roughness" in matInfo["mPropDict"]:
 				roughnessNode = addPropertyNode(matInfo["mPropDict"]["Roughness"], matInfo["currentPropPos"], nodeTree)
