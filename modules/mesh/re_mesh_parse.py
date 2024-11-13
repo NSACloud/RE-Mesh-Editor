@@ -181,6 +181,7 @@ def ReadVertexElementBuffers(vertexElementList,vertexBuffer,tagSet):
 		"Color":None,
 		"SF6UnknownVertexDataType":None,
 		"MHWildsUnknownVertexDataType":None,
+		"SecondaryWeight":None,
 		}
 	lastIndex = len(vertexElementList)-1
 	importedElementsSet = set()
@@ -232,6 +233,9 @@ class SubMesh:
 		self.linkedSubMesh = None
 		self.subMeshIndex = 0
 		self.blendShapeList = []
+		#DD2 shape key weights
+		self.secondaryWeightList = []
+		self.secondaryWeightIndicesList = []
 class ParsedBone:
 	def __init__(self):
 		self.boneName = "BONE"
@@ -240,6 +244,7 @@ class ParsedBone:
 		self.nextSiblingIndex = 0
 		self.nextChildIndex = 0
 		self.symmetryBoneIndex = 0
+		self.useSecondaryWeight = 0
 		self.worldMatrix = Matrix4x4()
 		self.localMatrix = Matrix4x4()
 		self.inverseMatrix = Matrix4x4()
@@ -399,6 +404,10 @@ def parseLODStructure(reMesh,targetLODList,vertexDictList,faceBufferList,usedVer
 					submesh.weightList = vertexDictList[meshInfo.vertexBufferIndex]["Weight"][1][meshInfo.vertexStartIndex:bufferEnd]
 				if vertexDictList[meshInfo.vertexBufferIndex]["Color"] != None:
 					submesh.colorList = vertexDictList[meshInfo.vertexBufferIndex]["Color"][meshInfo.vertexStartIndex:bufferEnd]
+					
+				if vertexDictList[meshInfo.vertexBufferIndex]["SecondaryWeight"] != None:
+					submesh.secondaryWeightIndicesList = vertexDictList[meshInfo.vertexBufferIndex]["SecondaryWeight"][0][meshInfo.vertexStartIndex:bufferEnd]
+					submesh.secondaryWeightList = vertexDictList[meshInfo.vertexBufferIndex]["SecondaryWeight"][1][meshInfo.vertexStartIndex:bufferEnd]
 				
 				if blendShapeLODData != None:
 					"""
@@ -518,6 +527,7 @@ class ParsedREMesh:
 		self.bufferHasWeight = False
 		self.bufferHasColor = False
 		self.bufferHasIntFaces = False
+		self.bufferHasSecondaryWeight = False#DD2 shapekeys
 	def MergeStreamedBuffers(self,reMesh):#WILDS
 	#Unused now, refactored streaming mesh implementation
 		print("Merging streamed vertex buffers...")
@@ -640,6 +650,7 @@ class ParsedREMesh:
 				bone.nextSiblingIndex = reMesh.skeletonHeader.boneInfoList[i].boneSibling
 				bone.nextChildIndex = reMesh.skeletonHeader.boneInfoList[i].boneChild
 				bone.symmetryBoneIndex = reMesh.skeletonHeader.boneInfoList[i].boneSymmetric
+				bone.useSecondaryWeight = reMesh.skeletonHeader.boneInfoList[i].useSecondaryWeight
 				bone.worldMatrix = reMesh.skeletonHeader.worldMatList[i]
 				bone.localMatrix = reMesh.skeletonHeader.localMatList[i]
 				bone.inverseMatrix = reMesh.skeletonHeader.inverseMatList[i]
@@ -663,6 +674,9 @@ class ParsedREMesh:
 			
 			vertexDictList.append(ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList,  reMesh.meshBufferHeader.vertexBuffer,tags))
 			faceBufferList.append(reMesh.meshBufferHeader.faceBuffer)
+			
+			if reMesh.meshBufferHeader.secondaryWeightBuffer != None:
+				vertexDictList[-1]["SecondaryWeight"] = ReadWeightBuffer(reMesh.meshBufferHeader.secondaryWeightBuffer, tags = set())
 			
 			if reMesh.streamingInfoHeader != None and reMesh.streamingInfoHeader.entryCount != 0 and reMesh.streamingBuffer != None:
 				for entry in reMesh.meshBufferHeader.streamingBufferHeaderList:

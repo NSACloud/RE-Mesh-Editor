@@ -3,7 +3,7 @@ import os
 
 from ..gen_functions import textColors,raiseWarning,raiseError,getPaddingAmount,read_uint,read_int,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte
 
-VERSION_MHWILDS = 240606151#mhwilds tex version
+VERSION_MHWILDS = 240701001#mhwilds tex version
 
 gameNameToTexVersionDict = {
 	"DMC5":11,
@@ -387,24 +387,28 @@ class MipData():
 		self.imageOffset = 0
 		
 		self.textureData = bytearray()
-	def read(self,file,expectedMipSize,width,height,ddsBPPs,texVersion):
+	def read(self,file,expectedMipSize,width,height,ddsBPPs,currentImageDataHeaderOffset,imageDataOffset,texVersion):
 
 		self.mipOffset = read_uint64(file)
 		self.compressedSize = read_uint(file)
 		self.uncompressedSize = read_uint(file)
 		currentPos = file.tell()
 		file.seek(self.mipOffset)
-		
+		#print(f"mip offset {self.mipOffset}")
+		#print(f"{file.tell()}")
+		endSize = self.uncompressedSize
 		if texVersion == VERSION_MHWILDS:
 			raise Exception("MH Wilds textures are not supported. The oodle texture compression has not been solved yet.")
+			file.seek(currentImageDataHeaderOffset)
 			self.imageSize = read_uint(file)
+			endSize = self.imageSize
 			self.imageOffset = read_uint(file)
 			
-			file.seek(self.imageOffset)
+			file.seek(imageDataOffset + self.imageOffset)
 			
 			
 		#print(f"expected mip size: {expectedMipSize}\nactual mip size: {self.uncompressedSize}")
-		if self.uncompressedSize != expectedMipSize :
+		if endSize != expectedMipSize:
 
 			pitch = self.uncompressedSize
 			#print(f"{width},{height}")
@@ -427,10 +431,13 @@ class MipData():
 			currentOffset = 0
 			seekAmount = self.compressedSize - byteReadLength
 			#print(f"seekAmount: {seekAmount}")
-			while currentOffset != self.uncompressedSize:
+			#print(f"endSize: {endSize}")
+			while currentOffset != endSize:
+				#print(f"current block offset {file.tell()}")
 				self.textureData.extend(file.read(byteReadLength))
 				file.seek(seekAmount,1)
 				currentOffset += self.compressedSize
+				#print(f"end block offset {file.tell()}")
 			#print(f"end mip read offset {file.tell()}")
 		else:
 			
@@ -452,6 +459,9 @@ class Tex():
 
 		self.header.read(file)
 		self.imageMipDataList = []
+		currentOverallMipIndex = 0
+		currentImageDataHeaderOffset = file.tell() + (self.header.mipCount * self.header.imageCount ) * 16#16 is mip header size
+		imageDataOffset = currentImageDataHeaderOffset +  (self.header.mipCount * self.header.imageCount ) * 8#8 is image data header size
 		for i in range(self.header.imageCount):
 			imageMipDataListEntry = []
 			currentXSize = self.header.width
@@ -464,8 +474,9 @@ class Tex():
 				mipBitSize = (mipX*mipY) * self.header.ddsBitsPerPixel
 				pad = 8 - mipBitSize if mipBitSize < 8 else 0
 				expectedMipSize = (mipBitSize + pad) // 8
-				mipEntry.read(file,expectedMipSize,mipX,mipY,self.header.ddsBitsPerPixel,self.header.version)
+				mipEntry.read(file,expectedMipSize,mipX,mipY,self.header.ddsBitsPerPixel,currentImageDataHeaderOffset,imageDataOffset,self.header.version)
 				imageMipDataListEntry.append(mipEntry)
+				currentImageDataHeaderOffset += 8#8 is image data header size
 			self.imageMipDataList.append(imageMipDataListEntry)
 			
 	def write(self,file):

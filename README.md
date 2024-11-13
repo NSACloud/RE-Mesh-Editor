@@ -16,6 +16,8 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - Texture conversion tools.
  - Collection based system that allows for export with multiple mesh files in a scene.
  - RE Toolbox batch export integration. Any files exported will be added to the RE Toolbox batch export list.
+ - Drag and drop dds/tex conversion. (Blender 4.1 and higher)
+ - Drag and drop mesh importing. (Blender 4.1 and higher)
    
  ## Supported Games
  - **Devil May Cry 5**
@@ -53,6 +55,10 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.32 - 11/12/2024
+* Added support for secondary weights used by Dragon's Dogma 2. These weights are labeled with "SHAPEKEY_" and control the scaling of armor meshes.
+* Fixed third person animation issue in Resident Evil 8 caused by incorrect symmetry indices.
 
 ### V0.31 - 11/6/2024
 * Added support for Dragon's Dogma 2's new mesh version.

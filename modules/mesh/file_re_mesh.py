@@ -626,7 +626,7 @@ class MeshBufferHeader():
 		self.streamingBufferHeaderList = []#WILDS
 		self.vertexBuffer = bytearray()
 		self.faceBuffer = bytearray()#NOTE: Face buffer is padded to 4 byte alignment per sub mesh
-		
+		self.secondaryWeightBuffer = None#DD2 shape keys
 		#SF6
 		self.totalBufferSize = 0
 		self.sf6unkn0 = 0
@@ -665,7 +665,9 @@ class MeshBufferHeader():
 			self.sf6unkn0 = read_uint64(file)
 			self.streamingVertexElementOffset = read_uint64(file)
 			self.sf6unkn2 = read_uint64(file)
-		
+			
+			
+			
 		if streamingHeader != None and streamingHeader.entryCount != 0 and streamingBuffer != None:
 			#Made a bit of a miscalculation, this doesn't account for the fact that the vertex buffers can't just be stacked since the elements won't be grouped together correctly
 			#Moved into re_mesh_parse
@@ -721,6 +723,15 @@ class MeshBufferHeader():
 		file.seek(self.faceBufferOffset)
 		#print(f"Face buffer start {str(file.tell())}")
 		self.faceBuffer.extend(file.read(self.faceBufferSize))
+		
+		
+		if self.sunbreakOffset != 0:
+			if (version == VERSION_DD2 or version == VERSION_DD2NEW):	
+				#Limit this DD2 for now in case it happens to be used in other games for other things
+				file.seek(self.sunbreakOffset)
+				vertexCount = self.vertexElementList[1].posStartOffset // 12#Get amount of vertices from length of position buffer,pos data is 12 bytes
+				self.secondaryWeightBuffer = file.read(vertexCount*16)#Weight data is 16 bytes
+				print("Read DD2 secondary weight data")
 		#print(f"full face buffer size {len(self.faceBuffer)}")
 		#print(f"Face buffer end {str(file.tell())}")
 	def write(self,file,version):
@@ -762,6 +773,9 @@ class MeshBufferHeader():
 		file.write(self.vertexBuffer)
 		file.seek(getPaddedPos(file.tell(), 16))
 		file.write(self.faceBuffer)
+		if self.secondaryWeightBuffer != None:
+			file.seek(getPaddedPos(file.tell(), 16))
+			file.write(self.secondaryWeightBuffer)
 
 class ContentFlag():#Short bitflag in header that determines what content the mesh has Ex: Blend shapes, skeleton, etc.
 	def __init__(self):
@@ -1297,6 +1311,7 @@ class Bone():
 		self.boneSibling = 0
 		self.boneChild = 0
 		self.boneSymmetric = 0
+		self.useSecondaryWeight = 0
 		self.padding0 = 0
 		self.padding1 = 0
 	def read(self,file):
@@ -1305,7 +1320,8 @@ class Bone():
 		self.boneSibling = read_short(file)
 		self.boneChild = read_short(file)
 		self.boneSymmetric = read_short(file)
-		self.padding0 = read_int(file)
+		self.useSecondaryWeight = read_short(file)
+		self.padding0 = read_short(file)
 		self.padding1 = read_short(file)
 	def write(self,file):
 		write_ushort(file, self.boneIndex)
@@ -1313,7 +1329,8 @@ class Bone():
 		write_short(file, self.boneSibling)
 		write_short(file, self.boneChild)
 		write_short(file, self.boneSymmetric)
-		write_int(file, self.padding0)
+		write_short(file, self.useSecondaryWeight)
+		write_short(file, self.padding0)
 		write_short(file, self.padding1)
 
 class Skeleton():
@@ -1817,6 +1834,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 	weightBuffer = BytesIO()
 	colorBuffer = BytesIO()
 	faceBuffer = BytesIO()
+	secondaryWeightBuffer = BytesIO()#DD2 shapekey
 	
 	parsedSubMeshToSubMeshDataDict = dict()
 	
@@ -1907,6 +1925,11 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 						
 						if len(parsedSubMesh.weightIndicesList) != 0 and len(parsedSubMesh.weightIndicesList) == len(parsedSubMesh.weightList):
 							WriteToWeightBuffer(weightBuffer,parsedSubMesh.weightList,parsedSubMesh.weightIndicesList,isSixWeight)
+						
+						#DD2 shapekeys
+						if len(parsedSubMesh.secondaryWeightIndicesList) != 0 and len(parsedSubMesh.secondaryWeightIndicesList) == len(parsedSubMesh.secondaryWeightList):
+							WriteToWeightBuffer(secondaryWeightBuffer,parsedSubMesh.secondaryWeightList,parsedSubMesh.secondaryWeightIndicesList,isSixWeight)
+						
 						
 						#Add vertex color if it's missing and other meshes have it
 						if parsedMesh.bufferHasColor and parsedSubMesh.colorList is None:
@@ -2055,6 +2078,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 			bone.boneSibling = parsedBone.nextSiblingIndex
 			bone.boneChild = parsedBone.nextChildIndex
 			bone.boneSymmetric = parsedBone.symmetryBoneIndex
+			bone.useSecondaryWeight = parsedBone.useSecondaryWeight
 			reMesh.skeletonHeader.boneInfoList.append(bone)
 		
 		reMesh.skeletonHeader.boneHeaderOffset = getPaddedPos(reMesh.fileHeader.skeletonOffset + sd.SKELETON_REMAP_TABLE_OFFSET + 2*reMesh.skeletonHeader.remapCount,16)
@@ -2157,6 +2181,8 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		if version == VERSION_SF6:#Buffers are written twice in SF6
 			reMesh.meshBufferHeader.vertexBuffer.extend(weightBuffer.getvalue())
 			currentBufferOffset+=weightBuffer.tell()
+			
+	
 	if colorBuffer.tell() != 0:
 		#print("Added color buffer")
 		vertexElement = VertexElementStruct()
@@ -2205,8 +2231,16 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 	if version == VERSION_SF6:
 		reMesh.fileHeader.sf6UnknCount = 6
 		reMesh.fileHeader.unknHash = 3407096719	
-		
+	
+	
 	currentOffset = getPaddedPos(reMesh.meshBufferHeader.faceBufferOffset + reMesh.meshBufferHeader.faceBufferSize,16)
+	if version >= VERSION_DD2:	
+		if parsedMesh.bufferHasSecondaryWeight:
+			reMesh.meshBufferHeader.sunbreakOffset = reMesh.meshBufferHeader.vertexBufferOffset + reMesh.meshBufferHeader.totalBufferSize
+			
+			reMesh.meshBufferHeader.secondaryWeightBuffer = secondaryWeightBuffer.getvalue()
+			reMesh.meshBufferHeader.sunbreakSecondUnknown = len(reMesh.meshBufferHeader.secondaryWeightBuffer)
+			currentOffset = reMesh.meshBufferHeader.sunbreakOffset + len(reMesh.meshBufferHeader.secondaryWeightBuffer)
 	reMesh.fileHeader.fileSize = currentOffset
 	
 	
@@ -2219,8 +2253,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 	weightBuffer.close()
 	colorBuffer.close()
 	faceBuffer.close()
-	
-	faceBuffer.close()
+	secondaryWeightBuffer.close()
 				
 	return reMesh
 #---RE MESH IO FUNCTIONS---#

@@ -150,6 +150,23 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 	
 	boneNameIndexDict = {index: bone.boneName for index, bone in enumerate(parsedSkeleton.boneList)}
 	
+	#Debug - print symmetry and sibling bone assignments
+	"""
+	for bone in parsedSkeleton.boneList:
+		if bone.symmetryBoneIndex != -1:
+			print(f"symmetry: {bone.boneName} -> {boneNameIndexDict[bone.symmetryBoneIndex]}")
+		else:
+			print(f"symmetry: {bone.boneName} -> None")
+			
+		
+	for bone in parsedSkeleton.boneList:
+		if bone.nextSiblingIndex != -1:
+			print(f"next sibling: {bone.boneName} -> {boneNameIndexDict[bone.nextSiblingIndex]}")
+		else:
+			print(f"next sibling: {bone.boneName} -> None")
+	
+	"""
+	
 	if mergedArmature:
 		print(f"Merging imported armature with {armatureObj.name}")
 		if rotate90:
@@ -211,7 +228,7 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 			obj.select_set(True)
 	return armatureObj
 
-def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
+def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],vertexGroupWeightListSecondary = [],vertexGroupBoneIndicesListSecondary = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
 	#print(f"\n{meshName}, Vertex Count: {len(vertexList)}, Face Count: {len(faceList)}\n")
 	#print(vertexList)
 	#print()
@@ -299,7 +316,38 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 			for i in range(len(meshObj.data.vertices)):
 				vg.add([i], 1.0, 'REPLACE')
 	
+	#DD2 Shapekey Weights
+	#Import Secondary Weights
 	
+	if vertexGroupWeightListSecondary != [] and boneNameList != []:
+		#print("Importing secondary weights")
+		#Only create vertex groups for bones that get used
+		usedBoneIndices = sorted(list({x for vertex in vertexGroupBoneIndicesListSecondary for x in vertex}))#Get all used bone indices in hierarchy order
+		#print(boneNameList)
+		if len(boneNameList) > 1:
+			#print(boneNameList)
+			#print(usedBoneIndices)
+			for boneIndex in usedBoneIndices:
+				boneName = "SHAPEKEY_" + boneNameList[boneIndex]
+				if len(boneName) > 63:
+					boneName = f"#HASHED_{str(hash(boneName))}"
+					
+				vg = meshObj.vertex_groups.new(name = boneName)
+				vg.lock_weight = True
+				
+			for vertexIndex, boneIndexList in enumerate(vertexGroupBoneIndicesListSecondary):
+				#print(vertexIndex)
+				#print(boneIndexList)
+				for weightIndex, boneIndex in enumerate(boneIndexList):
+					if vertexGroupWeightList[vertexIndex][weightIndex] > 0:
+						boneName = "SHAPEKEY_"+boneNameList[boneIndex]
+						if len(boneName) > 63:
+							boneName = f"#HASHED_{str(hash(boneName))}"
+						meshObj.vertex_groups[boneName].add([vertexIndex],vertexGroupWeightListSecondary[vertexIndex][weightIndex],'ADD')
+		else:#No bone remap table edge case
+			vg = meshObj.vertex_groups.new(name="SHAPEKEY_"+boneNameList[0])
+			for i in range(len(meshObj.data.vertices)):
+				vg.add([i], 1.0, 'REPLACE')
 	
 	if armature != None:
 		meshObj.parent = armature
@@ -407,6 +455,9 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 						boneNameList=boneNameList,
 						vertexGroupWeightList=subMesh.weightList,
 						vertexGroupBoneIndicesList=subMesh.weightIndicesList,
+						#DD2 shape key weights
+						vertexGroupWeightListSecondary=subMesh.secondaryWeightList,
+						vertexGroupBoneIndicesListSecondary=subMesh.secondaryWeightIndicesList,
 						material = materialDict[materialName],
 						armature=armatureObj,
 						collection=lodCollection,
@@ -928,12 +979,34 @@ def exportREMeshFile(filePath,options):
 			parsedBone.boneIndex = boneIndexDict[bone.name]
 			parsedBone.nextSiblingIndex = -1
 			parsedBone.nextChildIndex = -1
-			parsedBone.symmetryIndex = -1
-			if bone.name[0:2] == "L_" and "R_"+bone.name[2::] in armatureObj.data.bones:
-				parsedBone.symmetryIndex = boneIndexDict["R_"+bone.name[2::]]	
-			elif bone.name[0:2] == "R_" and "L_"+bone.name[2::] in armatureObj.data.bones:
-				parsedBone.symmetryIndex = boneIndexDict["L_"+bone.name[2::]]
-				
+			parsedBone.symmetryBoneIndex = boneIndexDict[bone.name]
+			
+			#symmetryIndex is -1 if bone is symmetry bone, but missing it's symmetric bone
+			
+			if bone.name.startswith("L_") :
+				if "R"+bone.name[1::] in armatureObj.data.bones:
+					parsedBone.symmetryBoneIndex = boneIndexDict["R"+bone.name[1::]]
+				else:
+					parsedBone.symmetryBoneIndex = -1
+			elif bone.name.startswith("R_"):
+				if "L"+bone.name[1::] in armatureObj.data.bones:
+					parsedBone.symmetryBoneIndex = boneIndexDict["L"+bone.name[1::]]
+				else:
+					parsedBone.symmetryBoneIndex = -1
+			
+			elif bone.name.endswith("_L"):
+				if bone.name[:-1]+"R" in armatureObj.data.bones:
+					parsedBone.symmetryBoneIndex = boneIndexDict[bone.name[:-1]+"R"]
+				else:
+					parsedBone.symmetryBoneIndex = -1
+			elif bone.name.endswith("_R"):
+				if bone.name[:-1]+"L" in armatureObj.data.bones:
+					parsedBone.symmetryBoneIndex = boneIndexDict[bone.name[:-1]+"L"]
+				else:
+					parsedBone.symmetryBoneIndex = -1
+			
+			
+			
 			if bone.parent != None:
 				parsedBone.parentIndex = boneIndexDict[bone.parent.name]
 				for childBone in bone.parent.children:
@@ -944,7 +1017,7 @@ def exportREMeshFile(filePath,options):
 				parsedBone.parentIndex = -1
 			
 			if len(bone.children) != 0:
-				nextChildIndex = boneIndexDict[bone.children[0].name]
+				parsedBone.nextChildIndex = boneIndexDict[bone.children[0].name]
 			#Get matrices
 			if options["preserveBoneMatrices"] and bone.get("reMeshWorldMatrix"):
 				if bone.get("reMeshWorldMatrix"):
@@ -1056,6 +1129,7 @@ def exportREMeshFile(filePath,options):
 	isFirstLOD = True
 	remapDict = dict()
 	boneVertDict = dict()
+	shapeKeyBoneSet = set()#DD2 secondary weights
 	for lodIndex, lod in enumerate(meshLODCollectionList):
 		print(f"LOD {lodIndex} collection:{lod.name}")
 		parsedLODLevel = LODLevel()
@@ -1110,15 +1184,22 @@ def exportREMeshFile(filePath,options):
 					groupID = 0
 				
 				#Build bone remap table from first LOD by first finding all bones that have vertex groups weighted to them
+				
 				if isFirstLOD and armatureObj != None:
 					hasWeights = False
 					for vg in obj.vertex_groups:#If weight is applied to any vertex groups, add them to weighted bone set
 						
-						if any(vg.index in [g.group for g in v.groups] for v in cloneObj.data.vertices) and vg.name in armatureObj.data.bones:
-							weightedBonesSet.add(vg.name)
+						if vg.name.startswith("SHAPEKEY_"):
+							
+							vgName = vg.name.split("SHAPEKEY_")[1]
+							shapeKeyBoneSet.add(vgName)
+						else:
+							vgName = vg.name
+						if any(vg.index in [g.group for g in v.groups] for v in cloneObj.data.vertices) and vgName in armatureObj.data.bones:
+							weightedBonesSet.add(vgName)
 							hasWeights = True
 						else:
-							remapDict[vg.name] = 0
+							remapDict[vgName] = 0
 					if armatureObj != None and not hasWeights:
 						addErrorToDict(errorDict, "NoWeightsOnMesh", obj.name)  
 						
@@ -1256,7 +1337,12 @@ def exportREMeshFile(filePath,options):
 				
 				faceCount += len(evaluatedSubMeshData.polygons)
 				
-				vertexGroupIndexToRemapDict = {vgroup.index: remapDict[vgroup.name] for vgroup in rawsubmesh.vertex_groups}
+				vertexGroupIndexToRemapDict = {vgroup.index: remapDict[vgroup.name.removeprefix("SHAPEKEY_")] for vgroup in rawsubmesh.vertex_groups}
+				
+				#DD2 shape key vertex group indices
+				shapeKeyGroupIndices = set([vgroup.index for vgroup in rawsubmesh.vertex_groups if vgroup.name.startswith("SHAPEKEY_")])
+				if len(shapeKeyGroupIndices) != 0:
+					parsedMesh.bufferHasSecondaryWeight = True
 				
 				#print(vertexGroupIndexToRemapDict)
 				parsedMesh.bufferHasPosition = True
@@ -1268,6 +1354,10 @@ def exportREMeshFile(filePath,options):
 					parsedMesh.bufferHasWeight = True
 					parsedSubMesh.weightList = np.zeros((len(evaluatedSubMeshData.vertices),8))
 					parsedSubMesh.weightIndicesList = np.zeros((len(evaluatedSubMeshData.vertices),8),dtype="<H")#ushort because of SF6
+					
+					if parsedMesh.bufferHasSecondaryWeight:
+						parsedSubMesh.secondaryWeightList = np.zeros((len(evaluatedSubMeshData.vertices),8))
+						parsedSubMesh.secondaryWeightIndicesList = np.zeros((len(evaluatedSubMeshData.vertices),8),dtype="<H")#ushort because of SF6
 				#Get Faces
 				parsedSubMesh.faceList = [tuple(f.vertices) for f in evaluatedSubMeshData.polygons]
 				if len(parsedSubMesh.faceList) > MAX_FACES:
@@ -1365,13 +1455,25 @@ def exportREMeshFile(filePath,options):
 					MIN_WEIGHT = 0.004#If the weight is any lower than this, the engine freaks out and puts the vert at the origin
 					weightList = []
 					weightIndicesList = []
+					
+					secondaryWeightList = []
+					secondaryWeightIndicesList = []
+					
 					if parsedMesh.bufferHasWeight:
 						for g in vertex.groups:
-							if g.weight >= MIN_WEIGHT and g.group < vertexGroupCount:
-								weightList.append(g.weight)
-								weightIndicesList.append(vertexGroupIndexToRemapDict[g.group])
-								#Gather vertex positions of bone weights to generate bone bounding box
-								boneVertDict[parsedMesh.skeleton.weightedBones[weightIndicesList[-1]]].append(vertex.co)
+							if (g.weight >= MIN_WEIGHT or g.group in shapeKeyGroupIndices) and g.group < vertexGroupCount:
+								if g.group in shapeKeyGroupIndices:#DD2 shapekey weights
+									#print(f"Added secondary weight Vertex {currentVertIndex}")
+									secondaryWeightList.append(g.weight)
+									secondaryWeightIndicesList.append(vertexGroupIndexToRemapDict[g.group])
+									#print(f"Added secondary weight: Vert {currentVertIndex}, {parsedMesh.skeleton.weightedBones[vertexGroupIndexToRemapDict[g.group]]}")
+									#Gather vertex positions of bone weights to generate bone bounding box
+									boneVertDict[parsedMesh.skeleton.weightedBones[secondaryWeightIndicesList[-1]]].append(vertex.co)
+								else:
+									weightList.append(g.weight)
+									weightIndicesList.append(vertexGroupIndexToRemapDict[g.group])
+									#Gather vertex positions of bone weights to generate bone bounding box
+									boneVertDict[parsedMesh.skeleton.weightedBones[weightIndicesList[-1]]].append(vertex.co)
 						"""
 						weightList = [g.weight for g in vertex.groups]
 						try:
@@ -1383,10 +1485,15 @@ def exportREMeshFile(filePath,options):
 						#print(weightIndicesList)
 						if len(weightList) > maxWeightsPerVertex:
 							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
+						elif len(secondaryWeightList) > maxWeightsPerVertex:
+							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
 						
 						parsedSubMesh.weightList[currentVertIndex] = list(pad(weightList,size=8,padding=0.0))
 						parsedSubMesh.weightIndicesList[currentVertIndex] = list(pad(weightIndicesList,size=8,padding=0))
-				
+						if parsedMesh.bufferHasSecondaryWeight:
+							parsedSubMesh.secondaryWeightList[currentVertIndex] = list(pad(secondaryWeightList,size=8,padding=0.0))
+							parsedSubMesh.secondaryWeightIndicesList[currentVertIndex] = list(pad(secondaryWeightIndicesList,size=8,padding=0))
+					
 				visconGroup.subMeshList.append(parsedSubMesh)
 				if any([vertIndex not in UVPoints for vertIndex in range(len(evaluatedSubMeshData.vertices))]):
 					addErrorToDict(errorDict, "LooseVerticesOnSubMesh", rawsubmesh.name)  
@@ -1435,9 +1542,16 @@ def exportREMeshFile(filePath,options):
 			#boneVertDict[boneName] =
 			boneBBoxDict[boneName] = {"min":minVec,"max":maxVec}
 			
-		
+		if parsedMesh.bufferHasSecondaryWeight and len(parsedMesh.skeleton.boneList) > 1:
+			#DD2, mark all bones as secondary weight if at least one bone is
+			for bone in parsedMesh.skeleton.boneList[1::]:
+				bone.useSecondaryWeight = 1
 		#Assign bounding boxes to bones
 		for bone in parsedMesh.skeleton.boneList:
+			
+			#Check if using DD2 secondary weight
+			#if bone.boneName in shapeKeyBoneSet:
+				#bone.useSecondaryWeight = 1
 			if bone.boneName in boneBBoxDict:
 				if options["exportBoundingBoxes"] and bone.boneName in importedBoneBoundingBoxes:
 					bone.boundingBox = importedBoneBoundingBoxes[bone.boneName]
