@@ -2,6 +2,7 @@
 import os
 
 from ..gen_functions import textColors,raiseWarning,raiseError,getPaddingAmount,read_uint,read_int,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte
+from ..gdeflate.gdeflate import GDeflate
 
 VERSION_MHWILDS = 240701001#mhwilds tex version
 
@@ -398,15 +399,26 @@ class MipData():
 		#print(f"{file.tell()}")
 		endSize = self.uncompressedSize
 		if texVersion == VERSION_MHWILDS:
-			raise Exception("MH Wilds textures are not supported. The oodle texture compression has not been solved yet.")
 			file.seek(currentImageDataHeaderOffset)
 			self.imageSize = read_uint(file)
 			endSize = self.imageSize
 			self.imageOffset = read_uint(file)
 			
 			file.seek(imageDataOffset + self.imageOffset)
+			rawImageData = file.read(self.imageSize)
+
+			# Check if it's GDeflate compressed by the [0x04, 0xFB] header until we figure
+			# out if there is a flag somewhere else.
+			if len(rawImageData) >= 2 and rawImageData[0] == 0x04 and rawImageData[1] == 0xFB:
+				print("decompressing MH Wilds texture with GDeflate")
+				decompressor = GDeflate()
+				self.textureData = bytearray(decompressor.decompress(rawImageData, num_workers=4))
+			else:
+				print("MH Wilds texture without GDeflate header - assuming uncompressed.")
+				self.textureData = bytearray(rawImageData)
 			
-			
+			return
+
 		#print(f"expected mip size: {expectedMipSize}\nactual mip size: {self.uncompressedSize}")
 		if endSize != expectedMipSize:
 
