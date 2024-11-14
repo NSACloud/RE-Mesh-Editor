@@ -1363,7 +1363,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						nodeTree.links.remove(link)
 					else:
 						links.new(linkSource,link.to_socket)
-			links.new(matInfo["currentShaderOutput"],nodes["Material Output"].inputs["Surface"])
+			links.new(matInfo["currentShaderOutput"],nodeMaterialOutput.inputs["Surface"])
 			if arrangeNodes:
 				#TODO Force blender to update node dimensions so that a large margin doesn't need to be used as a workaround
 				arrangeNodeTree(blenderMaterial.node_tree,margin_x = 300,margin_y = 300,centerNodes = True)

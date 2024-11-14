@@ -56,6 +56,13 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.34 - 11/14/2024
+* Fixed issue that caused materials to fail to import when Blender's language was not set to English.
+
+NOTE: For Monster Hunter Wilds, be sure to extract re_chunk_000.pak.sub_000.pak and merge it's contents with the extracted re_chunk_000.pak.
+
+Textures will not be imported if the extracted chunk files are not merged.
+
 ### V0.33 - 11/13/2024
 * Added support for Monster Hunter Wilds textures. (Thanks Ando)
 NOTE: Conversion from DDS back to MH Wilds tex is not implemented yet.
