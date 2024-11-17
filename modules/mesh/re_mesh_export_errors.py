@@ -268,6 +268,19 @@ _______________
 	
 Import a valid armature from an existing mesh file.
 """,
+
+"NoArmatureInCollection":"""No Armature In Collection
+A mesh has weights but no armature is inside the mesh collection.
+	
+HOW TO FIX:
+_______________
+	
+Move the armature that the mesh is parented to inside the mesh collection.
+
+You can do this by selecting the armature in the outliner and dragging it onto the mesh collection.
+
+""",
+
 "NoWeightsOnMesh":"""No Weights on Sub Mesh
 A mesh has an armature, but no weights assigned to bones.
 	

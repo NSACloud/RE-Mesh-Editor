@@ -922,6 +922,8 @@ def getTexFileFromDDS(ddsList,texVersion,streamingFlag = False):
 	return newTexFile
 
 def DDSToTex(ddsPathList,texVersion,outPath,streamingFlag = False):
+	if texVersion == 240701001:#MHWilds
+		raise Exception("Conversion to MH Wilds Tex is not implemented yet.")
 	if len(ddsPathList) == 1:
 		ddsFile = DDSFile()
 		ddsFile.read(ddsPathList[0])

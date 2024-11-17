@@ -461,6 +461,8 @@ class MipData():
 				self.textureData.extend(mipData.read(byteReadLength))
 				mipData.seek(seekAmount,1)
 				currentOffset += self.compressedSize
+				if currentOffset > endSize:
+					raise Exception("Texture Data Read Past Bounds")
 				#print(f"end block offset {file.tell()}")
 			#print(f"end mip read offset {file.tell()}")
 			

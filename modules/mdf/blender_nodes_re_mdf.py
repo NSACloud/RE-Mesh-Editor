@@ -10,7 +10,7 @@ legacyUV2HairOcclusionList = set(["RE2","RE2RT","RE3","RE3RT","RE7RT","DMC5"])
 def addLoc(node,delta):#Just to shorten what would otherwise be a long line
 	return (node.location[0] + delta[0],node.location[1] + delta[0])
 
-def getColorNodeGroup():#No RGBA node in shader editor so a custom group is needed
+def getColorNodeGroup(nodeTree):#No RGBA node in shader editor so a custom group is needed
 	if "ColorNodeGroup" in bpy.data.node_groups:
 		nodeGroup = bpy.data.node_groups["ColorNodeGroup"]
 	else:
@@ -34,9 +34,13 @@ def getColorNodeGroup():#No RGBA node in shader editor so a custom group is need
 			nodeGroup.interface.new_socket(name="Alpha",description="",in_out ="OUTPUT", socket_type="NodeSocketFloat")
 		nodeGroup.links.new(inNode.outputs["Color"],outNode.inputs["Color"])
 		nodeGroup.links.new(inNode.outputs["Alpha"],outNode.inputs["Alpha"])
-	return nodeGroup
+	
+	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+	nodeGroupNode.node_tree = nodeGroup
+	
+	return nodeGroupNode
 
-def getImagePassThroughNodeGroup():#Same as color node group but with vector input/output, used for texture array selection
+def getImagePassThroughNodeGroup(nodeTree):#Same as color node group but with vector input/output, used for texture array selection
 	if "ImagePassThroughNodeGroup" in bpy.data.node_groups:
 		nodeGroup = bpy.data.node_groups["ImagePassThroughNodeGroup"]
 	else:
@@ -65,9 +69,13 @@ def getImagePassThroughNodeGroup():#Same as color node group but with vector inp
 		nodeGroup.links.new(inNode.outputs["Color"],outNode.inputs["Color"])
 		nodeGroup.links.new(inNode.outputs["Alpha"],outNode.inputs["Alpha"])
 		nodeGroup.links.new(inNode.outputs["Vector"],outNode.inputs["Vector"])
-	return nodeGroup
+	
+	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+	nodeGroupNode.node_tree = nodeGroup
+	
+	return nodeGroupNode
 
-def getVec4NodeGroup():
+def getVec4NodeGroup(nodeTree):
 	if "Vec4NodeGroup" in bpy.data.node_groups:
 		nodeGroup = bpy.data.node_groups["Vec4NodeGroup"]
 	else:
@@ -101,58 +109,13 @@ def getVec4NodeGroup():
 		nodeGroup.links.new(inNode.outputs["Y"],outNode.inputs["Y"])
 		nodeGroup.links.new(inNode.outputs["Z"],outNode.inputs["Z"])
 		nodeGroup.links.new(inNode.outputs["W"],outNode.inputs["W"])
-	return nodeGroup
+	
+	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+	nodeGroupNode.node_tree = nodeGroup
+	
+	return nodeGroupNode
 
-def getBentNormalNodeGroupOld():
-	if "BentNormalNodeGroup" in bpy.data.node_groups:
-		nodeGroup = bpy.data.node_groups["BentNormalNodeGroup"]
-	else:
-		nodeGroup = bpy.data.node_groups.new(type="ShaderNodeTree", name="BentNormalNodeGroup")
-		nodes = nodeGroup.nodes
-		links = nodeGroup.links
-		if bpy.app.version < (4,0,0):
-			nodeGroup.inputs.new("NodeSocketFloat","Color")
-			nodeGroup.inputs.new("NodeSocketFloat","Alpha")
-		else:
-			nodeGroup.interface.new_socket(name="Color",description="",in_out ="INPUT", socket_type="NodeSocketColor")
-			nodeGroup.interface.new_socket(name="Alpha",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
-		inNode = nodeGroup.nodes.new('NodeGroupInput')
-		currentLoc = [300,0]
-		separateRGBNode = nodes.new("ShaderNodeSeparateRGB")
-		separateRGBNode.location = currentLoc
-		currentLoc[0] += 300
-		links.new(inNode.outputs["Color"],separateRGBNode.inputs["Image"])
-		
-		combineRGBNode = nodes.new("ShaderNodeCombineRGB")
-		combineRGBNode.location = currentLoc
-		combineRGBNode.inputs["B"].default_value = 1.0
-		links.new(inNode.outputs["Alpha"],combineRGBNode.inputs["R"])
-		links.new(separateRGBNode.outputs["G"],combineRGBNode.inputs["G"])
-		
-		normalMapNode = nodes.new("ShaderNodeNormalMap")
-		normalMapNode.location = currentLoc
-		normalMapNode.inputs["Strength"].default_value = 0.4
-		links.new(combineRGBNode.outputs["Image"],normalMapNode.inputs["Color"])
-		
-		
-		outNode = nodeGroup.nodes.new('NodeGroupOutput')
-		if bpy.app.version < (4,0,0):
-			nodeGroup.outputs.new('NodeSocketVector', "Normal")
-			nodeGroup.outputs.new('NodeSocketFloat', "Roughness")
-			nodeGroup.outputs.new('NodeSocketFloat', "BlueChannel")
-			
-		else:
-			nodeGroup.interface.new_socket(name="Normal",description="",in_out ="OUTPUT", socket_type="NodeSocketVector")
-			nodeGroup.interface.new_socket(name="Roughness",description="",in_out ="OUTPUT", socket_type="NodeSocketFloat")
-			nodeGroup.interface.new_socket(name="BlueChannel",description="",in_out ="OUTPUT", socket_type="NodeSocketFloat")
-		
-		links.new(normalMapNode.outputs["Normal"],outNode.inputs["Normal"])
-		links.new(separateRGBNode.outputs["R"],outNode.inputs["Roughness"])
-		links.new(separateRGBNode.outputs["B"],outNode.inputs["BlueChannel"])
-
-	return nodeGroup
-
-def getBentNormalNodeGroup():
+def getBentNormalNodeGroup(nodeTree):
 	if "BentNormalNodeGroup" in bpy.data.node_groups:
 		nodeGroup = bpy.data.node_groups["BentNormalNodeGroup"]
 	else:
@@ -328,9 +291,12 @@ def getBentNormalNodeGroup():
 		links.new(separateRGBNode.outputs["R"],outNode.inputs["Roughness"])
 		links.new(separateRGBNode.outputs["B"],outNode.inputs["BlueChannel"])
 
-	return nodeGroup
+	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+	nodeGroupNode.node_tree = nodeGroup
+	
+	return nodeGroupNode
 
-def getDualUVMappingNodeGroup():
+def getDualUVMappingNodeGroup(nodeTree):
 	if "DualUVMappingNodeGroup" in bpy.data.node_groups:
 		nodeGroup = bpy.data.node_groups["DualUVMappingNodeGroup"]
 	else:
@@ -400,44 +366,56 @@ def getDualUVMappingNodeGroup():
 			nodeGroup.interface.new_socket(name="Vector",description="",in_out ="OUTPUT", socket_type="NodeSocketVector")
 		
 		links.new(mappingNode.outputs["Vector"],outNode.inputs["Vector"])
+	
+	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+	nodeGroupNode.node_tree = nodeGroup
+	
+	#Set defaults
 
-	return nodeGroup
+	nodeGroupNode.inputs["Tiling"].default_value = 1.0
+	
+	return nodeGroupNode
+	
 
-def getMHWildsSkinMappingNodeGroup():
-	if "MHWildsSkinMapping" in bpy.data.node_groups:
-		nodeGroup = bpy.data.node_groups["MHWildsSkinMapping"]
+def getMHWildsSkinMappingNodeGroup(nodeTree):
+	if "MHWildsSkinMappingV2" in bpy.data.node_groups:
+		nodeGroup = bpy.data.node_groups["MHWildsSkinMappingV2"]
 	else:
-		nodeGroup = bpy.data.node_groups.new(type="ShaderNodeTree", name="MHWildsSkinMapping")
+		nodeGroup = bpy.data.node_groups.new(type="ShaderNodeTree", name="MHWildsSkinMappingV2")
 	
 		if bpy.app.version < (4,0,0):
 			nodeGroup.inputs.new("NodeSocketFloat","X")
 			nodeGroup.inputs.new("NodeSocketFloat","Y")
-			nodeGroup.inputs.new("NodeSocketVector","UV")
 			
 		else:
 			nodeGroup.interface.new_socket(name="X",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
 			nodeGroup.interface.new_socket(name="Y",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
-			nodeGroup.interface.new_socket(name="UV",description="",in_out ="INPUT", socket_type="NodeSocketVector")
 		
 		nodes = nodeGroup.nodes
 		links = nodeGroup.links
 		
 		inNode = nodeGroup.nodes.new('NodeGroupInput')
-		#TODO Fix defaults / soft min max
-		
-		#inNode.inputs["X"].default_value = 0.0
-		#inNode.inputs["X"].min_value = 0.001
-		#inNode.inputs["X"].max_value = 0.999
-		
-		#inNode.inputs["Y"].default_value = 0.0
-		#inNode.inputs["Y"].min_value = 0.001
-		#inNode.inputs["Y"].max_value = 0.999
+
 		currentLoc = [300,0]
+		#Multiply node input values to give finer control since min and max inputs can't be set any more.
+		multXNode = nodes.new("ShaderNodeMath")
+		multXNode.location = [currentLoc[0],currentLoc[1]+300]
+		multXNode.operation = "MULTIPLY"
+		links.new(inNode.outputs["X"],multXNode.inputs[0])
+		multXNode.inputs[1].default_value = 0.01
+		
+		multYNode = nodes.new("ShaderNodeMath")
+		multYNode.location = [currentLoc[0],currentLoc[1]-300]
+		multYNode.operation = "MULTIPLY"
+		links.new(inNode.outputs["Y"],multYNode.inputs[0])
+		multYNode.inputs[1].default_value = 0.01
+		
+		currentLoc[0] += 300
 		
 		combineXYZNode = nodes.new("ShaderNodeCombineXYZ")
 		combineXYZNode.location = currentLoc
-		links.new(inNode.outputs["X"],combineXYZNode.inputs["X"])
-		links.new(inNode.outputs["Y"],combineXYZNode.inputs["Y"])
+		links.new(multXNode.outputs["Value"],combineXYZNode.inputs["X"])
+		links.new(multYNode.outputs["Value"],combineXYZNode.inputs["Y"])
 		
 		currentLoc[0] += 300
 		
@@ -456,7 +434,149 @@ def getMHWildsSkinMappingNodeGroup():
 			nodeGroup.interface.new_socket(name="Vector",description="",in_out ="OUTPUT", socket_type="NodeSocketVector")
 		
 		links.new(mappingNode.outputs["Vector"],outNode.inputs["Vector"])
-	return nodeGroup
+	
+	
+	
+	
+	
+	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+	nodeGroupNode.node_tree = nodeGroup
+	
+	#Set defaults
+	
+	#Set skin tone closer to MHW default
+	nodeGroupNode.inputs["X"].default_value = 10.0
+	#nodeGroupNode.inputs["X"].min_value = 0.001
+	#nodeGroupNode.inputs["X"].max_value = 0.999
+	
+	nodeGroupNode.inputs["Y"].default_value = 75.0
+	
+	#nodeGroupNode.inputs["Y"].min_value = 0.001
+	#nodeGroupNode.inputs["Y"].max_value = 0.999
+	
+	return nodeGroupNode
+
+def getMHWildsDetailMapNodeGroup(nodeTree):#Unfinished
+	if "MHWildsDetailMapNodeGroup" in bpy.data.node_groups:
+		nodeGroup = bpy.data.node_groups["MHWildsDetailMapNodeGroup"]
+	else:
+		nodeGroup = bpy.data.node_groups.new(type="ShaderNodeTree", name="MHWildsDetailMapNodeGroup")
+		nodes = nodeGroup.nodes
+		links = nodeGroup.links
+		if bpy.app.version < (4,0,0):
+			nodeGroup.inputs.new("NodeSocketColor","DetailMaskMap")
+			nodeGroup.inputs.new("NodeSocketFloat","DetailMaskMapAlpha")
+			
+			nodeGroup.inputs.new("NodeSocketColor","ColorLayer_R")
+			nodeGroup.inputs.new("NodeSocketColor","ColorParam_R")
+			nodeGroup.inputs.new("NodeSocketColor","NormalLayer_R")
+			nodeGroup.inputs.new("NodeSocketFloat","NormalParam_R")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessLayer_R")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessParam_R")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicLayer_R")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicParam_R")
+			
+			nodeGroup.inputs.new("NodeSocketColor","ColorLayer_G")
+			nodeGroup.inputs.new("NodeSocketColor","ColorParam_G")
+			nodeGroup.inputs.new("NodeSocketColor","NormalLayer_G")
+			nodeGroup.inputs.new("NodeSocketFloat","NormalParam_G")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessLayer_G")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessParam_G")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicLayer_G")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicParam_G")
+			
+			nodeGroup.inputs.new("NodeSocketColor","ColorLayer_B")
+			nodeGroup.inputs.new("NodeSocketColor","ColorParam_B")
+			nodeGroup.inputs.new("NodeSocketColor","NormalLayer_B")
+			nodeGroup.inputs.new("NodeSocketFloat","NormalParam_B")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessLayer_B")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessParam_B")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicLayer_B")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicParam_B")
+			
+			nodeGroup.inputs.new("NodeSocketColor","ColorLayer_A")
+			nodeGroup.inputs.new("NodeSocketColor","ColorParam_A")
+			nodeGroup.inputs.new("NodeSocketColor","NormalLayer_A")
+			nodeGroup.inputs.new("NodeSocketFloat","NormalParam_A")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessLayer_A")
+			nodeGroup.inputs.new("NodeSocketFloat","RoughnessParam_A")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicLayer_A")
+			nodeGroup.inputs.new("NodeSocketFloat","MetallicParam_A")
+			
+			nodeGroup.inputs.new("NodeSocketFloat","UseDetail")
+			nodeGroup.inputs.new("NodeSocketVector","TexCoordNormal")
+
+		else:
+			nodeGroup.interface.new_socket(name="DetailMaskMap",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="DetailMaskMapAlpha",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			
+			nodeGroup.interface.new_socket(name="ColorLayer_R",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="ColorParam_R",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalLayer_R",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalParam_R",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessLayer_R",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessParam_R",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicLayer_R",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicParam_R",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			
+			nodeGroup.interface.new_socket(name="ColorLayer_G",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="ColorParam_G",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalLayer_G",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalParam_G",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessLayer_G",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessParam_G",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicLayer_G",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicParam_G",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			
+			nodeGroup.interface.new_socket(name="ColorLayer_B",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="ColorParam_B",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalLayer_B",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalParam_B",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessLayer_B",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessParam_B",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicLayer_B",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicParam_B",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			
+			nodeGroup.interface.new_socket(name="ColorLayer_A",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="ColorParam_A",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalLayer_A",description="",in_out ="INPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="NormalParam_A",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessLayer_A",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="RoughnessParam_A",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicLayer_A",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="MetallicParam_A",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			
+			nodeGroup.interface.new_socket(name="UseDetail",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="TexCoordNormal",description="",in_out ="INPUT", socket_type="NodeSocketVector")
+			
+		inNode = nodeGroup.nodes.new('NodeGroupInput')
+	
+		currentLoc = [300,0]
+		
+		#TODO
+		
+		outNode = nodeGroup.nodes.new('NodeGroupOutput')
+		if bpy.app.version < (4,0,0):
+			nodeGroup.outputs.new('NodeSocketColor', "Color")
+			nodeGroup.outputs.new('NodeSocketVector', "Normal")
+			nodeGroup.outputs.new('NodeSocketFloat', "Roughness")
+			nodeGroup.outputs.new('NodeSocketFloat', "Metallic")
+			
+		else:
+			nodeGroup.interface.new_socket(name="Color",description="",in_out ="OUTPUT", socket_type="NodeSocketColor")
+			nodeGroup.interface.new_socket(name="Normal",description="",in_out ="OUTPUT", socket_type="NodeSocketVector")
+			nodeGroup.interface.new_socket(name="Roughness",description="",in_out ="OUTPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="Metallic",description="",in_out ="OUTPUT", socket_type="NodeSocketFloat")
+		
+		#links.new(mappingNode.outputs["Vector"],outNode.inputs["Vector"])
+	
+	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
+	nodeGroupNode.node_tree = nodeGroup
+	
+	
+	return nodeGroupNode
+	
+
 
 def addPropertyNode(prop,currentPos,node_tree):
 	if prop.propName in node_tree.nodes:
@@ -465,15 +585,13 @@ def addPropertyNode(prop,currentPos,node_tree):
 		lowerPropName = prop.propName.lower()
 		if prop.propName in colorPropertySet or (prop.paramCount == 4 and ("color" in lowerPropName or "_col_" in lowerPropName) and "rate" not in lowerPropName):
 			#RGBA Color
-			nodeGroup = node_tree.nodes.new("ShaderNodeGroup")
-			nodeGroup.node_tree = getColorNodeGroup()
+			nodeGroup = getColorNodeGroup(node_tree)
 			nodeGroup.inputs["Color"].default_value = prop.propValue
 			nodeGroup.inputs["Alpha"].default_value = prop.propValue[3]
 			propNode = nodeGroup
 		elif prop.paramCount > 1:
 			#Vec4
-			nodeGroup = node_tree.nodes.new("ShaderNodeGroup")
-			nodeGroup.node_tree = getVec4NodeGroup()
+			nodeGroup = getVec4NodeGroup(node_tree)
 			nodeGroup.inputs[0].default_value = prop.propValue[0]
 			nodeGroup.inputs[1].default_value = prop.propValue[1]
 			nodeGroup.inputs[2].default_value = prop.propValue[2]
@@ -581,7 +699,7 @@ class dynamicArrayTextureSelectorNodeGroup():
 missingTexTypeDict = {
 	"ALBD":(1.0,0.0,0.0,1.0),
 	"ALBM":(1.0,0.0,0.0,0.0),
-	"ALB":(1.0,0.0,1.0,1.0),
+	"ALB":(1.0,0.0,0.0,1.0),
 	"ALP":(1.0,1.0,1.0,1.0),
 	"ALBA":(1.0,0.0,0.0,1.0),
 	"NRMR":(.502,.502,1.0,1.0),
@@ -633,10 +751,9 @@ def addImageNode(nodeTree,textureType,imageList,texturePath,currentPos):
 			
 	else:
 		#Create image array selector
-		imageNode = nodeTree.nodes.new("ShaderNodeGroup")
+		imageNode = getImagePassThroughNodeGroup(nodeTree)
 		imageNode.name = textureType
 		imageNode.label = textureType
-		imageNode.node_tree = getImagePassThroughNodeGroup()
 		imageNode.location = currentPos
 		currentXPos = currentPos[0] - 300
 		
@@ -791,8 +908,7 @@ def newNRRTNode (nodeTree,textureType,matInfo):
 	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
 	
 	
-	nodeGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
-	nodeGroupNode.node_tree = getBentNormalNodeGroup()
+	nodeGroupNode = getBentNormalNodeGroup(nodeTree)
 	nodeGroupNode.location = currentPos
 	nodeTree.links.new(imageNode.outputs["Color"],nodeGroupNode.inputs["Color"])
 	nodeTree.links.new(imageNode.outputs["Alpha"],nodeGroupNode.inputs["Alpha"])
@@ -911,8 +1027,7 @@ def newCMMNode (nodeTree,textureType,matInfo):
 		if UVMap1Node != None and UVMap2Node != None:
 			useSecondaryUVNode = addPropertyNode(matInfo["mPropDict"]["UseSecondaryUV_ColorLayer_MaskMap"], matInfo["currentPropPos"], nodeTree)
 			
-			uvMappingGroupNode = nodeTree.nodes.new("ShaderNodeGroup")
-			uvMappingGroupNode.node_tree = getDualUVMappingNodeGroup()
+			uvMappingGroupNode = getDualUVMappingNodeGroup(nodeTree)
 			uvMappingGroupNode.location = useSecondaryUVNode.location + Vector((300,0))
 			nodeTree.links.new(UVMap1Node.outputs["UV"],uvMappingGroupNode.inputs["UV1"])
 			nodeTree.links.new(UVMap2Node.outputs["UV"],uvMappingGroupNode.inputs["UV2"])
@@ -935,14 +1050,63 @@ def newCMMNode (nodeTree,textureType,matInfo):
 			
 	elif "ColorLayer_R" in matInfo["mPropDict"] and "ColorLayer_G" in matInfo["mPropDict"] and "ColorLayer_B" in matInfo["mPropDict"] and "ColorLayer_A" in matInfo["mPropDict"]:
 		RColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_R"], matInfo["currentPropPos"], nodeTree)
+		
+		
+		if "Use_R" in matInfo["mPropDict"]:
+			useRNode = addPropertyNode(matInfo["mPropDict"]["Use_R"], matInfo["currentPropPos"], nodeTree)
+			multRNode = nodeTree.nodes.new("ShaderNodeMath")
+			multRNode.location = useRNode.location + Vector((300,0))
+			multRNode.operation = "MULTIPLY"
+			nodeTree.links.new(useRNode.outputs["Value"],multRNode.inputs[0])
+			nodeTree.links.new(CMMSeparateNode.outputs["R"],multRNode.inputs[1])
+			RColorFactorSocket = multRNode.outputs["Value"]
+		else:
+			RColorFactorSocket = CMMSeparateNode.outputs["R"]
+		
 		GColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_G"], matInfo["currentPropPos"], nodeTree)
+		
+		if "Use_G" in matInfo["mPropDict"]:
+			useGNode = addPropertyNode(matInfo["mPropDict"]["Use_G"], matInfo["currentPropPos"], nodeTree)
+			multGNode = nodeTree.nodes.new("ShaderNodeMath")
+			multGNode.location = useGNode.location + Vector((300,0))
+			multGNode.operation = "MULTIPLY"
+			nodeTree.links.new(useGNode.outputs["Value"],multGNode.inputs[0])
+			nodeTree.links.new(CMMSeparateNode.outputs["G"],multGNode.inputs[1])
+			GColorFactorSocket = multGNode.outputs["Value"]
+		else:
+			GColorFactorSocket = CMMSeparateNode.outputs["G"]
+		
 		BColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_B"], matInfo["currentPropPos"], nodeTree)
+		
+		if "Use_B" in matInfo["mPropDict"]:
+			useBNode = addPropertyNode(matInfo["mPropDict"]["Use_B"], matInfo["currentPropPos"], nodeTree)
+			multBNode = nodeTree.nodes.new("ShaderNodeMath")
+			multBNode.location = useBNode.location + Vector((300,0))
+			multBNode.operation = "MULTIPLY"
+			nodeTree.links.new(useBNode.outputs["Value"],multBNode.inputs[0])
+			nodeTree.links.new(CMMSeparateNode.outputs["B"],multBNode.inputs[1])
+			BColorFactorSocket = multBNode.outputs["Value"]
+		else:
+			BColorFactorSocket = CMMSeparateNode.outputs["B"]
+		
 		AColorNode = addPropertyNode(matInfo["mPropDict"]["ColorLayer_A"], matInfo["currentPropPos"], nodeTree)
+		
+		if "Use_A" in matInfo["mPropDict"]:
+			useANode = addPropertyNode(matInfo["mPropDict"]["Use_A"], matInfo["currentPropPos"], nodeTree)
+			multANode = nodeTree.nodes.new("ShaderNodeMath")
+			multANode.location = useANode.location + Vector((300,0))
+			multANode.operation = "MULTIPLY"
+			nodeTree.links.new(useANode.outputs["Value"],multANode.inputs[0])
+			nodeTree.links.new(imageNode.outputs["Alpha"],multANode.inputs[1])
+			AColorFactorSocket = multANode.outputs["Value"]
+		else:
+			AColorFactorSocket = imageNode.outputs["Alpha"]
+			
 		if matInfo["albedoNodeLayerGroup"] != None:
-			matInfo["albedoNodeLayerGroup"].addMixLayer(RColorNode.outputs["Color"],CMMSeparateNode.outputs["R"],mixType = "MULTIPLY")
-			matInfo["albedoNodeLayerGroup"].addMixLayer(GColorNode.outputs["Color"],CMMSeparateNode.outputs["G"],mixType = "MULTIPLY")
-			matInfo["albedoNodeLayerGroup"].addMixLayer(BColorNode.outputs["Color"],CMMSeparateNode.outputs["B"],mixType = "MULTIPLY")
-			matInfo["albedoNodeLayerGroup"].addMixLayer(AColorNode.outputs["Color"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(RColorNode.outputs["Color"],RColorFactorSocket,mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(GColorNode.outputs["Color"],GColorFactorSocket,mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(BColorNode.outputs["Color"],BColorFactorSocket,mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(AColorNode.outputs["Color"],AColorFactorSocket,mixType = "MULTIPLY")
 	return imageNode
 def newCMASKNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]

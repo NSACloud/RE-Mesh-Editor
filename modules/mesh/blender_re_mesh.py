@@ -332,8 +332,8 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 				if len(boneName) > 63:
 					boneName = f"#HASHED_{str(hash(boneName))}"
 					
-				vg = meshObj.vertex_groups.new(name = boneName)
-				vg.lock_weight = True
+				meshObj.vertex_groups.new(name = boneName)
+				#vg.lock_weight = True
 				
 			for vertexIndex, boneIndexList in enumerate(vertexGroupBoneIndicesListSecondary):
 				#print(vertexIndex)
@@ -1067,9 +1067,10 @@ def exportREMeshFile(filePath,options):
 					parsedBone.inverseMatrix.matrix = [list(row) for row in (armatureWorldMatrix @ (bone.matrix_local))]
 				"""
 			parsedMesh.skeleton.boneList.append(parsedBone)
-			
+	
 			#print(bone.name)
-		
+	else:
+		print(f"Armature: None")
 	#Get previously imported bounding boxes if option enabled
 	if boundingBoxCollection != None and options["exportBoundingBoxes"]:
 		for obj in boundingBoxCollection.objects:
@@ -1185,7 +1186,12 @@ def exportREMeshFile(filePath,options):
 				
 				#Build bone remap table from first LOD by first finding all bones that have vertex groups weighted to them
 				
-				if isFirstLOD and armatureObj != None:
+				if armatureObj != None:
+					armatureBoneDict = armatureObj.data.bones
+				else:
+					armatureBoneDict = dict()
+				
+				if isFirstLOD:
 					hasWeights = False
 					for vg in obj.vertex_groups:#If weight is applied to any vertex groups, add them to weighted bone set
 						
@@ -1195,14 +1201,15 @@ def exportREMeshFile(filePath,options):
 							shapeKeyBoneSet.add(vgName)
 						else:
 							vgName = vg.name
-						if any(vg.index in [g.group for g in v.groups] for v in cloneObj.data.vertices) and vgName in armatureObj.data.bones:
+						if any(vg.index in [g.group for g in v.groups] for v in cloneObj.data.vertices) and vgName in armatureBoneDict:
 							weightedBonesSet.add(vgName)
 							hasWeights = True
 						else:
 							remapDict[vgName] = 0
 					if armatureObj != None and not hasWeights:
 						addErrorToDict(errorDict, "NoWeightsOnMesh", obj.name)  
-						
+					if armatureObj == None and len(remapDict) != 0:
+						addErrorToDict(errorDict, "NoArmatureInCollection", obj.name)
 				if not visconDict.get(groupID):
 					visconDict[groupID] = [obj]
 				else:

@@ -5,19 +5,35 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-![meshEditorPreview](https://github.com/user-attachments/assets/3490888d-f3b8-4590-9201-0f68bb166e16)
+![meshEditorPreview](https://github.com/user-attachments/assets/8e12f75c-83d3-4ed3-a6ac-9189b35d0be1)
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
  - Allows for importing and exporting of RE Engine mdf2 (material) files.
- - MDF material editing from within Blender.
+ - MDF material editing from within Blender.<details>
+    <summary>Video Preview</summary>
+  
+    https://github.com/user-attachments/assets/48be61bc-7c40-440f-881b-534809d3232f
+   
+    </details>
+   
  - Preset system that allows for presets of materials to be saved and shared.
  - Supports LOD (level of detail) import and export.
  - Texture conversion tools.
  - Collection based system that allows for export with multiple mesh files in a scene.
  - RE Toolbox batch export integration. Any files exported will be added to the RE Toolbox batch export list.
- - Drag and drop dds/tex conversion. (Blender 4.1 and higher)
- - Drag and drop mesh importing. (Blender 4.1 and higher)
+ - Drag and drop dds/tex conversion. (Blender 4.1 and higher)<details>
+    <summary>Video Preview</summary>
+  
+    https://github.com/user-attachments/assets/cf99e5f2-2aa6-4a6f-b170-1e5beb3bcec4
+   
+    </details>
+ - Drag and drop mesh importing. (Blender 4.1 and higher)<details>
+    <summary>Video Preview</summary>
+  
+    https://github.com/user-attachments/assets/fa1ba74e-8a57-4115-b6cd-9585a2a92a21
+   
+    </details>
    
  ## Supported Games
  - **Devil May Cry 5**
@@ -56,6 +72,14 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.35 - 11/17/2024
+* Default mesh import and export settings can now be configured in the addon preferences.
+* Fixed some issues with MH Wilds color masks.
+* Made adjustments to the MH Wilds skin shader mapping node. It's now easier to set specific skin tones.
+* DD2 Shapekey vertex groups are no longer locked upon import.
+* Fixed an export error that occurred when the exported armature was not inside the mesh collection.
+* If an error occurs during material importing, it will notify you an error occurred.
+
 ### V0.34 - 11/14/2024
 * Fixed issue that caused materials to fail to import when Blender's language was not set to English.
 
@@ -66,6 +90,10 @@ Textures will not be imported if the extracted chunk files are not merged.
 ### V0.33 - 11/13/2024
 * Added support for Monster Hunter Wilds textures. (Thanks Ando)
 NOTE: Conversion from DDS back to MH Wilds tex is not implemented yet.
+
+
+<details>
+  <summary>Older Version Change Logs</summary>
 
 ### V0.32 - 11/12/2024
 * Added support for secondary weights used by Dragon's Dogma 2. These weights are labeled with "SHAPEKEY_" and control the scaling of armor meshes.
@@ -91,8 +119,6 @@ UPDATE: MH Wilds Textures are now supported.
 * Textures that were not imported appear red now instead of pink. This is for differentiating between textures that were once present but later moved.
 * Added "Merge All New Armatures" import option. When multiple meshes are selected during import, using this option will merge all newly imported armatures into one.
 * Minor bug fixes.
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.28 - 9/19/2024
 * Fixed issue that caused Blender to crash when importing certain Dead Rising meshes.
@@ -280,6 +306,8 @@ The mesh is not rigged to the armature correctly. Check the the mesh moves along
 * **The material looks bugged in game**
   
 You may be using an outdated .mdf2 file, be sure to extract from the latest patch pak as materials can change upon updates.
+
+**For additional help, go here:**
 
 [Monster Hunter Modding Discord](https://discord.gg/gJwMdhK)
 
