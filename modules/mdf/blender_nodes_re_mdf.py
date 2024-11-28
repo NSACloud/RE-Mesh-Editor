@@ -840,7 +840,8 @@ def newNAMNode (nodeTree,textureType,matInfo):
 	matInfo["normalNodeLayerGroup"].addMixLayer(combineRGBNode.outputs["Image"])
 	
 	matInfo["alphaSocket"] = imageNode.outputs["Alpha"]
-	matInfo["blenderMaterial"].shadow_method = "NONE"
+	if bpy.app.version < (4,2,0):
+		matInfo["blenderMaterial"].shadow_method = "NONE"
 	
 	if "Stitch_Color" in matInfo["mPropDict"]:
 		stitchColorNode = addPropertyNode(matInfo["mPropDict"]["Stitch_Color"], matInfo["currentPropPos"], nodeTree)

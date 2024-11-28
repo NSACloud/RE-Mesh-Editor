@@ -346,7 +346,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 		blenderMaterial = meshMaterialDict[materialName]
 		blenderMaterial.use_nodes = True
 		blenderMaterial.blend_method = "HASHED"#Blender 4.2 removed clip and opaque blend options, so everything has to be hash or blend
-		blenderMaterial.shadow_method = "HASHED"
+		if bpy.app.version < (4,2,0):
+			blenderMaterial.shadow_method = "HASHED"
 		blenderMaterial.node_tree.nodes.clear()
 		mdfMaterial = mdfMaterialDict.get(materialName,None)
 		textureNodeInfoList = []
@@ -519,7 +520,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 			
 			if matInfo["shaderType"] in alphaBlendShaderTypes:
 				matInfo["isAlphaBlend"] = True
-				blenderMaterial.shadow_method = "NONE"
+				if bpy.app.version < (4,2,0):
+					blenderMaterial.shadow_method = "NONE"
 			elif matInfo["mmtrName"] == "Env_Decal.mmtr":
 				matInfo["isAlphaBlend"] = True
 			for (_,textureType,imageList,texturePath) in textureNodeInfoList:

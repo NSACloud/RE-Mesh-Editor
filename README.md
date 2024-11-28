@@ -72,6 +72,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.36 - 11/28/2024
+* Fixed issue with importing materials on Blender 4.3.
+
 ### V0.35 - 11/17/2024
 * Default mesh import and export settings can now be configured in the addon preferences.
 * Fixed some issues with MH Wilds color masks.
