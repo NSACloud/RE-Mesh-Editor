@@ -11,6 +11,7 @@ gameNameMDFVersionDict = {
 	10:"RE2",#DMC5
 	13:"RE3",
 	19:"RE8",
+	20:"RE8",#RE Verse, imported as RE8
 	21:"RE2RT",#RE3RT
 	23:"MHRSB",
 	31:"SF6",

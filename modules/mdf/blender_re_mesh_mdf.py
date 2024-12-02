@@ -236,6 +236,7 @@ def findMDFPathFromMeshPath(meshPath):
 		".1902042334":".13",#RE3
 		".32":".6",#RE7
 		".2101050001":".19",#RE8
+		".2102020001":".20",#RE VERSE
 		".1808282334":".10",#DMC5
 		".2008058288":".19",#MHRise
 		".2109148288":".23",#MHRiseSunbreak
@@ -283,6 +284,14 @@ def findMDFPathFromMeshPath(meshPath):
 			split = os.path.split(fileRoot)
 			mdfPath = os.path.join(split[0],"00",split[1]+f"_00_v00.mdf2{mdfVersion}")
 		
+		if not os.path.isfile(mdfPath) and meshVersion == ".2102020001" and "sk_" in fileRoot.lower():
+			split = os.path.split(meshPath)
+			rootPath = split[0]
+			fileName = split[1].split(".mesh")[0].lower().replace("sk_","m_")
+			mdfPath = os.path.join(rootPath,"Material",f"{fileName}.mdf2{mdfVersion}")
+			
+		
+		
 		if mdfPath == None or not os.path.isfile(mdfPath):
 			print(f"Could not find {mdfPath}.")
 			mdfPath = None
@@ -293,6 +302,7 @@ texVersionDict = {
 	".10":".10",
 	".13":".190820018",
 	".19":".30",
+	".20":".31",
 	".21":".34",
 	".23":".28",
 	".32":".143221013",

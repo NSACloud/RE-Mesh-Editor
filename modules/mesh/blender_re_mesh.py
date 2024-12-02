@@ -1459,7 +1459,7 @@ def exportREMeshFile(filePath,options):
 						
 				
 					#Bone Weights
-					MIN_WEIGHT = 0.004#If the weight is any lower than this, the engine freaks out and puts the vert at the origin
+					MIN_WEIGHT = 0.002#If the weight is any lower than this, the engine freaks out and puts the vert at the origin
 					weightList = []
 					weightIndicesList = []
 					

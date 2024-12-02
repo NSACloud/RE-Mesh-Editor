@@ -41,6 +41,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - **Resident Evil 4 Remake**
  - **Resident Evil 7 Ray Tracing Version**
  - **Resident Evil 8**
+ - **Resident Evil Re:Verse** 
  - **Monster Hunter Rise**
  - **Street Fighter 6**
  - **Dragon's Dogma 2**
@@ -71,6 +72,9 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.37 - 12/2/2024
+* Added mesh import support for RE:Verse. 
 
 ### V0.36 - 11/28/2024
 * Fixed issue with importing materials on Blender 4.3.

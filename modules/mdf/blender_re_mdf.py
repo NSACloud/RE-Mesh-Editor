@@ -242,9 +242,11 @@ def importMDFFile(filePath):
 				gameName = resolveMDFGameNameConflict(gameName, mdfFile, filePath)
 				print(f"MDF version {str(mdfVersion)} is used by more than one game, detected {gameName}")
 			bpy.context.scene.re_mdf_toolpanel.activeGame = gameName
+		else:
+			gameName = -1
 	except:
 		print("Unable to parse mdf version number in file path.")
-		meshVersion = None
+		gameName = -1
 	#headerObj = createEmpty("MDF_HEADER ("+os.path.split(filePath)[1]+")",[("~TYPE","RE_MDF_HEADER"),("unknHeaderValue",mdfFile.Header.version),("MDFVersion",os.path.splitext(filePath)[1].split(".")[1])],None,"MDFData")
 	mdfCollection = createMDFCollection(mdfFileName)
 	#MATERIALS IMPORT

@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 36),
+	"version": (0, 37),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -788,8 +788,12 @@ class ExportREMesh(Operator, ExportHelper):
 			if context.scene["REMeshLastImportedMeshVersion"] == 231011879:
 				#DD2 version update fix
 				context.scene["REMeshLastImportedMeshVersion"] = 240423143
-				
+			elif context.scene["REMeshLastImportedMeshVersion"] == 2102020001:
+				#Remap RE Verse to RE8
+				context.scene["REMeshLastImportedMeshVersion"] = 2101050001	
+			
 			self.filename_ext = "."+str(context.scene["REMeshLastImportedMeshVersion"])
+			
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
 	def draw(self, context):
