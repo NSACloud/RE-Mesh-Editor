@@ -2,7 +2,7 @@ import numpy as np
 import struct
 from .file_re_mesh import Matrix4x4,AABB,Sphere,CompressedSixWeightIndices,CompressedBlendShapeVertexInt
 
-typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color","SF6UnknownVertexDataType","MHWildsUnknownVertexDataType"]
+typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color","SF6UnknownVertexDataType","ExtraWeight"]
 typeStrideDict = {
 	"Position":12,
 	"NorTan":8,
@@ -10,7 +10,7 @@ typeStrideDict = {
 	"UV2":4,
 	"Weight":16,
 	"Color":4,
-	"MHWildsUnknownVertexDataType":16,
+	"ExtraWeight":16,
 	}
 
 blendShapeNameMapping =["BlendShapeByte","BlendShapeShort"]
@@ -100,7 +100,7 @@ BufferReadDict = {
 	"Weight":ReadWeightBuffer,
 	"Color":ReadColorBuffer,
 	"SF6UnknownVertexDataType":ReadColorBuffer,#Read as color data for now until what it is can be determined
-	"MHWildsUnknownVertexDataType":ReadColorBuffer,#Read as color data for now until what it is can be determined
+	"ExtraWeight":ReadWeightBuffer,
 	}
 
 def ReadBlendShapeByteBuffer(blendShapeBuffer,tags):
@@ -180,7 +180,7 @@ def ReadVertexElementBuffers(vertexElementList,vertexBuffer,tagSet):
 		"Weight":None,
 		"Color":None,
 		"SF6UnknownVertexDataType":None,
-		"MHWildsUnknownVertexDataType":None,
+		"ExtraWeight":None,
 		"SecondaryWeight":None,
 		}
 	lastIndex = len(vertexElementList)-1
@@ -226,6 +226,9 @@ class SubMesh:
 		self.faceList = []
 		self.weightList = []
 		self.weightIndicesList = []
+		#MH Wilds extra weights
+		self.extraWeightIndicesList = []
+		self.extraWeightList = []
 		self.colorList = []
 		self.materialIndex = 0
 		self.meshVertexOffset = 0#Used for determining mesh reuse
@@ -402,6 +405,10 @@ def parseLODStructure(reMesh,targetLODList,vertexDictList,faceBufferList,usedVer
 				if vertexDictList[meshInfo.vertexBufferIndex]["Weight"] != None:
 					submesh.weightIndicesList = vertexDictList[meshInfo.vertexBufferIndex]["Weight"][0][meshInfo.vertexStartIndex:bufferEnd]
 					submesh.weightList = vertexDictList[meshInfo.vertexBufferIndex]["Weight"][1][meshInfo.vertexStartIndex:bufferEnd]
+				if vertexDictList[meshInfo.vertexBufferIndex]["ExtraWeight"] != None:
+					submesh.extraWeightIndicesList = vertexDictList[meshInfo.vertexBufferIndex]["ExtraWeight"][0][meshInfo.vertexStartIndex:bufferEnd]
+					submesh.extraWeightList = vertexDictList[meshInfo.vertexBufferIndex]["ExtraWeight"][1][meshInfo.vertexStartIndex:bufferEnd]
+				
 				if vertexDictList[meshInfo.vertexBufferIndex]["Color"] != None:
 					submesh.colorList = vertexDictList[meshInfo.vertexBufferIndex]["Color"][meshInfo.vertexStartIndex:bufferEnd]
 					
@@ -527,96 +534,9 @@ class ParsedREMesh:
 		self.bufferHasWeight = False
 		self.bufferHasColor = False
 		self.bufferHasIntFaces = False
+		self.bufferHasExtraWeight = False#Doubled weight buffer, used in MH Wilds
 		self.bufferHasSecondaryWeight = False#DD2 shapekeys
-	def MergeStreamedBuffers(self,reMesh):#WILDS
-	#Unused now, refactored streaming mesh implementation
-		print("Merging streamed vertex buffers...")
-			
-		newVertBuffer = bytearray()
-		bufferArrayList = []
-		vertexSize = 0
-		for vertexElement in reMesh.meshBufferHeader.vertexElementList:
-			vertexSize += vertexElement.stride
-			bufferArrayList.append(bytearray())
-		
-		lodVertexCountList = []
-		lodFaceCountList = []
-		for lod in reMesh.lodHeader.lodGroupList:
-			vertexTotal = 0
-			faceTotal = 0
-			for group in lod.meshGroupList:
-				vertexTotal += group.vertexCount
-				faceTotal += group.faceCount
-			lodVertexCountList.append(vertexTotal)
-			lodFaceCountList.append(faceTotal)
-			
-		#templateLODList = []
-			
-		for index, streamInfo in enumerate(reMesh.streamingInfoHeader.streamingInfoEntryList):
-			
-			#templateElementList = []
-			
-			currentBufferOffset = streamInfo.bufferStart
-			streamBufferHeader = reMesh.meshBufferHeader.streamingBufferHeaderList[index]
-			for vertexElementIndex,vertexElement in enumerate(reMesh.meshBufferHeader.vertexElementList):
-				elementLength = lodVertexCountList[index] * vertexElement.stride
-				elementBytes = reMesh.streamingBuffer[currentBufferOffset:currentBufferOffset+elementLength]
-				
-				#print(f"element {vertexElementIndex} bytes: {len(elementBytes)}")
-				bufferArrayList[vertexElementIndex].extend(elementBytes)
-				
-				"""
-				templateEntry = dict()
-				templateEntry["type"] = typeNameMapping[vertexElement.typing]
-				templateEntry["stride"] = vertexElement.stride
-				templateEntry["start"] = currentBufferOffset
-				templateEntry["end"] = currentBufferOffset+elementLength
-				templateElementList.append(templateEntry)
-				"""
-				currentBufferOffset+=elementLength
-				
-			#templateLODList.append(templateElementList)
-			#print(f"vertex range {i} {streamInfo.bufferStart}:{streamInfo.bufferStart+entry.vertexBufferLength}")
-			#print(f"face range {i} {streamInfo.bufferStart+entry.vertexBufferLength}:{streamInfo.bufferStart+entry.unpaddedBufferSize}")
-		#print(f"current vertex buffer size {i} {len(self.vertexBuffer)}")
-		#print(f"current face buffer size {i} {len(self.faceBuffer)}")
-		
-		#debug_Generate010StreamingTemplate(templateLODList)
-		
-		#Add non streamed LOD
-		currentBufferOffset = 0
-		for vertexElementIndex,vertexElement in enumerate(reMesh.meshBufferHeader.vertexElementList): 
-			elementLength = lodVertexCountList[-1] * vertexElement.stride
-			elementBytes = reMesh.meshBufferHeader.vertexBuffer[currentBufferOffset:currentBufferOffset+elementLength]
-			
-			#print(f"element {vertexElementIndex} bytes: {len(elementBytes)}")
-			bufferArrayList[vertexElementIndex].extend(elementBytes)
-			
-			currentBufferOffset+=elementLength
-		
-		
-		#TODO Refactor this to not change the loaded file in the future
-		
-		#Modify the imported file to use the new vertex buffer offsets
-		#This isn't ideal but a lot of other things would need to be changed otherwise
-		for arrayIndex,array in enumerate(bufferArrayList):
-			reMesh.meshBufferHeader.vertexElementList[arrayIndex].posStartOffset = len(newVertBuffer)
-			newVertBuffer.extend(array)		#TODO Add LOD from non stream file
-		
-		
-		print("Fixing streamed lod start indices...")
-		currentVertexOffset = 0
-		currentFaceOffset = 0
-		for lodIndex,lod in enumerate(reMesh.lodHeader.lodGroupList[1::]):
-			currentVertexOffset += lodVertexCountList[lodIndex]
-			currentFaceOffset += lodFaceCountList[lodIndex]
-			for group in lod.meshGroupList: 
-				for submesh in group.vertexInfoList:
-					submesh.vertexStartIndex += currentVertexOffset
-					submesh.faceStartIndex += currentFaceOffset
-		
-		return newVertBuffer
-			
+	
 	def ParseREMesh(self,reMesh,importOptions = {"importAllLOD":True,"importShadowMesh":True,"importOcclusionMesh":True,"importBlendShapes":True}):
 		usedVertexOffsetDictList = []
 		lodOffsetDict = dict()#Used for linking shadow mesh lods to main mesh lods
@@ -656,8 +576,11 @@ class ParsedREMesh:
 				bone.inverseMatrix = reMesh.skeletonHeader.inverseMatList[i]
 				
 				if bone.boneName in self.skeleton.weightedBones:
-					bone.boundingBox = reMesh.boneBoundingBoxHeader.bboxList[weightedBoneIndex]
-					weightedBoneIndex += 1
+					try:
+						bone.boundingBox = reMesh.boneBoundingBoxHeader.bboxList[weightedBoneIndex]
+						weightedBoneIndex += 1
+					except:
+						print("WARNING: Missing bone bounding box, likely incorrectly exported mesh mod")
 				self.skeleton.boneList.append(bone)
 			
 		#Parse Vertex Buffer

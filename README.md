@@ -1,6 +1,12 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
+
+**V0.38 (1/18/2025)**
+
 **BETA RELEASE, THERE MAY BE BUGS**
+
+[Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)
+
 
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
@@ -73,6 +79,18 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
+### V0.38 - 1/18/2025
+* Moved .mesh and .mdf2 import/export into "RE Mesh Editor" menu under File > Import/Export.
+* MDF materials can now be renamed by changing the material name inside the parentheses. (The material name in the mdf settings will be updated upon export or reindexing). 
+* When "Load MDF Material Data" is checked, the mesh and MDF collection will be grouped together in a collection.
+* Only mesh or mdf collections will show when choosing a collection in the RE MDF tab.
+* The mod directory in the RE MDF tab is now set automatically when exporting a mesh or mdf file.
+* Fixed some issues with loading certain MH Wilds materials.
+* Fixed issue where streaming textures would not be loaded when importing an RE7 RT mesh.
+
+<details>
+  <summary>Older Version Change Logs</summary>
+
 ### V0.37 - 12/2/2024
 * Added mesh import support for RE:Verse. 
 
@@ -98,9 +116,6 @@ Textures will not be imported if the extracted chunk files are not merged.
 * Added support for Monster Hunter Wilds textures. (Thanks Ando)
 NOTE: Conversion from DDS back to MH Wilds tex is not implemented yet.
 
-
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.32 - 11/12/2024
 * Added support for secondary weights used by Dragon's Dogma 2. These weights are labeled with "SHAPEKEY_" and control the scaling of armor meshes.

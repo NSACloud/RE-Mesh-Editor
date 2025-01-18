@@ -908,6 +908,9 @@ def newNRRTNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]
 	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
 	
+	occlusionUV2Node = None
+	if "UseAOSecondaryUV" in matInfo["mPropDict"] and matInfo["gameName"] == "MHWILDS":
+		occlusionUV2Node = addPropertyNode(matInfo["mPropDict"]["UseAOSecondaryUV"], matInfo["currentPropPos"], nodeTree)
 	
 	nodeGroupNode = getBentNormalNodeGroup(nodeTree)
 	nodeGroupNode.location = currentPos
@@ -921,7 +924,40 @@ def newNRRTNode (nodeTree,textureType,matInfo):
 		matInfo["cavityNodeLayerGroup"].addMixLayer(nodeGroupNode.outputs["BlueChannel"])
 		
 	elif textureType == "NormalRoughnessOcclusionMap":
-		matInfo["aoNodeLayerGroup"].addMixLayer(nodeGroupNode.outputs["BlueChannel"])
+		
+		if occlusionUV2Node != None:
+			UVMap1Node = None
+			UVMap2Node = None
+			if "UVMap1Node" in nodeTree.nodes:
+				UVMap1Node = nodeTree.nodes["UVMap1Node"]
+			if "UVMap2Node" in nodeTree.nodes:
+				UVMap2Node = nodeTree.nodes["UVMap2Node"]
+			if UVMap1Node != None and UVMap2Node != None:
+				
+				
+				uvMappingGroupNode = getDualUVMappingNodeGroup(nodeTree)
+				uvMappingGroupNode.location = occlusionUV2Node.location + Vector((300,0))
+				nodeTree.links.new(UVMap1Node.outputs["UV"],uvMappingGroupNode.inputs["UV1"])
+				nodeTree.links.new(UVMap2Node.outputs["UV"],uvMappingGroupNode.inputs["UV2"])
+				nodeTree.links.new(occlusionUV2Node.outputs["Value"],uvMappingGroupNode.inputs["UseSecondaryUV"])
+				nodeTree.links.new(uvMappingGroupNode.outputs["Vector"],imageNode.inputs["Vector"])
+				
+				
+				imageNodeUV2 = nodeTree.nodes.new('ShaderNodeTexImage')
+				imageNodeUV2.name = "UV2_"+textureType
+				imageNodeUV2.label = "UV2_"+textureType
+				imageNodeUV2.location = currentPos
+				imageNodeUV2.image = imageNode.image
+				nodeTree.links.new(uvMappingGroupNode.outputs["Vector"],imageNodeUV2.inputs["Vector"])
+				currentPos[0] += 300
+				
+				separateNodeUV2 = nodeTree.nodes.new('ShaderNodeSeparateRGB')
+				separateNodeUV2.location = currentPos
+				nodeTree.links.new(imageNodeUV2.outputs["Color"],separateNodeUV2.inputs["Image"])
+				currentPos[0] += 300
+				matInfo["aoNodeLayerGroup"].addMixLayer(separateNodeUV2.outputs["B"])
+		else:
+			matInfo["aoNodeLayerGroup"].addMixLayer(nodeGroupNode.outputs["BlueChannel"])
 	elif textureType == "NormalRoughnessAlphaMap":
 		matInfo["alphaSocket"] = nodeGroupNode.outputs["BlueChannel"]
 	else:
@@ -1201,7 +1237,7 @@ def newATOSNode (nodeTree,textureType,matInfo):
 	useLegacyHairUV2Occlusion = (matInfo["gameName"] in legacyUV2HairOcclusionList and "hair" in matInfo["mmtrName"].lower())
 	
 	#RE2 puts other masks in the alpha channel sometimes
-	isMTOS = imageNode.image != None and "_mtos" in imageNode.image.filepath.lower()
+	isMTOS = imageNode.image != None and "_mtos" in imageNode.image.filepath.lower() or "BaseAlphaMap" in matInfo["textureNodeDict"]
 	isMaskAlpha = matInfo["isMaskAlphaMMTR"]
 	
 	#Have to do this hack since there's no good way of telling whether the alpha channel is actually alpha with this game

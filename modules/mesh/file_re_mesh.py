@@ -121,6 +121,7 @@ meshFileVersionToGameNameDict = {
 	2101050001:"RE8",#VERSION_RE8
 	2102020001:"RE8",#RE VERSE
 	2109108288:"RE2RT",#VERSION_RERT
+	220128762:"RE7RT",#VERSION_RERT
 	2109148288:"MHRSB",#VERSION_MHRSB
 	230110883:"SF6",#VERSION_SF6
 	221108797:"RE4",#VERSION_RE4
@@ -1836,6 +1837,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 	weightBuffer = BytesIO()
 	colorBuffer = BytesIO()
 	faceBuffer = BytesIO()
+	extraWeightBuffer = BytesIO()#MH Wilds extended weight buffer
 	secondaryWeightBuffer = BytesIO()#DD2 shapekey
 	
 	parsedSubMeshToSubMeshDataDict = dict()
@@ -1927,6 +1929,9 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 						
 						if len(parsedSubMesh.weightIndicesList) != 0 and len(parsedSubMesh.weightIndicesList) == len(parsedSubMesh.weightList):
 							WriteToWeightBuffer(weightBuffer,parsedSubMesh.weightList,parsedSubMesh.weightIndicesList,isSixWeight)
+						
+						if parsedMesh.bufferHasExtraWeight and len(parsedSubMesh.extraWeightIndicesList) != 0 and len(parsedSubMesh.extraWeightIndicesList) == len(parsedSubMesh.extraWeightList):
+							WriteToWeightBuffer(extraWeightBuffer,parsedSubMesh.extraWeightList,parsedSubMesh.extraWeightIndicesList,isSixWeight)
 						
 						#DD2 shapekeys
 						if len(parsedSubMesh.secondaryWeightIndicesList) != 0 and len(parsedSubMesh.secondaryWeightIndicesList) == len(parsedSubMesh.secondaryWeightList):
@@ -2136,9 +2141,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		currentBufferOffset+=vertexPosBuffer.tell()
 		reMesh.meshBufferHeader.vertexElementList.append(vertexElement)
 		reMesh.meshBufferHeader.vertexBuffer.extend(vertexPosBuffer.getvalue())
-		if version == VERSION_SF6:#Buffers are written twice in SF6
-			reMesh.meshBufferHeader.vertexBuffer.extend(vertexPosBuffer.getvalue())
-			currentBufferOffset+=vertexPosBuffer.tell()
+
 	if norTanBuffer.tell() != 0:
 		vertexElement = VertexElementStruct()
 		vertexElement.posStartOffset = currentBufferOffset
@@ -2147,9 +2150,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		currentBufferOffset+=norTanBuffer.tell()
 		reMesh.meshBufferHeader.vertexElementList.append(vertexElement)
 		reMesh.meshBufferHeader.vertexBuffer.extend(norTanBuffer.getvalue())
-		if version == VERSION_SF6:#Buffers are written twice in SF6
-			reMesh.meshBufferHeader.vertexBuffer.extend(norTanBuffer.getvalue())
-			currentBufferOffset+=norTanBuffer.tell()
+
 	if UVBuffer.tell() != 0:
 		vertexElement = VertexElementStruct()
 		vertexElement.posStartOffset = currentBufferOffset
@@ -2158,9 +2159,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		currentBufferOffset+=UVBuffer.tell()
 		reMesh.meshBufferHeader.vertexElementList.append(vertexElement)
 		reMesh.meshBufferHeader.vertexBuffer.extend(UVBuffer.getvalue())
-		if version == VERSION_SF6:#Buffers are written twice in SF6
-			reMesh.meshBufferHeader.vertexBuffer.extend(UVBuffer.getvalue())
-			currentBufferOffset+=UVBuffer.tell()
+
 	if UV2Buffer.tell() != 0:
 		vertexElement = VertexElementStruct()
 		vertexElement.posStartOffset = currentBufferOffset
@@ -2169,20 +2168,15 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		currentBufferOffset+=UV2Buffer.tell()
 		reMesh.meshBufferHeader.vertexElementList.append(vertexElement)
 		reMesh.meshBufferHeader.vertexBuffer.extend(UV2Buffer.getvalue())
-		if version == VERSION_SF6:#Buffers are written twice in SF6
-			reMesh.meshBufferHeader.vertexBuffer.extend(UV2Buffer.getvalue())
-			currentBufferOffset+=UV2Buffer.tell()
+
 	if weightBuffer.tell() != 0:
 		vertexElement = VertexElementStruct()
 		vertexElement.posStartOffset = currentBufferOffset
 		vertexElement.typing = 4
-		vertexElement.stride = len(parsedMesh.mainMeshLODList[0].visconGroupList[0].subMeshList[0].weightIndicesList[0])*2
+		vertexElement.stride = 16
 		currentBufferOffset+=weightBuffer.tell()
 		reMesh.meshBufferHeader.vertexElementList.append(vertexElement)
 		reMesh.meshBufferHeader.vertexBuffer.extend(weightBuffer.getvalue())
-		if version == VERSION_SF6:#Buffers are written twice in SF6
-			reMesh.meshBufferHeader.vertexBuffer.extend(weightBuffer.getvalue())
-			currentBufferOffset+=weightBuffer.tell()
 			
 	
 	if colorBuffer.tell() != 0:
@@ -2194,9 +2188,16 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		currentBufferOffset+=colorBuffer.tell()
 		reMesh.meshBufferHeader.vertexElementList.append(vertexElement)
 		reMesh.meshBufferHeader.vertexBuffer.extend(colorBuffer.getvalue())
-		if version == VERSION_SF6:#Buffers are written twice in SF6
-			reMesh.meshBufferHeader.vertexBuffer.extend(colorBuffer.getvalue())
-			currentBufferOffset+=colorBuffer.tell()
+
+	if extraWeightBuffer.tell() != 0:
+		vertexElement = VertexElementStruct()
+		vertexElement.posStartOffset = currentBufferOffset
+		vertexElement.typing = 7
+		vertexElement.stride = 16
+		currentBufferOffset+=extraWeightBuffer.tell()
+		reMesh.meshBufferHeader.vertexElementList.append(vertexElement)
+		reMesh.meshBufferHeader.vertexBuffer.extend(extraWeightBuffer.getvalue())
+		
 	reMesh.meshBufferHeader.faceBuffer = faceBuffer.getvalue()
 	#print(len(reMesh.meshBufferHeader.faceBuffer))
 	reMesh.meshBufferHeader.vertexElementCount = len(reMesh.meshBufferHeader.vertexElementList)
@@ -2254,6 +2255,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 	UV2Buffer.close()
 	weightBuffer.close()
 	colorBuffer.close()
+	extraWeightBuffer.close()
 	faceBuffer.close()
 	secondaryWeightBuffer.close()
 				

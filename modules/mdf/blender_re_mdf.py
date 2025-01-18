@@ -144,7 +144,7 @@ def createMDFCollection(collectionName,parentCollection = None):
 		parentCollection.children.link(collection)
 	else:
 		bpy.context.scene.collection.children.link(collection)
-	bpy.context.scene.re_mdf_toolpanel.mdfCollection = collection.name
+	bpy.context.scene.re_mdf_toolpanel.mdfCollection = collection
 	return collection
 
 def checkNameUsage(baseName,checkSubString = True, objList = None):
@@ -231,7 +231,7 @@ def getMDFFlags(obj,flags):
 #MDF IMPORT
 
 
-def importMDFFile(filePath):
+def importMDFFile(filePath,parentCollection = None):
 	mdfFile = readMDF(filePath)
 	mdfFileName = os.path.splitext(os.path.split(filePath)[1])[0]
 	try:
@@ -248,7 +248,7 @@ def importMDFFile(filePath):
 		print("Unable to parse mdf version number in file path.")
 		gameName = -1
 	#headerObj = createEmpty("MDF_HEADER ("+os.path.split(filePath)[1]+")",[("~TYPE","RE_MDF_HEADER"),("unknHeaderValue",mdfFile.Header.version),("MDFVersion",os.path.splitext(filePath)[1].split(".")[1])],None,"MDFData")
-	mdfCollection = createMDFCollection(mdfFileName)
+	mdfCollection = createMDFCollection(mdfFileName,parentCollection)
 	#MATERIALS IMPORT
 	for index, material in enumerate(mdfFile.materialList):
 		name = "Material "+str(index).zfill(2)+ " ("+material.materialName+")"
@@ -287,17 +287,24 @@ def importMDFFile(filePath):
 
 #MDF EXPORT
 
-def reindexMaterials(collectionName = None):
+def reindexMaterials(collectionName):
 	
-	noesisMeshMaterialSet = set()
-	if collectionName != None:
-		mdfCollection = bpy.data.collections.get(collectionName,None)
+	if bpy.data.collections.get(collectionName,None) != None:
+		mdfCollection = bpy.data.collections[collectionName]
 	else:
-		mdfCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.mdfCollection,None)
+		mdfCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
 	if mdfCollection != None:
+		
 		currentIndex = 0
 		for obj in sorted(mdfCollection.all_objects,key = lambda item: item.name):
+			
 			if obj.get("~TYPE",None) == "RE_MDF_MATERIAL":
+				#Change the material name in the mdf material settings to the one in the object name
+				#This allows for the user to set the material name by either method of renaming the object or setting it in the mdf material settings
+				if "Material" in obj.name and "(" in obj.name:
+					objMaterialName = obj.name.rsplit("(",1)[1].split(")")[0]
+					if objMaterialName != obj.re_mdf_material.materialName:
+						obj.re_mdf_material.materialName = objMaterialName
 				obj.name = "Material "+str(currentIndex).zfill(2)+ " ("+obj.re_mdf_material.materialName+")"
 				currentIndex += 1
 def MDFErrorCheck(collectionName):

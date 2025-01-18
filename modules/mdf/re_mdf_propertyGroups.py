@@ -41,6 +41,14 @@ except Exception as err:
 	print(f"Unable to load usable properties - {str(err)}")
 	editablePropsSet = set()
 #print(editablePropsSet)
+
+def filterMDFCollection(self, collection):
+    return True if ((collection.get("~TYPE") == "RE_MDF_COLLECTION") or (".mdf2" in collection.name)) else False
+
+def filterMeshCollection(self, collection):
+    return True if ((collection.get("~TYPE") == "RE_MESH_COLLECTION") or (".mesh" in collection.name)) else False
+
+
 flags = MDFFlags()#Bitflag struct
 
 def linkBlenderMaterial(materialObj,materialName):
@@ -79,6 +87,10 @@ def linkBlenderMaterial(materialObj,materialName):
 							materialObj.re_mdf_material.linkedMaterial = material
 							#print(f"Linked {materialObj.name} to {material} (Slow)")
 							break						
+
+def update_mdfCollection(self, context):#Set mesh collection automatically if it exists when active mdf is changed
+	if self.mdfCollection != None and self.mdfCollection.name.replace(".mdf2",".mesh") in bpy.data.collections:
+		self.meshCollection = bpy.data.collections[self.mdfCollection.name.replace(".mdf2",".mesh")]
 								
 def update_materialNodes(self,context):
 	obj = self.id_data
@@ -181,10 +193,13 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 	
 	def getMaterialPresets(self,context):
 		return reloadPresets(context.scene.re_mdf_toolpanel.activeGame)
-	mdfCollection: bpy.props.StringProperty(
+
+	mdfCollection: bpy.props.PointerProperty(
 		name="",
 		description = "Set the collection containing the MDF file to edit.\nHint: MDF collections are blue.\nYou can create a new MDF collection by pressing the \"Create MDF Collection\" button",
-		
+		type=bpy.types.Collection,
+		poll = filterMDFCollection,
+		update = update_mdfCollection
 		)
 	activeGame: EnumProperty(
 		name="",
@@ -211,15 +226,16 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 		description="Set preset to be used by Add Material Preset button",
 		items= getMaterialPresets
 		)
-	meshCollection: bpy.props.StringProperty(
+	meshCollection: bpy.props.PointerProperty(
 		name="",
 		description = "Set the mesh collection to apply the active MDF collection to.\nHint: Mesh collections are red",
-		
+		type=bpy.types.Collection,
+		poll = filterMeshCollection
 		)
 	modDirectory: bpy.props.StringProperty(
 		name="",
 		subtype = "DIR_PATH",
-		description = "Set the natives directory of your mod.\nThis is used by \"Apply Active MDF\" and \"Copy Converted Tex\".\nThe platform folder must be included. (STM in most cases)\nExample:\n"+r"C:\Modding\Monster Hunter Rise\FluffyManager\Games\MHRISE\Mods\ArmorTest\natives\STM",
+		description = "Set the natives directory of your mod.\nThis is used by \"Apply Active MDF\" and \"Copy Converted Tex\".\nThe platform folder must be included. (STM in most cases)\nThis will be set automatically when a mesh or mdf file is exported.\nExample:\n"+r"C:\Modding\Monster Hunter Rise\FluffyManager\Games\MHRISE\Mods\ArmorTest\natives\STM",
 		update = update_modDirectoryRelPathToAbs
 		)
 	textureDirectory: bpy.props.StringProperty(

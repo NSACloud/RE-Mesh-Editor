@@ -228,7 +228,9 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 			obj.select_set(True)
 	return armatureObj
 
-def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],vertexGroupWeightListSecondary = [],vertexGroupBoneIndicesListSecondary = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
+IMPORT_EXTRA_WEIGHTS = False#Does not work correctly atm
+
+def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],extraVertexGroupWeightList = [],extraVertexGroupBoneIndicesList = [],vertexGroupWeightListSecondary = [],vertexGroupBoneIndicesListSecondary = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
 	#print(f"\n{meshName}, Vertex Count: {len(vertexList)}, Face Count: {len(faceList)}\n")
 	#print(vertexList)
 	#print()
@@ -311,6 +313,18 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 						if len(boneName) > 63:
 							boneName = f"#HASHED_{str(hash(boneName))}"
 						meshObj.vertex_groups[boneName].add([vertexIndex],vertexGroupWeightList[vertexIndex][weightIndex],'ADD')
+		
+			if extraVertexGroupWeightList != [] and IMPORT_EXTRA_WEIGHTS:		
+				#print(f"Importing extra weights on {meshName}")
+				for vertexIndex, boneIndexList in enumerate(extraVertexGroupBoneIndicesList):
+					#print(vertexIndex)
+					#print(boneIndexList)
+					for weightIndex, boneIndex in enumerate(boneIndexList):
+						if extraVertexGroupWeightList[vertexIndex][weightIndex] > 0:
+							boneName = boneNameList[boneIndex]
+							if len(boneName) > 63:
+								boneName = f"#HASHED_{str(hash(boneName))}"
+							meshObj.vertex_groups[boneName].add([vertexIndex],extraVertexGroupWeightList[vertexIndex][weightIndex],'ADD')
 		else:#No bone remap table edge case
 			vg = meshObj.vertex_groups.new(name=boneNameList[0])
 			for i in range(len(meshObj.data.vertices)):
@@ -455,6 +469,9 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 						boneNameList=boneNameList,
 						vertexGroupWeightList=subMesh.weightList,
 						vertexGroupBoneIndicesList=subMesh.weightIndicesList,
+						#MH Wilds extra weights
+						extraVertexGroupWeightList=subMesh.extraWeightList,
+						extraVertexGroupBoneIndicesList=subMesh.extraWeightIndicesList,
 						#DD2 shape key weights
 						vertexGroupWeightListSecondary=subMesh.secondaryWeightList,
 						vertexGroupBoneIndicesListSecondary=subMesh.secondaryWeightIndicesList,
@@ -609,11 +626,15 @@ def importREMeshFile(filePath,options):
 	meshParseTime =  meshParseEndTime - meshParseStartTime
 	print(f"Mesh parsing took {timeFormat%(meshParseTime * 1000)} ms.")
 	armatureObj = None
+	parentCollection = None#Collection for grouping mesh and mdf
 	if options["createCollections"]:
-		meshCollection = getCollection(meshFileName,makeNew = True)
+		if options["loadMDFData"]:
+			parentCollection = getCollection(meshFileName.split(".mesh")[0],makeNew = True)
+		meshCollection = getCollection(meshFileName,parentCollection,makeNew = True)
 		meshCollection.color_tag = "COLOR_01"
 		meshCollection["~TYPE"] = "RE_MESH_COLLECTION"
-		bpy.context.scene.re_mdf_toolpanel.meshCollection = meshCollection.name
+		
+		bpy.context.scene.re_mdf_toolpanel.meshCollection = meshCollection
 	else:
 		meshCollection = bpy.context.scene.collection
 	hiddenCollectionSet = set()
@@ -660,7 +681,7 @@ def importREMeshFile(filePath,options):
 				if options["loadMDFData"]:#MDF gets read twice when importing mdf data, could fix it but reading is fast enough that it's not really noticable.
 					print("Loading MDF Data...")
 					try:
-						importMDFFile(mdfPath)
+						importMDFFile(mdfPath,parentCollection = parentCollection)
 					except Exception as err:
 						raiseWarning("Could not import MDF data from " + mdfPath +":" + str(err))
 						warningList.append("Could not import MDF data from " + mdfPath +":" + str(err))
@@ -908,9 +929,11 @@ def exportREMeshFile(filePath,options):
 		bpy.ops.object.mode_set(mode='OBJECT')
 	
 	maxWeightsPerVertex = 8
+	maxWeightsPerVertexExtended = 16
 	maxWeightedBones = 256
 	if gameName == "SF6" or gameName == "MHWILDS":
 		maxWeightsPerVertex = 6
+		maxWeightsPerVertexExtended = 12
 		maxWeightedBones = 1024
 	MAX_VERTICES = 65536
 	MAX_VERTICES_EXTENDED = 4294967295
@@ -1361,7 +1384,9 @@ def exportREMeshFile(filePath,options):
 					parsedMesh.bufferHasWeight = True
 					parsedSubMesh.weightList = np.zeros((len(evaluatedSubMeshData.vertices),8))
 					parsedSubMesh.weightIndicesList = np.zeros((len(evaluatedSubMeshData.vertices),8),dtype="<H")#ushort because of SF6
-					
+					#In case weights exceed standard maximum
+					parsedSubMesh.extraWeightList = np.zeros((len(evaluatedSubMeshData.vertices),8))
+					parsedSubMesh.extraWeightIndicesList = np.zeros((len(evaluatedSubMeshData.vertices),8),dtype="<H")#ushort because of SF6
 					if parsedMesh.bufferHasSecondaryWeight:
 						parsedSubMesh.secondaryWeightList = np.zeros((len(evaluatedSubMeshData.vertices),8))
 						parsedSubMesh.secondaryWeightIndicesList = np.zeros((len(evaluatedSubMeshData.vertices),8),dtype="<H")#ushort because of SF6
@@ -1490,13 +1515,27 @@ def exportREMeshFile(filePath,options):
 							addErrorToDict(errorDict, "InvalidWeights", rawsubmesh.name)
 						"""
 						#print(weightIndicesList)
-						if len(weightList) > maxWeightsPerVertex:
+						if len(weightList) > maxWeightsPerVertex:#Extended weights are not correct yet
+							#parsedMesh.bufferHasExtraWeight = True
 							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
-						elif len(secondaryWeightList) > maxWeightsPerVertex:
+							
+							parsedSubMesh.extraWeightList[currentVertIndex] = list(pad(weightList[maxWeightsPerVertex:],size=8,padding=0.0))
+							parsedSubMesh.extraWeightIndicesList[currentVertIndex] = list(pad(weightIndicesList[maxWeightsPerVertex:],size=8,padding=0))
+							#print(rawsubmesh.name)
+							#print(currentVertIndex)
+							#print(parsedSubMesh.extraWeightList[currentVertIndex])
+							#print(parsedSubMesh.extraWeightIndicesList[currentVertIndex])
+							if len(weightList) > maxWeightsPerVertexExtended:
+								addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
+						else:
+							parsedSubMesh.extraWeightList[currentVertIndex] = [0.0]*8
+							parsedSubMesh.extraWeightIndicesList[currentVertIndex] = [0]*8
+						
+						if len(secondaryWeightList) > maxWeightsPerVertex:
 							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
 						
-						parsedSubMesh.weightList[currentVertIndex] = list(pad(weightList,size=8,padding=0.0))
-						parsedSubMesh.weightIndicesList[currentVertIndex] = list(pad(weightIndicesList,size=8,padding=0))
+						parsedSubMesh.weightList[currentVertIndex] = list(pad(weightList[:maxWeightsPerVertex],size=8,padding=0.0))
+						parsedSubMesh.weightIndicesList[currentVertIndex] = list(pad(weightIndicesList[:maxWeightsPerVertex],size=8,padding=0))
 						if parsedMesh.bufferHasSecondaryWeight:
 							parsedSubMesh.secondaryWeightList[currentVertIndex] = list(pad(secondaryWeightList,size=8,padding=0.0))
 							parsedSubMesh.secondaryWeightIndicesList[currentVertIndex] = list(pad(secondaryWeightIndicesList,size=8,padding=0))
@@ -1673,6 +1712,8 @@ def exportREMeshFile(filePath,options):
 		vertexBufferString += "[Weight] "
 	if parsedMesh.bufferHasColor:
 		vertexBufferString += "[Color] " 
+	if parsedMesh.bufferHasExtraWeight:
+		vertexBufferString += "[Extra Weight] " 
 	
 	meshExportEndTime = time.time()
 	meshExportTime =  meshExportEndTime - meshExportStartTime

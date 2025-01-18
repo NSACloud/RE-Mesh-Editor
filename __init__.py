@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 37),
+	"version": (0, 38),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -19,7 +19,7 @@ from bpy_extras.io_utils import ExportHelper,ImportHelper
 from bpy.props import StringProperty, BoolProperty,IntProperty, EnumProperty, CollectionProperty,PointerProperty
 from bpy.types import Operator, OperatorFileListElement,AddonPreferences
 from rna_prop_ui import PropertyPanel
-from .modules.gen_functions import textColors,raiseWarning,getFolderSize,formatByteSize
+from .modules.gen_functions import textColors,raiseWarning,getFolderSize,formatByteSize,splitNativesPath
 from .modules.blender_utils import operator_exists
 #mesh
 from .modules.mesh.file_re_mesh import meshFileVersionToGameNameDict
@@ -127,6 +127,10 @@ def showMessageBox(message = "", title = "Message Box", icon = 'INFO'):
 
 	bpy.context.window_manager.popup_menu(draw, title = title, icon = icon)
 
+def setModDirectoryFromFilePath(filePath):
+	if "re_chunk_000" not in filePath and "re_dlc_stm" not in filePath and "natives" in filePath:
+		bpy.context.scene.re_mdf_toolpanel.modDirectory = splitNativesPath(filePath)[0]
+		print(f"Set mod directory to {bpy.context.scene.re_mdf_toolpanel.modDirectory}")
 class WM_OT_OpenTextureCacheFolder(Operator):
 	bl_label = "Open Texture Cache Folder"
 	bl_description = "Opens the texture cache folder in File Explorer"
@@ -479,7 +483,7 @@ class REMeshPreferences(AddonPreferences):
 		row.operator("re_mesh.chunk_path_list_reorder_item", text="Move Down").direction = 'DOWN'
 		addon_updater_ops.update_settings_ui(self,context)
 class ImportREMesh(Operator, ImportHelper):
-	'''Import RE Mesh File'''
+	'''Import RE Engine Mesh File'''
 	bl_idname = "re_mesh.importfile"
 	bl_label = "Import RE Mesh"
 	bl_options = {'PRESET', "REGISTER", "UNDO"}
@@ -705,8 +709,9 @@ class ImportREMesh(Operator, ImportHelper):
 				return self.execute(context)
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
+
 class ExportREMesh(Operator, ExportHelper):
-	'''Export RE Mesh File'''
+	'''Export RE Engine Mesh File'''
 	bl_idname = "re_mesh.exportfile"
 	bl_label = "Export RE Mesh"
 	bl_options = {'PRESET'}
@@ -734,8 +739,7 @@ class ExportREMesh(Operator, ExportHelper):
 		)
 	targetCollection: bpy.props.StringProperty(
 		name="",
-		description = "Set the collection containing the meshes to be exported",
-		
+		description = "Set the collection containing the meshes to be exported.\nNote: Mesh collections are red and end with .mesh",
 		)
 	selectedOnly : BoolProperty(
 	   name = "Selected Objects Only",
@@ -857,6 +861,10 @@ class ExportREMesh(Operator, ExportHelper):
 					print("Added path to RE Toolbox Batch Export list.")
 		else:
 			self.report({"INFO"},"RE Mesh export failed. See Window > Toggle System Console for info on how to fix it.")
+		
+		if bpy.context.scene.re_mdf_toolpanel.modDirectory == "":
+			setModDirectoryFromFilePath(self.filepath)
+		
 		if bpy.context.preferences.addons[__name__].preferences.showConsole:
 			 bpy.ops.wm.console_toggle()
 		return {"FINISHED"}
@@ -935,13 +943,13 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 		)
 	targetCollection : StringProperty(
 	   name = "",
-	   description = "Set the MDF collection to be exported",
+	   description = "Set the MDF collection to be exported\nNote: MDF collections are blue and end with .mdf2",
 	   default = "")
 	filter_glob: StringProperty(default="*.mdf2*", options={'HIDDEN'})
 	def invoke(self, context, event):
 		if bpy.data.collections.get(self.targetCollection,None) == None:
-			if bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.mdfCollection):
-				self.targetCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
+			if bpy.context.scene.re_mdf_toolpanel.mdfCollection:
+				self.targetCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection.name
 				if self.targetCollection.endswith(".mdf2"):
 					self.filepath = self.targetCollection + self.filename_ext
 			self.filename_ext = "."+str(gameNameMDFVersionDict[bpy.context.scene.re_mdf_toolpanel.activeGame])
@@ -962,6 +970,9 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 		success = exportMDFFile(self.filepath,self.targetCollection)
 		if success:
 			self.report({"INFO"},"Exported RE MDF successfully.")
+			
+			if bpy.context.scene.re_mdf_toolpanel.modDirectory == "":
+				setModDirectoryFromFilePath(self.filepath)
 			
 			#Add batch export entry to RE Toolbox if it doesn't already have one
 			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
@@ -1089,7 +1100,8 @@ class GU_PT_collection_custom_properties(bpy.types.Panel, PropertyPanel): #For a
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "collection"
-	
+
+"""	
 def re_mesh_import(self, context):
 	self.layout.operator(ImportREMesh.bl_idname, text="RE Mesh (.mesh.x)")
 	
@@ -1101,11 +1113,42 @@ def re_mdf_import(self, context):
 	
 def re_mdf_export(self, context):
 	self.layout.operator(ExportREMDF.bl_idname, text="RE MDF (.mdf2.x)")
+"""
+
+class IMPORT_MT_re_mesh_editor(bpy.types.Menu):
+    bl_label = "RE Mesh Editor"
+    bl_idname = "IMPORT_MT_re_mesh_editor"
+    
+    def draw(self, context):
+        layout = self.layout
+        
+        layout.operator(ImportREMesh.bl_idname, text="RE Mesh (.mesh.x) (Model)",icon = "MESH_DATA")
+        layout.operator(ImportREMDF.bl_idname, text="RE MDF (.mdf2.x) (Materials)",icon = "MATERIAL")
+
+def re_mesh_editor_import(self, context):
+	self.layout.menu("IMPORT_MT_re_mesh_editor",icon = "MOD_LINEART")
+	
+class EXPORT_MT_re_mesh_editor(bpy.types.Menu):
+    bl_label = "RE Mesh Editor"
+    bl_idname = "EXPORT_MT_re_mesh_editor"
+    
+    def draw(self, context):
+        layout = self.layout
+        
+        layout.operator(ExportREMesh.bl_idname, text="RE Mesh (.mesh.x) (Model)",icon = "MESH_DATA")
+        layout.operator(ExportREMDF.bl_idname, text="RE MDF (.mdf2.x) (Materials)",icon = "MATERIAL")
+
+def re_mesh_editor_export(self, context):
+	self.layout.menu("EXPORT_MT_re_mesh_editor",icon = "MOD_LINEART")
 
 def register():
 	addon_updater_ops.register(bl_info)
 	for classEntry in classes:
 		bpy.utils.register_class(classEntry)
+		
+	bpy.utils.register_class(IMPORT_MT_re_mesh_editor)
+	bpy.utils.register_class(EXPORT_MT_re_mesh_editor)
+	
 	if (3, 3, 0) > bpy.app.version:
 		bpy.utils.register_class(GU_PT_collection_custom_properties)
 	
@@ -1116,11 +1159,13 @@ def register():
 	
 	
 	
-	bpy.types.TOPBAR_MT_file_import.append(re_mesh_import)
-	bpy.types.TOPBAR_MT_file_export.append(re_mesh_export)
-	bpy.types.TOPBAR_MT_file_import.append(re_mdf_import)
-	bpy.types.TOPBAR_MT_file_export.append(re_mdf_export)
-
+	#bpy.types.TOPBAR_MT_file_import.append(re_mesh_import)
+	#bpy.types.TOPBAR_MT_file_export.append(re_mesh_export)
+	#bpy.types.TOPBAR_MT_file_import.append(re_mdf_import)
+	#bpy.types.TOPBAR_MT_file_export.append(re_mdf_export)
+	
+	bpy.types.TOPBAR_MT_file_import.append(re_mesh_editor_import)
+	bpy.types.TOPBAR_MT_file_export.append(re_mesh_editor_export)
 
 	#Blender 4.1 and higher drag and drop operators
 	if bpy.app.version >= (4, 1, 0):
@@ -1132,15 +1177,21 @@ def unregister():
 	addon_updater_ops.unregister()
 	for classEntry in classes:
 		bpy.utils.unregister_class(classEntry)
+		
+	bpy.utils.unregister_class(IMPORT_MT_re_mesh_editor)
+	bpy.utils.unregister_class(EXPORT_MT_re_mesh_editor)
 	
 	if (3, 3, 0) > bpy.app.version:
 		bpy.utils.unregister_class(GU_PT_collection_custom_properties)
 		
 	
-	bpy.types.TOPBAR_MT_file_import.remove(re_mesh_import)
-	bpy.types.TOPBAR_MT_file_export.remove(re_mesh_export)
-	bpy.types.TOPBAR_MT_file_import.remove(re_mdf_import)
-	bpy.types.TOPBAR_MT_file_export.remove(re_mdf_export)
+	#bpy.types.TOPBAR_MT_file_import.remove(re_mesh_import)
+	#bpy.types.TOPBAR_MT_file_export.remove(re_mesh_export)
+	#bpy.types.TOPBAR_MT_file_import.remove(re_mdf_import)
+	#bpy.types.TOPBAR_MT_file_export.remove(re_mdf_export)
+	
+	bpy.types.TOPBAR_MT_file_import.remove(re_mesh_editor_import)
+	bpy.types.TOPBAR_MT_file_export.remove(re_mesh_editor_export)
 	
 	if bpy.app.version >= (4, 1, 0):
 		bpy.utils.unregister_class(MESH_FH_drag_import)

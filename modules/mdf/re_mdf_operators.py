@@ -39,7 +39,7 @@ class WM_OT_ReindexMaterials(Operator):
 	bl_idname = "re_mdf.reindex_materials"
 
 	def execute(self, context):
-		reindexMaterials(bpy.context.scene.re_mdf_toolpanel.mdfCollection)
+		reindexMaterials(bpy.context.scene.re_mdf_toolpanel.mdfCollection.name)
 		self.report({"INFO"},"Reindexed materials.")
 		return {'FINISHED'}
 
@@ -68,8 +68,8 @@ class WM_OT_ApplyMDFToMeshCollection(Operator):
 
 	def execute(self, context):
 		#reindexMaterials()
-		mdfCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.mdfCollection,None)
-		meshCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.meshCollection,None)
+		mdfCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
+		meshCollection = bpy.context.scene.re_mdf_toolpanel.meshCollection
 		
 		
 		

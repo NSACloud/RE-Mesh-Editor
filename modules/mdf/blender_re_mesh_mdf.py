@@ -61,6 +61,7 @@ albedoTypeSet = set([
 	"BackMap",
 	"BaseMap",
 	"BackMap_1",
+	"BaseAlphaMap"
 	"BaseMetalMap",
 	"BaseMetalMapArray",
 	"BaseShiftMap",
@@ -303,7 +304,7 @@ texVersionDict = {
 	".13":".190820018",
 	".19":".30",
 	".20":".31",
-	".21":".34",
+	#".21":".34",#Commented out so RE7RT streaming textures will be found
 	".23":".28",
 	".32":".143221013",
 	".40":".760230703",
@@ -319,6 +320,7 @@ def getTexPath(baseTexturePath,chunkPathList,mdfVersion):
 		
 		if inputPath == None:
 			inputPath = wildCardFileSearch(os.path.join(chunkPath,baseTexturePath+f".tex{texVersion}*"))
+		
 		if inputPath != None:
 			break
 	return inputPath	
@@ -1019,10 +1021,6 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				
 				if "BaseColor" in matInfo["mPropDict"]:
 					baseColorNode = addPropertyNode(matInfo["mPropDict"]["BaseColor"], matInfo["currentPropPos"], nodeTree)
-					matInfo["albedoNodeLayerGroup"].addMixLayer(baseColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
-				#WILDS
-				if "RayTrace_BaseColor" in matInfo["mPropDict"]:
-					baseColorNode = addPropertyNode(matInfo["mPropDict"]["RayTrace_BaseColor"], matInfo["currentPropPos"], nodeTree)
 					matInfo["albedoNodeLayerGroup"].addMixLayer(baseColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
 				
 				if "Sheen" in matInfo["mPropDict"]:
