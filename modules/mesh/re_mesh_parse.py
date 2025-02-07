@@ -553,7 +553,7 @@ class ParsedREMesh:
 			#I hope this doesn't cause weird issues somewhere, the root bone isn't counted in the remap table but it is used by some meshes and that causes issues
 			#EX F:\RE2RT_EXTRACT\re_chunk_000\natives\STM\ObjectRoot\SetModel\sm4x_Gimmick\sm42\sm42_253_Switch01A\sm42_253_Switch01A_00md.mesh.2109108288
 			#Check if the root bone is weighted and add it to the weighted bone list
-			if reMesh.skeletonHeader.remapCount != reMesh.boneBoundingBoxHeader.count:
+			if reMesh.boneBoundingBoxHeader != None and reMesh.skeletonHeader.remapCount != reMesh.boneBoundingBoxHeader.count:
 				self.skeleton.weightedBones.append(reMesh.rawNameList[reMesh.boneNameRemapList[0]])
 			
 			
@@ -586,7 +586,7 @@ class ParsedREMesh:
 		#Parse Vertex Buffer
 		if reMesh.meshBufferHeader != None:
 			tags = set()
-			if reMesh.meshVersion == 230110883 or reMesh.meshVersion == 240820143:#Street Fighter 6 mesh version + MH Wilds
+			if reMesh.meshVersion == 230110883 or reMesh.meshVersion == 240820143 or reMesh.meshVersion == 241111606:#Street Fighter 6 mesh version + MH Wilds
 				tags.add("SixWeightCompressed")#Add tag to parse compressed weights
 			#if duplicate in vertexelementlist, add shadowLOD tag
 			

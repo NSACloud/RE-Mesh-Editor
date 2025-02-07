@@ -1,11 +1,9 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.38 (1/18/2025)**
+**V0.39 (2/7/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
-
-[Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)
 
 
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
@@ -58,11 +56,12 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
 Support for more games may be added in the future.
 
 ## Requirements
-* [Blender 2.93 or higher (4.2.1 or higher recommended)](https://www.blender.org/download/)
+* [Blender 2.93 or higher (4.3.2 or higher recommended)](https://www.blender.org/download/)
 
   
 **Not required but strongly recommended:**
 * [RE Chain Editor](https://github.com/NSACloud/RE-Chain-Editor) - Blender addon for creation of chain files. Used to add physics to models.
+* [RE Asset Library (Blender 4.3.2 or higher required)](https://github.com/NSACloud/RE-Asset-Library) - Blender addon that allows for easy browsing and importing of RE Engine files. Reduces the need to look up file IDs to find what you're looking for.
 * [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
 ## Installation
 Download the addon from the "Download RE Mesh Editor" link at the top or click Code > Download Zip.
@@ -78,6 +77,18 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.39 - 2/7/2025
+* Fixed issue where the selected game version would revert to the last imported version upon every export.
+* Fixed some material loading issues for SF6.
+* Fixed MH Wilds player skin tone appearence.
+* Fixed bounding box related error upon import.
+* Added MH Wilds benchmark version import support.
+* Reduced sheen values to make them appear closer to how they appear in game.
+* Fixed issue where emission values were much too bright.
+* Color values can now be manually set to values above 1.0.
+* Removed alpha clipping from materials due to it causing issues with certain games.
+* Fixed issue where unused images weren't cleared when using the "Clear Scene" import option.
 
 ### V0.38 - 1/18/2025
 * Moved .mesh and .mdf2 import/export into "RE Mesh Editor" menu under File > Import/Export.

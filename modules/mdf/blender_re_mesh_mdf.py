@@ -151,6 +151,7 @@ NRRTTypes = set([
 	"NormalRoughnessTranslucencyMap",
 	"NormalRoughnessTranslucentMap",
 	"NormalRoughnessAlphaMap",
+	"NormalRoughnessHeightMap",
 	"NRRTMap",
 	])
 ATOSTypes = set([
@@ -568,7 +569,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				
 				
 				
-				if "SkinMap" in matInfo["textureNodeDict"]:
+				if "SkinMap" in matInfo["textureNodeDict"] and matInfo["gameName"] == "MHWILDS":
 					skinMapNode = matInfo["textureNodeDict"]["SkinMap"]
 					
 					skinMappingGroupNode = getMHWildsSkinMappingNodeGroup(nodeTree)
@@ -576,14 +577,28 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					#nodeTree.links.new(UVMap1Node.outputs["UV"],skinMappingGroupNode.inputs["UV"])
 					
 					nodeTree.links.new(skinMappingGroupNode.outputs["Vector"],skinMapNode.inputs["Vector"])
-					matInfo["albedoNodeLayerGroup"].addMixLayer(skinMapNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+					
+					
+					overlaySkinNode = nodes.new("ShaderNodeMixRGB")
+					overlaySkinNode.location = skinMapNode.location + Vector((300,0))
+					overlaySkinNode.blend_type = "OVERLAY"
+					overlaySkinNode.inputs["Fac"].default_value = 1.0
+					links.new(skinMapNode.outputs["Color"],overlaySkinNode.inputs["Color1"])
+					if matInfo["albedoNodeLayerGroup"].currentOutSocket != None:
+						links.new(matInfo["albedoNodeLayerGroup"].currentOutSocket,overlaySkinNode.inputs["Color2"])
+						matInfo["albedoNodeLayerGroup"].currentOutSocket = overlaySkinNode.outputs["Color"]
+						
+						
+					#matInfo["albedoNodeLayerGroup"].addMixLayer(skinMapNode.outputs["Color"],factorOutSocket = None,mixType = "OVERLAY",mixFactor = 1.0)
 					
 				if "HairOverMap" in matInfo["textureNodeDict"]:
 					nodeTree.links.new(UVMap2Node.outputs["UV"],matInfo["textureNodeDict"]["HairOverMap"].inputs["Vector"])
 					useHairOverFactorSocket = None
 					if "UseHairOverMap" in matInfo["mPropDict"]:
 						useHairOverFactorSocket = addPropertyNode(matInfo["mPropDict"]["UseHairOverMap"], matInfo["currentPropPos"], nodeTree).outputs["Value"]
-					matInfo["albedoNodeLayerGroup"].addMixLayer(matInfo["textureNodeDict"]["HairOverMap"].outputs["Color"],factorOutSocket = useHairOverFactorSocket,mixType = "OVERLAY",mixFactor = 1.0)
+					
+					#TODO Look into correct way to apply hair over, alpha is used to blend through two hairover colors, also input order may need to be changed. Alma's hair does not display correctly with inputs not swapped, but swapping causes issues on things without hairover.
+					matInfo["albedoNodeLayerGroup"].addMixLayer(matInfo["textureNodeDict"]["HairOverMap"].outputs["Color"],factorOutSocket = useHairOverFactorSocket,mixType = "OVERLAY",mixFactor = 1.0,swapInputs = False)
 				#Base layer overrides
 				if "Roughness" in matInfo["mPropDict"]:
 					roughnessNode = addPropertyNode(matInfo["mPropDict"]["Roughness"], matInfo["currentPropPos"], nodeTree)
@@ -1025,14 +1040,22 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				
 				if "Sheen" in matInfo["mPropDict"]:
 					sheenNode = addPropertyNode(matInfo["mPropDict"]["Sheen"], matInfo["currentPropPos"], nodeTree)
-					matInfo["sheenSocket"] = sheenNode.outputs["Value"]
+					
+					
+					reduceSheenMultNode = nodeTree.nodes.new('ShaderNodeMath')
+					reduceSheenMultNode.location = sheenNode.location + Vector((300,0))
+					reduceSheenMultNode.operation = "MULTIPLY"
+					nodeTree.links.new(sheenNode.outputs["Value"],reduceSheenMultNode.inputs[0])
+					reduceSheenMultNode.inputs[1].default_value = 0.3
+					
+					matInfo["sheenSocket"] = reduceSheenMultNode.outputs["Value"]
 				
 				
 				#mmtr specific nodes
 				#if "eye" in matInfo["mmtrName"]:
 				if "eye" in matInfo["blenderMaterial"].name or "eye" in matInfo["mmtrName"].lower() or matInfo["mmtrName"].lower().endswith("_ao.mmtr"):
 					#Tearline mat setup
-					if "ColorParam" in matInfo["mPropDict"]:  
+					if "ColorParam" in matInfo["mPropDict"] and matInfo["gameName"] != "MHWILDS":  
 						baseColorNode = addPropertyNode(matInfo["mPropDict"]["ColorParam"], matInfo["currentPropPos"], nodeTree)
 						matInfo["albedoNodeLayerGroup"].addMixLayer(baseColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
 					elif "TearColor" in matInfo["mPropDict"]:  
@@ -1250,7 +1273,11 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				disableShadowCast = False
 				#if hasAlpha:
 				if matInfo["alphaSocket"] != None:
+					
+					
 					clippingThresholdOutSocket = None
+					#Disabled alpha clipping for now since it causes issues with certain games
+					"""
 					if "Nuki" in matInfo["mPropDict"]:#I wish capcom didn't use 1000 different names for the same thing
 						#clippingThresholdNode = addPropertyNode(matInfo["mPropDict"]["Nuki"], matInfo["currentPropPos"], nodeTree)
 						nukiNode = addPropertyNode(matInfo["mPropDict"]["Nuki"], matInfo["currentPropPos"], nodeTree)
@@ -1287,20 +1314,30 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						dissolveNode = addPropertyNode(matInfo["mPropDict"]["DissolveThreshold"], matInfo["currentPropPos"], nodeTree)
 						clippingThresholdOutSocket = dissolveNode.outputs["Value"]
 					
-	
+					"""
 					if not matInfo["isAlphaBlend"] and "reflectivetransparent" not in matInfo["mmtrName"].lower() and "alphadissolve" not in matInfo["mmtrName"].lower():
-						alphaClippingNode = nodes.new("ShaderNodeMath")
-						alphaClippingNode.location = nodeBSDF.location + Vector((-300,-400))
-						alphaClippingNode.operation = "GREATER_THAN"
-						alphaClippingNode.outputs["Value"].default_value = 1.0
 						
-						links.new(alphaClippingNode.outputs["Value"],nodeBSDF.inputs["Alpha"])
-						if clippingThresholdOutSocket != None:
-							links.new(clippingThresholdOutSocket,alphaClippingNode.inputs[1])
-						
-						if matInfo["alphaSocket"] != None:
+						links.new(matInfo["alphaSocket"],nodeBSDF.inputs["Alpha"])#Temporary
+						#Alpha clipping is disabled for now
+						"""
+						if "hair" not in matInfo["mmtrName"].lower() and "BaseAlphaMap" not in matInfo["textureNodeDict"]:
+							alphaClippingNode = nodes.new("ShaderNodeMath")
+							alphaClippingNode.location = nodeBSDF.location + Vector((-300,-400))
+							alphaClippingNode.operation = "GREATER_THAN"
+							alphaClippingNode.outputs["Value"].default_value = 1.0
 							
-							links.new(matInfo["alphaSocket"],alphaClippingNode.inputs[0])
+							
+							links.new(alphaClippingNode.outputs["Value"],nodeBSDF.inputs["Alpha"])
+							if clippingThresholdOutSocket != None:
+								links.new(clippingThresholdOutSocket,alphaClippingNode.inputs[1])
+							
+							if matInfo["alphaSocket"] != None:
+								
+								links.new(matInfo["alphaSocket"],alphaClippingNode.inputs[0])
+						else:#Hack to bypass clipping because alpha clipping with hair is being a pain
+							if matInfo["alphaSocket"] != None: 
+								links.new(matInfo["alphaSocket"],nodeBSDF.inputs["Alpha"])
+						"""
 					else:
 						if bpy.app.version < (4,2,0):
 							matInfo["blenderMaterial"].blend_method = "BLEND"
@@ -1309,8 +1346,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 							matInfo["blenderMaterial"].surface_render_method = "BLENDED"
 							matInfo["blenderMaterial"].use_transparent_shadow = True
 							disableShadowCast = True
-						if matInfo["alphaSocket"] != None: 
-							links.new(matInfo["alphaSocket"],nodeBSDF.inputs["Alpha"])
+						
+						links.new(matInfo["alphaSocket"],nodeBSDF.inputs["Alpha"])
 					#Blender removed blend and shadow method in 4.2+ so everything will just be alpha hashed now
 					#blenderMaterial.blend_method = "CLIP"
 					#blenderMaterial.shadow_method = "CLIP"

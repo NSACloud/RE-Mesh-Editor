@@ -609,7 +609,9 @@ def importREMeshFile(filePath,options):
 			obj.user_clear()
 		for nodeGroup in bpy.data.node_groups:
 			bpy.data.node_groups.remove(nodeGroup)
-		
+		for img in bpy.data.images:
+		    if not img.users:
+		        bpy.data.images.remove(img)
 
 	print("\033[96m__________________________________\nRE Mesh import started.\033[0m")
 	if options["importAllLODs"]:

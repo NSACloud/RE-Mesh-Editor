@@ -621,7 +621,7 @@ class dynamicColorMixLayerNodeGroup():
 		self._currentOutSocket = value
 		self.nodeLoc = value.node.location
 	
-	def addMixLayer(self,colorOutSocket,factorOutSocket = None,mixType = "MIX",mixFactor = 0.5):
+	def addMixLayer(self,colorOutSocket,factorOutSocket = None,mixType = "MIX",mixFactor = 0.5,swapInputs = False):
 		
 		
 		if self.currentOutSocket == None:#For the first layer added, just store the out socket since it's not being mixed with anything
@@ -632,8 +632,12 @@ class dynamicColorMixLayerNodeGroup():
 			mixNode.blend_type = mixType
 			mixNode.inputs["Fac"].default_value = mixFactor
 			
-			self.node_tree.links.new(self.currentOutSocket,mixNode.inputs["Color1"])
-			self.node_tree.links.new(colorOutSocket,mixNode.inputs["Color2"])
+			if swapInputs:
+				self.node_tree.links.new(self.currentOutSocket,mixNode.inputs["Color2"])
+				self.node_tree.links.new(colorOutSocket,mixNode.inputs["Color1"])
+			else:
+				self.node_tree.links.new(self.currentOutSocket,mixNode.inputs["Color1"])
+				self.node_tree.links.new(colorOutSocket,mixNode.inputs["Color2"])
 			if factorOutSocket != None:
 				self.node_tree.links.new(factorOutSocket,mixNode.inputs["Fac"])
 			self.currentOutSocket = mixNode.outputs["Color"]
@@ -960,6 +964,9 @@ def newNRRTNode (nodeTree,textureType,matInfo):
 			matInfo["aoNodeLayerGroup"].addMixLayer(nodeGroupNode.outputs["BlueChannel"])
 	elif textureType == "NormalRoughnessAlphaMap":
 		matInfo["alphaSocket"] = nodeGroupNode.outputs["BlueChannel"]
+	elif textureType == "NormalRoughnessHeightMap":
+		pass
+		#TODO Add height map support
 	else:
 		matInfo["translucentSocket"] = nodeGroupNode.outputs["BlueChannel"]
 		
@@ -975,6 +982,8 @@ def newALPNode (nodeTree,textureType,matInfo):
 	nodeTree.links.new(imageNode.outputs["Color"],bwNode.inputs["Color"])
 	matInfo["alphaSocket"] = bwNode.outputs["Val"]
 	return imageNode
+
+EMISSION_MULTIPLIER = 0.1#Multiply strength by this value,way too bright by default
 def newEMINode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]
 	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
@@ -999,14 +1008,25 @@ def newEMINode (nodeTree,textureType,matInfo):
 		bwNode = nodeTree.nodes.new('ShaderNodeRGBToBW')
 		bwNode.location = currentPos
 		bwNode.name = "BWEMINode"
+		
+		currentPos[0]+=300
+		
+		reduceEMIMultNode = nodeTree.nodes.new('ShaderNodeMath')
+		reduceEMIMultNode.location = currentPos
+		reduceEMIMultNode.operation = "MULTIPLY"
+		nodeTree.links.new(emiIntensityNode.outputs["Value"],reduceEMIMultNode.inputs[0])
+		reduceEMIMultNode.inputs[1].default_value = EMISSION_MULTIPLIER
+		
 		currentPos[0]+=300
 		nodeTree.links.new(imageNode.outputs["Color"],bwNode.inputs[0])
+		
+		
 		
 		baseEMIMultNode = nodeTree.nodes.new('ShaderNodeMath')
 		baseEMIMultNode.location = currentPos
 		baseEMIMultNode.operation = "MULTIPLY"
 		nodeTree.links.new(bwNode.outputs[0],baseEMIMultNode.inputs[0])
-		nodeTree.links.new(emiIntensityNode.outputs["Value"],baseEMIMultNode.inputs[1])
+		nodeTree.links.new(reduceEMIMultNode.outputs["Value"],baseEMIMultNode.inputs[1])
 		
 		matInfo["emissionStrengthNodeLayerGroup"].addMixLayer(baseEMIMultNode.outputs["Value"],mixType = "MULTIPLY",mixFactor = 1.0)
 	if "S_col_R" in matInfo["mPropDict"] and "S_col_G" in matInfo["mPropDict"] and "S_col_R_Emissive_intensity" in matInfo["mPropDict"] and "S_col_G_Emissive_intensity" in matInfo["mPropDict"]:
@@ -1164,68 +1184,74 @@ def newCMASKNode (nodeTree,textureType,matInfo):
 		elif "CustomizeColor"  in prop.propName:
 			if prop.propValue == [0.501960813999176, 0.501960813999176, 0.501960813999176, 1.0]:
 				prop.propValue = [1.0,1.0,1.0,1.0]
-	if "CustomizeColor_0" not in nodeTree.nodes:
-		color0Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_0"], matInfo["currentPropPos"], nodeTree)
-		color1Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_1"], matInfo["currentPropPos"], nodeTree)
-		color2Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_2"], matInfo["currentPropPos"], nodeTree)
-		color3Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_3"], matInfo["currentPropPos"], nodeTree)
-		
-		rough0Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_0"], matInfo["currentPropPos"], nodeTree)
-		rough1Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_1"], matInfo["currentPropPos"], nodeTree)
-		rough2Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_2"], matInfo["currentPropPos"], nodeTree)
-		rough3Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_3"], matInfo["currentPropPos"], nodeTree)
-		
-		metal0Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_0"], matInfo["currentPropPos"], nodeTree)
-		metal1Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_1"], matInfo["currentPropPos"], nodeTree)
-		metal2Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_2"], matInfo["currentPropPos"], nodeTree)
-		metal3Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_3"], matInfo["currentPropPos"], nodeTree)
-		
-		
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color0Node.outputs["Color"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color1Node.outputs["Color"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color2Node.outputs["Color"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color3Node.outputs["Color"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
-		
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough0Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough1Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough2Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough3Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
-		
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal0Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal1Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal2Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal3Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
-	else:#Is cmask2
-		color4Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_4"], matInfo["currentPropPos"], nodeTree)
-		color5Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_5"], matInfo["currentPropPos"], nodeTree)
-		color6Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_6"], matInfo["currentPropPos"], nodeTree)
-		color7Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_7"], matInfo["currentPropPos"], nodeTree)
+	if "CustomizeColor_0" in matInfo["mPropDict"]:
+		if "CustomizeColor_0" not in nodeTree.nodes:
+			color0Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_0"], matInfo["currentPropPos"], nodeTree)
+			color1Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_1"], matInfo["currentPropPos"], nodeTree)
+			color2Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_2"], matInfo["currentPropPos"], nodeTree)
+			color3Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_3"], matInfo["currentPropPos"], nodeTree)
+			
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color0Node.outputs["Color"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color1Node.outputs["Color"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color2Node.outputs["Color"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color3Node.outputs["Color"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
+		else:#Is cmask2
+			color4Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_4"], matInfo["currentPropPos"], nodeTree)
+			color5Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_5"], matInfo["currentPropPos"], nodeTree)
+			color6Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_6"], matInfo["currentPropPos"], nodeTree)
+			color7Node = addPropertyNode(matInfo["mPropDict"]["CustomizeColor_7"], matInfo["currentPropPos"], nodeTree)
+			
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color4Node.outputs["Color"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color5Node.outputs["Color"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color6Node.outputs["Color"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
+			matInfo["albedoNodeLayerGroup"].addMixLayer(color7Node.outputs["Color"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
 	
-		rough4Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_4"], matInfo["currentPropPos"], nodeTree)
-		rough5Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_5"], matInfo["currentPropPos"], nodeTree)
-		rough6Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_6"], matInfo["currentPropPos"], nodeTree)
-		rough7Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_7"], matInfo["currentPropPos"], nodeTree)
+	if "CustomizeMetal_0" in matInfo["mPropDict"]:
+		if "CustomizeMetal_0" not in nodeTree.nodes:
+			rough0Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_0"], matInfo["currentPropPos"], nodeTree)
+			rough1Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_1"], matInfo["currentPropPos"], nodeTree)
+			rough2Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_2"], matInfo["currentPropPos"], nodeTree)
+			rough3Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_3"], matInfo["currentPropPos"], nodeTree)
+			
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough0Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough1Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough2Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough3Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
+		else:
+			rough4Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_4"], matInfo["currentPropPos"], nodeTree)
+			rough5Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_5"], matInfo["currentPropPos"], nodeTree)
+			rough6Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_6"], matInfo["currentPropPos"], nodeTree)
+			rough7Node = addPropertyNode(matInfo["mPropDict"]["CustomizeRoughness_7"], matInfo["currentPropPos"], nodeTree)
+			
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough4Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough5Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough6Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
+			matInfo["roughnessNodeLayerGroup"].addMixLayer(rough7Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
 		
-		metal4Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_4"], matInfo["currentPropPos"], nodeTree)
-		metal5Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_5"], matInfo["currentPropPos"], nodeTree)
-		metal6Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_6"], matInfo["currentPropPos"], nodeTree)
-		metal7Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_7"], matInfo["currentPropPos"], nodeTree)
+	if "CustomizeMetal_0" in matInfo["mPropDict"]:
+		if "CustomizeMetal_0" not in nodeTree.nodes:
+			
+			metal0Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_0"], matInfo["currentPropPos"], nodeTree)
+			metal1Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_1"], matInfo["currentPropPos"], nodeTree)
+			metal2Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_2"], matInfo["currentPropPos"], nodeTree)
+			metal3Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_3"], matInfo["currentPropPos"], nodeTree)
+			
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal0Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal1Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal2Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal3Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
+		else:
+			metal4Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_4"], matInfo["currentPropPos"], nodeTree)
+			metal5Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_5"], matInfo["currentPropPos"], nodeTree)
+			metal6Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_6"], matInfo["currentPropPos"], nodeTree)
+			metal7Node = addPropertyNode(matInfo["mPropDict"]["CustomizeMetal_7"], matInfo["currentPropPos"], nodeTree)
+			
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal4Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal5Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal6Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
+			matInfo["metallicNodeLayerGroup"].addMixLayer(metal7Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
+				
 		
-		
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color4Node.outputs["Color"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color5Node.outputs["Color"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color6Node.outputs["Color"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
-		matInfo["albedoNodeLayerGroup"].addMixLayer(color7Node.outputs["Color"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
-	
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough4Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough5Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough6Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
-		matInfo["roughnessNodeLayerGroup"].addMixLayer(rough7Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
-		
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal4Node.outputs["Value"],CMaskSeparateNode.outputs["R"],mixType = "MULTIPLY")
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal5Node.outputs["Value"],CMaskSeparateNode.outputs["G"],mixType = "MULTIPLY")
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal6Node.outputs["Value"],CMaskSeparateNode.outputs["B"],mixType = "MULTIPLY")
-		matInfo["metallicNodeLayerGroup"].addMixLayer(metal7Node.outputs["Value"],imageNode.outputs["Alpha"],mixType = "MULTIPLY")
 	return imageNode
 def newATOSNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]
@@ -1237,7 +1263,8 @@ def newATOSNode (nodeTree,textureType,matInfo):
 	useLegacyHairUV2Occlusion = (matInfo["gameName"] in legacyUV2HairOcclusionList and "hair" in matInfo["mmtrName"].lower())
 	
 	#RE2 puts other masks in the alpha channel sometimes
-	isMTOS = imageNode.image != None and "_mtos" in imageNode.image.filepath.lower() or "BaseAlphaMap" in matInfo["textureNodeDict"]
+	#Check for nullblack to avoid issues with SF6
+	isMTOS = imageNode.image != None and "_mtos" in imageNode.image.filepath.lower() or "BaseAlphaMap" in matInfo["textureNodeDict"] or "nullblack" in imageNode.image.filepath.lower()
 	isMaskAlpha = matInfo["isMaskAlphaMMTR"]
 	
 	#Have to do this hack since there's no good way of telling whether the alpha channel is actually alpha with this game

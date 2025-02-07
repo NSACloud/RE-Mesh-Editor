@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 38),
+	"version": (0, 39),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -782,21 +782,22 @@ class ExportREMesh(Operator, ExportHelper):
 	def invoke(self, context, event):
 		if not bpy.context.scene.get("REMeshDefaultExportSettingsLoaded"):
 			setMeshExportDefaults(self)
-		if self.targetCollection == "":
-			prevCollection = context.scene.get("REMeshLastImportedCollection","")
-			if prevCollection in bpy.data.collections:
-				self.targetCollection = prevCollection
-			if ".mesh" in prevCollection:#Remove blender suffix after .mesh if it exists
-				self.filepath = prevCollection.split(".mesh")[0]+".mesh" + self.filename_ext
 		if context.scene.get("REMeshLastImportedMeshVersion",0) in meshFileVersionToGameNameDict:
 			if context.scene["REMeshLastImportedMeshVersion"] == 231011879:
 				#DD2 version update fix
 				context.scene["REMeshLastImportedMeshVersion"] = 240423143
 			elif context.scene["REMeshLastImportedMeshVersion"] == 2102020001:
 				#Remap RE Verse to RE8
-				context.scene["REMeshLastImportedMeshVersion"] = 2101050001	
+				context.scene["REMeshLastImportedMeshVersion"] = 2101050001
+		self.filename_ext = "."+str(context.scene.get("REMeshLastImportedMeshVersion",1808282334))
+		if self.targetCollection == "":
+			prevCollection = context.scene.get("REMeshLastImportedCollection","")
+			if prevCollection in bpy.data.collections:
+				self.targetCollection = prevCollection
+			if ".mesh" in prevCollection:#Remove blender suffix after .mesh if it exists
+				self.filepath = prevCollection.split(".mesh")[0]+".mesh" + self.filename_ext
+				
 			
-			self.filename_ext = "."+str(context.scene["REMeshLastImportedMeshVersion"])
 			
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
@@ -804,7 +805,7 @@ class ExportREMesh(Operator, ExportHelper):
 		layout = self.layout
 		layout.label(text = "Mesh Version:")
 		layout.prop(self, "filename_ext")
-		layout.label(text = "Target Collection:")
+		layout.label(text = "Mesh Collection:")
 		layout.prop_search(self, "targetCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_01")
 		layout.prop(self, "selectedOnly")
 		layout.label(text = "Advanced Options")

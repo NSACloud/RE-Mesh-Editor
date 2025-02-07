@@ -433,7 +433,7 @@ class MDFPropPropertyGroup(bpy.types.PropertyGroup):
         subtype='COLOR',
         size=4,
         min=0.0,
-        max=1.0,
+        soft_max=1.0,
 		update = update_materialNodes
     )
     padding: bpy.props.IntProperty(#Not exposed in editor, used for SF6's weird mmtrs padding
@@ -616,7 +616,46 @@ class MDFMaterialPropertyGroup(bpy.types.PropertyGroup):
 				
 			   ]
 		)
-	
+	#TODO determine if updating shader type enum is going to break existing blend files
+	"""
+			("0", "Standard", ""),
+			("1", "Decal", ""),
+			("2", "SeparateAlphaDecal", ""),
+			("3", "DecalWithMetallic", ""),
+			("4", "DecalNRMR", ""),
+			("5", "Transparent", ""),
+			("6", "Distortion", ""),
+			("7", "PrimitiveMesh", ""),
+			("8", "PrimitiveSolidMesh", ""),
+			("9", "Water", ""),
+			("10", "SpeedTree", ""),
+			("11", "GUI", ""),
+			("12", "GUIMesh", ""),
+			("13", "GUIMeshTransparent", ""),
+			("14", "ExpensiveTransparent", ""),
+			("15", "Forward", ""),
+			("16", "RenderTarget", ""),
+			("17", "PostProcess", ""),
+			("18", "PrimitiveMaterial", ""),
+			("19", "PrimitiveSolidMaterial", ""),
+			("20", "PrimitiveSolidMaterialExpensive", ""),
+			("21", "SpineMaterial", ""),
+			("22", "VolumetricFog", ""),
+			("23", "ShellFurMaterial", ""),
+			("24", "VolumeDecal", ""),
+			("25", "AlembicMesh", ""),
+			("26", "AlembicMeshForward", ""),
+			("27", "AlembicMeshTransparent", ""),
+			("28", "MarchingCubes", ""),
+			("29", "MarchingCubesForward", ""),
+			("30", "MarchingCubesTransparent", ""),
+			("31", "Strands", ""),
+			("32", "NFXTransparent", ""),
+			("33", "Cloudscape2", ""),
+			("34", "CloudscapeReserved", ""),
+			("35", "VolumeSolidMaterial", ""),		
+			("36", "Max", ""),
+		"""
 	linkedMaterial: bpy.props.PointerProperty(
         name="Linked Material",
 		description="The Blender material that corresponds to this MDF material. Any changes made to supported MDF properties will reflect on the Blender material.\nIf a linked material is not set, it will be set automatically once an MDF property is changed",

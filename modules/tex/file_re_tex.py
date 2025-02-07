@@ -404,7 +404,7 @@ class MipData():
 		
 		mipData = None#BytesIO for uncompressed texture data
 		
-		if texVersion == VERSION_MHWILDS:
+		if texVersion >= VERSION_MHWILDS:
 			file.seek(currentImageDataHeaderOffset)
 			self.imageSize = read_uint(file)
 			self.imageOffset = read_uint(file)
