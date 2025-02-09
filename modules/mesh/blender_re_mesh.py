@@ -944,12 +944,13 @@ def exportREMeshFile(filePath,options):
 	subMeshCount = 0
 	
 	targetCollection = bpy.data.collections.get(options["targetCollection"])
-	
+	bpy.context.scene["REMeshLastExportedMeshVersion"] = meshVersion	
 	if targetCollection == None:
 		print("No target collection set. Using scene collection.")
-		targetCollection = bpy.context.scene.collection
+		targetCollection = bpy.context.scene.collection		
 	else:
 		print(f"Target collection: {targetCollection.name}")
+		bpy.context.scene["REMeshLastExportedCollection"] = targetCollection.name
 	#print(targetCollection)
 	
 	meshLODCollectionList = []

@@ -3,6 +3,9 @@
 # at the repository linked above.
 
 import ctypes
+
+import platform
+
 from ctypes import c_bool, c_uint8, c_uint32, c_uint64, POINTER, byref
 from pathlib import Path
 from typing import Union
@@ -19,6 +22,17 @@ class GDeflateCompressionLevel(IntEnum):
 class GDeflateError(Exception):
     """Custom exception for GDeflate-related errors"""
     pass
+
+def is_windows():
+    return platform.system() == 'Windows'
+
+
+def is_linux():
+    return platform.system() == 'Linux'
+
+
+def is_mac():
+    return platform.system() == 'Darwin'
 
 class GDeflate:
     """
@@ -48,7 +62,15 @@ class GDeflate:
         if dll_path is None:
             # Try to find the DLL next to the .py file first
             module_dir = Path(__file__).parent.absolute()
-            dll_name = "GDeflateWrapper-x86_64.dll"
+			
+            if is_windows():
+                dll_name = "GDeflateWrapper-x86_64.dll"
+            elif is_linux():
+                dll_name = "libGDeflateWrapper.so"
+			#elif is_mac():
+				#Maybe TODO
+            else:
+                raise RuntimeError(f'This OS ({platform.system()}) is unsupported.')
             possible_paths = [
                 module_dir / dll_name,           # Next to .py file
                 Path.cwd() / dll_name,           # Current working directory

@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 39),
+	"version": (0, 40),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -189,11 +189,12 @@ class RemoveItemOperator(bpy.types.Operator):
 	bl_description = "Remove chunk path from the list"
 	bl_label = "Remove Selected Path"
 
-	index: bpy.props.IntProperty()
-
 	def execute(self, context):
-        # Remove the item at the specified index from the list
-		context.preferences.addons[__name__].preferences.chunkPathList_items.remove(self.index)
+		
+		chunkList = bpy.context.preferences.addons[__name__].preferences.chunkPathList_items
+		index = bpy.context.preferences.addons[__name__].preferences.chunkPathList_index
+		chunkList.remove(index)
+		bpy.context.preferences.addons[__name__].preferences.chunkPathList_index = min(max(0, index - 1), len(chunkList) - 1)
 		return {'FINISHED'}
 
 # Operator to reorder items in the list
@@ -207,14 +208,19 @@ class ReorderItemOperator(bpy.types.Operator):
 		default='UP'
 	)
 
-	index: bpy.props.IntProperty()
-
+	def move_index(self):
+		index = bpy.context.preferences.addons[__name__].preferences.chunkPathList_index
+		list_length = len(bpy.context.preferences.addons[__name__].preferences.chunkPathList_items)
+		new_index = index + (-1 if self.direction == 'UP' else 1)
+		bpy.context.preferences.addons[__name__].preferences.chunkPathList_index = max(0,min(new_index,list_length))
+		
 	def execute(self, context):
-		# Reorder the item in the list
-		if self.direction == 'UP':
-			context.preferences.addons[__name__].preferences.chunkPathList_items.move(self.index, self.index - 1)
-		elif self.direction == 'DOWN':
-			context.preferences.addons[__name__].preferences.chunkPathList_items.move(self.index, self.index + 1)
+		chunkList = bpy.context.preferences.addons[__name__].preferences.chunkPathList_items
+		index = bpy.context.preferences.addons[__name__].preferences.chunkPathList_index
+		
+		neighbor = index + (-1 if self.direction == 'UP' else 1)
+		chunkList.move(neighbor, index)
+		self.move_index()
 		return {'FINISHED'}
 
 class MESH_UL_ChunkPathList(bpy.types.UIList):
@@ -655,7 +661,10 @@ class ImportREMesh(Operator, ImportHelper):
 		bpy.context.scene["REMeshDefaultImportSettingsLoaded"] = 1
 		
 		if bpy.context.preferences.addons[__name__].preferences.showConsole:
-			 bpy.ops.wm.console_toggle()
+			 try: 
+				 bpy.ops.wm.console_toggle()
+			 except:
+				 pass
 		
 		multiFileImport = len(self.files) > 1
 		hasImportErrors = False
@@ -686,7 +695,11 @@ class ImportREMesh(Operator, ImportHelper):
 			
 		if not hasImportErrors:
 			if bpy.context.preferences.addons[__name__].preferences.showConsole:
-				bpy.ops.wm.console_toggle()
+				try: 
+					bpy.ops.wm.console_toggle()
+				except:
+					 pass
+				
 				
 			if not multiFileImport:
 				self.report({"INFO"},"Imported RE Mesh file.")
@@ -709,7 +722,20 @@ class ImportREMesh(Operator, ImportHelper):
 				return self.execute(context)
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
-
+def update_targetMeshCollection(self,context):
+	temp = bpy.data.screens.get("temp")
+	browserSpace = None
+	if temp != None:
+	    for area in temp.areas:
+	        for space in area.spaces:
+	            if type(space.params).__name__ == "FileSelectParams":
+	                browserSpace = space
+	                break
+	                break
+	if browserSpace != None:
+		#print(browserSpace.params.filename)
+		if ".mesh" in self.targetCollection:
+			browserSpace.params.filename = self.targetCollection.split(".mesh")[0]+".mesh" + self.filename_ext
 class ExportREMesh(Operator, ExportHelper):
 	'''Export RE Engine Mesh File'''
 	bl_idname = "re_mesh.exportfile"
@@ -740,6 +766,7 @@ class ExportREMesh(Operator, ExportHelper):
 	targetCollection: bpy.props.StringProperty(
 		name="",
 		description = "Set the collection containing the meshes to be exported.\nNote: Mesh collections are red and end with .mesh",
+		update = update_targetMeshCollection
 		)
 	selectedOnly : BoolProperty(
 	   name = "Selected Objects Only",
@@ -782,6 +809,7 @@ class ExportREMesh(Operator, ExportHelper):
 	def invoke(self, context, event):
 		if not bpy.context.scene.get("REMeshDefaultExportSettingsLoaded"):
 			setMeshExportDefaults(self)
+			
 		if context.scene.get("REMeshLastImportedMeshVersion",0) in meshFileVersionToGameNameDict:
 			if context.scene["REMeshLastImportedMeshVersion"] == 231011879:
 				#DD2 version update fix
@@ -789,15 +817,27 @@ class ExportREMesh(Operator, ExportHelper):
 			elif context.scene["REMeshLastImportedMeshVersion"] == 2102020001:
 				#Remap RE Verse to RE8
 				context.scene["REMeshLastImportedMeshVersion"] = 2101050001
-		self.filename_ext = "."+str(context.scene.get("REMeshLastImportedMeshVersion",1808282334))
+
 		if self.targetCollection == "":
-			prevCollection = context.scene.get("REMeshLastImportedCollection","")
-			if prevCollection in bpy.data.collections:
-				self.targetCollection = prevCollection
-			if ".mesh" in prevCollection:#Remove blender suffix after .mesh if it exists
-				self.filepath = prevCollection.split(".mesh")[0]+".mesh" + self.filename_ext
-				
 			
+			
+			#Get last exported collection, if there isn't one, get last imported
+			exportCollection = context.scene.get("REMeshLastExportedCollection","")
+			if exportCollection in bpy.data.collections:
+				self.targetCollection = exportCollection
+				if ".mesh" in exportCollection:#Remove blender suffix after .mesh if it exists
+					if context.scene.get("REMeshLastExportedMeshVersion") in meshFileVersionToGameNameDict:
+						self.filename_ext = "."+str(context.scene.get("REMeshLastExportedMeshVersion",1808282334))
+					self.filepath = exportCollection.split(".mesh")[0]+".mesh" + self.filename_ext
+			else:
+				prevCollection = context.scene.get("REMeshLastImportedCollection","")
+				if prevCollection in bpy.data.collections:
+					self.targetCollection = prevCollection
+				if ".mesh" in prevCollection:#Remove blender suffix after .mesh if it exists
+					if context.scene.get("REMeshLastExportedMeshVersion") in meshFileVersionToGameNameDict:
+						self.filename_ext = "."+str(context.scene.get("REMeshLastImportedMeshVersion",1808282334))
+					self.filepath = prevCollection.split(".mesh")[0]+".mesh" + self.filename_ext
+
 			
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
@@ -807,6 +847,22 @@ class ExportREMesh(Operator, ExportHelper):
 		layout.prop(self, "filename_ext")
 		layout.label(text = "Mesh Collection:")
 		layout.prop_search(self, "targetCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_01")
+		
+		if self.targetCollection in bpy.data.collections:
+			collection = bpy.data.collections[self.targetCollection]
+			if not collection.get("~TYPE") == "RE_MESH_COLLECTION" and not collection.name.endswith(".mesh"):
+				row = layout.row()
+				row.alert=True
+				row.label(icon = "ERROR",text="Collection is not a mesh collection.")
+		elif self.targetCollection == "":
+			row = layout.row()
+			row.alert=True
+			row.label(icon = "ERROR",text="Collection is not a mesh collection.")
+			
+		else:
+			row = layout.row()
+			row.label(icon="ERROR",text="Chosen collection doesn't exist.")
+			row.alert=True
 		layout.prop(self, "selectedOnly")
 		layout.label(text = "Advanced Options")
 		layout.prop(self, "exportAllLODs")
@@ -840,8 +896,10 @@ class ExportREMesh(Operator, ExportHelper):
 		bpy.context.scene["REMeshDefaultExportSettingsLoaded"] = 1
 		
 		if bpy.context.preferences.addons[__name__].preferences.showConsole:
-			 bpy.ops.wm.console_toggle()
-		
+			try: 
+				bpy.ops.wm.console_toggle()
+			except:
+				pass
 		success = exportREMeshFile(self.filepath,options)
 		if success:
 			self.report({"INFO"},"Exported RE Mesh successfully.")
@@ -867,7 +925,10 @@ class ExportREMesh(Operator, ExportHelper):
 			setModDirectoryFromFilePath(self.filepath)
 		
 		if bpy.context.preferences.addons[__name__].preferences.showConsole:
-			 bpy.ops.wm.console_toggle()
+			try:
+				bpy.ops.wm.console_toggle()
+			except:
+				 pass
 		return {"FINISHED"}
 	
 class ImportREMDF(bpy.types.Operator, ImportHelper):
@@ -921,7 +982,22 @@ class ImportREMDF(bpy.types.Operator, ImportHelper):
 			return self.execute(context)
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
-supportedMDFVersions = set([23,19,21,32,31,40,45])		
+supportedMDFVersions = set([23,19,21,32,31,40,45])	
+
+def update_targetMDFCollection(self,context):
+	temp = bpy.data.screens.get("temp")
+	browserSpace = None
+	if temp != None:
+	    for area in temp.areas:
+	        for space in area.spaces:
+	            if type(space.params).__name__ == "FileSelectParams":
+	                browserSpace = space
+	                break
+	                break
+	if browserSpace != None:
+		#print(browserSpace.params.filename)
+		if ".mdf2" in self.targetCollection:
+			browserSpace.params.filename = self.targetCollection.split(".mdf2")[0]+".mdf2" + self.filename_ext	
 class ExportREMDF(bpy.types.Operator, ExportHelper):
 	'''Export RE Engine MDF File'''
 	bl_idname = "re_mdf.exportfile"
@@ -945,7 +1021,8 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 	targetCollection : StringProperty(
 	   name = "",
 	   description = "Set the MDF collection to be exported\nNote: MDF collections are blue and end with .mdf2",
-	   default = "")
+	   default = "",
+	   update = update_targetMDFCollection)
 	filter_glob: StringProperty(default="*.mdf2*", options={'HIDDEN'})
 	def invoke(self, context, event):
 		if bpy.data.collections.get(self.targetCollection,None) == None:
@@ -963,6 +1040,21 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 		layout.prop(self,"filename_ext")
 		layout.label(text = "MDF Collection:")
 		layout.prop_search(self, "targetCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_05")
+		if self.targetCollection in bpy.data.collections:
+			collection = bpy.data.collections[self.targetCollection]
+			if not collection.get("~TYPE") == "RE_MDF_COLLECTION" and not collection.name.endswith(".mdf2"):
+				row = layout.row()
+				row.alert=True
+				row.label(icon = "ERROR",text="Collection is not a MDF collection.")
+		elif self.targetCollection == "":
+			row = layout.row()
+			row.alert=True
+			row.label(icon = "ERROR",text="Collection is not a MDF collection.")
+			
+		else:
+			row = layout.row()
+			row.label(icon="ERROR",text="Chosen collection doesn't exist.")
+			row.alert=True
 	def execute(self, context):
 		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
 		print(f"\n{textColors.BOLD}RE MDF Editor V{editorVersion}{textColors.ENDC}")

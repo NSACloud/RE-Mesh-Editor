@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.39 (2/7/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.40 (2/9/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -77,6 +77,20 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+**NOTE: For Monster Hunter Wilds, be sure to also extract the sub_000 .pak file and merge it with the extracted re_chunk_000.pak. Textures will be missing otherwise.
+
+![image](https://github.com/user-attachments/assets/2f8f949e-fabd-4c12-9081-65b962768c18)
+
+### V0.40 - 2/9/2025
+* Added Linux support for converting MH Wilds textures.
+* When selecting a mesh or MDF collection to export, a warning will appear if the collection is not a mesh or MDF collection.
+* The file name will automatically change when the mesh or MDF collection is changed when exporting.
+* Fixed issue where the selected game version would revert upon every export. (Again)
+* Fixed error related to the console window on Linux.
+* Fixed issue where metallic on ALBM textures didn't work.
+* Fixed issue where the buttons for removing and reordering the chunk path list didn't work correctly.
+* Reverted alpha clipping changes from previous update as it caused issues.
 
 ### V0.39 - 2/7/2025
 * Fixed issue where the selected game version would revert to the last imported version upon every export.

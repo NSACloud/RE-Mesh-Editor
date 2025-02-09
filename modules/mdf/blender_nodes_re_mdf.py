@@ -799,7 +799,6 @@ def newALBDNode (nodeTree,textureType,matInfo):
 def newALBMNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]
 	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
-	
 	matInfo["albedoNodeLayerGroup"].addMixLayer(imageNode.outputs["Color"])
 	matInfo["metallicNodeLayerGroup"].addMixLayer(imageNode.outputs["Alpha"])
 	

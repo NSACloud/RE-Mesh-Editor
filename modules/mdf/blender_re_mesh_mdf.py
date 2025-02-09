@@ -61,7 +61,7 @@ albedoTypeSet = set([
 	"BackMap",
 	"BaseMap",
 	"BackMap_1",
-	"BaseAlphaMap"
+	"BaseAlphaMap",
 	"BaseMetalMap",
 	"BaseMetalMapArray",
 	"BaseShiftMap",
@@ -1276,8 +1276,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					
 					
 					clippingThresholdOutSocket = None
-					#Disabled alpha clipping for now since it causes issues with certain games
-					"""
+
 					if "Nuki" in matInfo["mPropDict"]:#I wish capcom didn't use 1000 different names for the same thing
 						#clippingThresholdNode = addPropertyNode(matInfo["mPropDict"]["Nuki"], matInfo["currentPropPos"], nodeTree)
 						nukiNode = addPropertyNode(matInfo["mPropDict"]["Nuki"], matInfo["currentPropPos"], nodeTree)
@@ -1314,12 +1313,9 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						dissolveNode = addPropertyNode(matInfo["mPropDict"]["DissolveThreshold"], matInfo["currentPropPos"], nodeTree)
 						clippingThresholdOutSocket = dissolveNode.outputs["Value"]
 					
-					"""
 					if not matInfo["isAlphaBlend"] and "reflectivetransparent" not in matInfo["mmtrName"].lower() and "alphadissolve" not in matInfo["mmtrName"].lower():
 						
-						links.new(matInfo["alphaSocket"],nodeBSDF.inputs["Alpha"])#Temporary
-						#Alpha clipping is disabled for now
-						"""
+						
 						if "hair" not in matInfo["mmtrName"].lower() and "BaseAlphaMap" not in matInfo["textureNodeDict"]:
 							alphaClippingNode = nodes.new("ShaderNodeMath")
 							alphaClippingNode.location = nodeBSDF.location + Vector((-300,-400))
@@ -1337,7 +1333,6 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						else:#Hack to bypass clipping because alpha clipping with hair is being a pain
 							if matInfo["alphaSocket"] != None: 
 								links.new(matInfo["alphaSocket"],nodeBSDF.inputs["Alpha"])
-						"""
 					else:
 						if bpy.app.version < (4,2,0):
 							matInfo["blenderMaterial"].blend_method = "BLEND"
