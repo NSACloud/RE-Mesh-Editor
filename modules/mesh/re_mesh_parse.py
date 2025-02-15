@@ -517,6 +517,7 @@ typedef struct
 
 class ParsedREMesh:
 	def __init__(self):
+		self.isMPLY = False
 		self.skeleton = None
 		self.mainMeshLODList = []
 		#self.shadowMeshLODList = []#Commented out because shadow meshes can only reuse lods from main mesh
@@ -538,6 +539,8 @@ class ParsedREMesh:
 		self.bufferHasSecondaryWeight = False#DD2 shapekeys
 	
 	def ParseREMesh(self,reMesh,importOptions = {"importAllLOD":True,"importShadowMesh":True,"importOcclusionMesh":True,"importBlendShapes":True}):
+		
+		self.isMPLY = reMesh.isMPLY
 		usedVertexOffsetDictList = []
 		lodOffsetDict = dict()#Used for linking shadow mesh lods to main mesh lods
 		self.nameList = reMesh.rawNameList
@@ -611,14 +614,14 @@ class ParsedREMesh:
 			#TODO
 			#tags.add("shadowLOD")
 			#shadowVertexDict = ReadVertexElementBuffers(reMesh.meshBufferHeader.vertexElementList, reMesh.meshBufferHeader.vertexBuffer,tags)
-		#Parse Blend Shapes
-		vertexCount = len(vertexDictList[-1]["Position"])
-		lastElement = reMesh.meshBufferHeader.vertexElementList[-1]
-		blendShapeStartPos = lastElement.posStartOffset + vertexCount * lastElement.stride
-		blendShapeBuffer =  reMesh.meshBufferHeader.vertexBuffer[blendShapeStartPos:]
-		if reMesh.blendShapeHeader != None:
-			
-			print(f"blendShape buffer start pos {str(reMesh.meshBufferHeader.vertexBufferOffset+blendShapeStartPos)}")
+			#Parse Blend Shapes
+			vertexCount = len(vertexDictList[-1]["Position"])
+			lastElement = reMesh.meshBufferHeader.vertexElementList[-1]
+			blendShapeStartPos = lastElement.posStartOffset + vertexCount * lastElement.stride
+			blendShapeBuffer =  reMesh.meshBufferHeader.vertexBuffer[blendShapeStartPos:]
+			if reMesh.blendShapeHeader != None:
+				
+				print(f"blendShape buffer start pos {str(reMesh.meshBufferHeader.vertexBufferOffset+blendShapeStartPos)}")
 			
 				
 				
@@ -643,3 +646,28 @@ class ParsedREMesh:
 			#self.shadowMeshLODList = parseLODStructure(reMesh,reMesh.shadowHeader.lodGroupList,vertexDict,usedVertexOffsetDict)
 		
 		#TODO Add occlusion mesh
+		
+		if self.isMPLY:
+			print("Parsing MPLY.")
+			self.mainMeshLODList = []
+			self.materialNameList = reMesh.rawNameList
+			for lodIndex in range(0,reMesh.meshletLayout.gpuMeshletHeader.lodNum):
+				#print(lodIndex)
+				lod = LODLevel()
+				lod.lodDistance = reMesh.meshletLayout.gpuMeshletHeader.lodFactor
+				group = VisconGroup()
+				group.visconGroupNum = 0
+				
+				for submeshIndex, clusterHeader in enumerate(reMesh.meshletBVH.clusterHeaderLODList[lodIndex]):
+					submesh = SubMesh()
+					submesh.materialIndex = clusterHeader.bitfield.fields.materialId
+					submesh.subMeshIndex = submeshIndex
+					#print(f"{submeshIndex} - {submesh.materialIndex}")
+					
+					#TEMP
+					submesh.vertexPosList = [(0.0,0.0,0.0),(0.0,1.0,0.0),(0.0,0.0,1.0)]
+					submesh.faceList = [(0,1,2)]
+					group.subMeshList.append(submesh)
+				lod.visconGroupList.append(group)
+				self.mainMeshLODList.append(lod)
+			pass#TODO Parse MPLY

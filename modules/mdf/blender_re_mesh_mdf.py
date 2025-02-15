@@ -2,6 +2,8 @@
 import os
 import bpy
 import re
+import traceback
+
 
 from mathutils import Vector
 from ..blender_utils import arrangeNodeTree,showErrorMessageBox
@@ -103,7 +105,9 @@ normalTypeSet = set([
 	"NormalRoughnessOcclusionMap",
 	"NormalRoughnessTranslucencyMap",
 	"NormalRoughnessAlphaMap",
+	"NormalRoughnessHeightMap",
 	"NRRTMap",
+	"Tex_Normal",
 	])
 
 alphaTypeSet = set([
@@ -169,6 +173,13 @@ OCTDTypes = set([
 MiscMapTypes = set([
 	"SkinMap",
 	"HairOverMap",
+	#MHWILDS Minimap
+	"Tex_Dirty",
+	"tex_noise",
+	"Tex_Effect",
+	"Tex_Normal",
+	"tex_lineMusk",
+	"Tex2D_0"
 	
 	#"Detail_ALBD_R",
 	#"Detail_ALBD_G",
@@ -229,7 +240,9 @@ def addChunkPath(chunkPath,gameName):
 	print(f"Saved chunk path for {gameName}: {chunkPath}")
 	 
 
-def findMDFPathFromMeshPath(meshPath):
+def findMDFPathFromMeshPath(meshPath,gameName = None):
+	#TODO fix this to be less of a mess
+	#Should use regex to do this
 	split = meshPath.split(".mesh")
 	fileRoot = split[0]
 	meshVersion = split[1]
@@ -251,6 +264,7 @@ def findMDFPathFromMeshPath(meshPath):
 		".240423143":".40",#DD2NEW
 		".240424828":".40",#DR
 		".240820143":".45",#MHWILDS
+		".241111606":".45",#MHWILDS
 		
 		
 		}
@@ -291,12 +305,44 @@ def findMDFPathFromMeshPath(meshPath):
 			rootPath = split[0]
 			fileName = split[1].split(".mesh")[0].lower().replace("sk_","m_")
 			mdfPath = os.path.join(rootPath,"Material",f"{fileName}.mdf2{mdfVersion}")
-			
 		
-		
-		if mdfPath == None or not os.path.isfile(mdfPath):
-			print(f"Could not find {mdfPath}.")
-			mdfPath = None
+		try:
+			if not os.path.isfile(mdfPath) and gameName != None:
+				split = os.path.split(meshPath)
+				rootPath = split[0]
+				fileName = split[1].split(".mesh")[0].lower()
+				if gameName == "MHWILDS":
+					mdfPath = os.path.join(rootPath,f"{fileName}_A.mdf2{mdfVersion}")	
+					
+					if not os.path.isfile(mdfPath) and fileName.startswith("ch"):
+						dirSplit = rootPath.split("Character",1)
+						
+						if fileName.count("_") == 2 and len(dirSplit) == 2:#Some models use materials from other gender
+							isMale = "_000_" in fileName
+							
+							if isMale:
+								newDir = dirSplit[1].replace("000","001",1)
+								newFileName = fileName.replace("_000_", "_001_")
+							else:
+								newDir = dirSplit[1].replace("001","000",1)
+								newFileName = fileName.replace("_001_", "_000_")
+							mdfPath = os.path.join(dirSplit[0]+"Character"+newDir,f"{newFileName}.mdf2{mdfVersion}")
+					if not os.path.isfile(mdfPath) and fileName.startswith("mesh_") and "ui_mesh" in rootPath and fileName.count("_") == 3:
+						#Minimap textures
+						split = fileName.split("_")
+						stageID = split[1]
+						section = split[3]
+						newDir = os.path.join(os.path.dirname(rootPath),f"{stageID}_a00").replace("ui_mesh","ui_material",1)
+						newFileName = f"mat_{stageID}_{section}.mdf2{mdfVersion}"
+						mdfPath = os.path.join(newDir,newFileName)
+						if not os.path.isfile(mdfPath):
+							newFileName = f"mat_{stageID}_00.mdf2{mdfVersion}"
+							mdfPath = os.path.join(newDir,newFileName)
+		except:
+			pass
+	if mdfPath == None or not os.path.isfile(mdfPath):
+		print(f"Could not find {mdfPath}.")
+		mdfPath = None
 			
 	return mdfPath
 texVersionDict = {
@@ -482,7 +528,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				currentPropPos = [-3000,2000]
 				currentXPos = -2000
 			matInfo = {
-				"mmtrName":os.path.split(mdfMaterial.mmtrPath)[1],
+				"mmtrName":os.path.split(mdfMaterial.mmtrPath.lower())[1],
 				"flags":mdfMaterial.flags.flagValues,
 				"textureNodeDict":{},
 				"mPropDict":mdfMaterial.getPropertyDict(),
@@ -506,6 +552,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				"detailMetallicSocket":None,
 				"isDielectric":False,
 				"isNRRT":False,
+				"disableAO":False,
+				"disableShadowCast":False,
 				"isMaskAlphaMMTR": os.path.split(mdfMaterial.mmtrPath)[1].lower() in maskAlphaMMTRSet,
 				"isAlphaBlend":False,
 				"shaderType":mdfMaterial.shaderType,
@@ -535,8 +583,11 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				matInfo["isAlphaBlend"] = True
 				if bpy.app.version < (4,2,0):
 					blenderMaterial.shadow_method = "NONE"
-			elif matInfo["mmtrName"] == "Env_Decal.mmtr":
+			elif matInfo["mmtrName"] == "env_decal.mmtr":
 				matInfo["isAlphaBlend"] = True
+			
+			
+					
 			for (_,textureType,imageList,texturePath) in textureNodeInfoList:
 				try:
 					newNode = addImageNode(blenderMaterial.node_tree,textureType,imageList,texturePath,(currentXPos,currentYPos))
@@ -559,15 +610,14 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					if nodeType != "UNKN" and textureType in nodes:
 						addTextureNode(blenderMaterial.node_tree, nodeType, textureType, matInfo)
 			except Exception as err:
-				raiseWarning(f"Material Importing Failed ({str(materialName)}). Error During Node Texture Node Assignment: {str(err)}\nIf you're on the latest version of RE Mesh Editor, please report this error.")
+				raiseWarning(f"Material Importing Failed ({str(materialName)}). Error During Node Texture Node Assignment.\nIf you're on the latest version of RE Mesh Editor, please report this error.")
+				traceback.print_exception(type(err), err, err.__traceback__)
 				inErrorState = True
 			
 			try:#Detect nodes for game specific setups
 				
 				
 				#WILDS
-				
-				
 				
 				if "SkinMap" in matInfo["textureNodeDict"] and matInfo["gameName"] == "MHWILDS":
 					skinMapNode = matInfo["textureNodeDict"]["SkinMap"]
@@ -594,17 +644,42 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				if "HairOverMap" in matInfo["textureNodeDict"]:
 					nodeTree.links.new(UVMap2Node.outputs["UV"],matInfo["textureNodeDict"]["HairOverMap"].inputs["Vector"])
 					useHairOverFactorSocket = None
+					hairOverOutSocket = matInfo["textureNodeDict"]["HairOverMap"].outputs["Color"]
+					
 					if "UseHairOverMap" in matInfo["mPropDict"]:
 						useHairOverFactorSocket = addPropertyNode(matInfo["mPropDict"]["UseHairOverMap"], matInfo["currentPropPos"], nodeTree).outputs["Value"]
-					
+					if "HairOverColorA" in matInfo["mPropDict"] and "HairOverColorB" in matInfo["mPropDict"]:
+						hairOverANode = addPropertyNode(matInfo["mPropDict"]["HairOverColorA"], matInfo["currentPropPos"], nodeTree)
+						
+						hairOverBNode = addPropertyNode(matInfo["mPropDict"]["HairOverColorB"], matInfo["currentPropPos"], nodeTree)
+						
+						
+						mixHairOverNode = nodes.new("ShaderNodeMixRGB")
+						mixHairOverNode.location = matInfo["textureNodeDict"]["HairOverMap"].location + Vector((300,0))
+						mixHairOverNode.blend_type = "MIX"
+						#The input order may need to be swapped
+						links.new(hairOverANode.outputs["Color"],mixHairOverNode.inputs["Color2"])
+						links.new(hairOverBNode.outputs["Color"],mixHairOverNode.inputs["Color1"])
+						links.new(matInfo["textureNodeDict"]["HairOverMap"].outputs["Alpha"],mixHairOverNode.inputs["Fac"])
+						
+						multHairOverNode = nodes.new("ShaderNodeMixRGB")
+						multHairOverNode.location = mixHairOverNode.location + Vector((300,0))
+						multHairOverNode.blend_type = "MULTIPLY"
+						links.new(mixHairOverNode.outputs["Color"],multHairOverNode.inputs["Color1"])
+						links.new(matInfo["textureNodeDict"]["HairOverMap"].outputs["Color"],multHairOverNode.inputs["Color2"])
+						multHairOverNode.inputs["Fac"].default_value = 1.0
+						hairOverOutSocket = multHairOverNode.outputs["Color"]
 					#TODO Look into correct way to apply hair over, alpha is used to blend through two hairover colors, also input order may need to be changed. Alma's hair does not display correctly with inputs not swapped, but swapping causes issues on things without hairover.
-					matInfo["albedoNodeLayerGroup"].addMixLayer(matInfo["textureNodeDict"]["HairOverMap"].outputs["Color"],factorOutSocket = useHairOverFactorSocket,mixType = "OVERLAY",mixFactor = 1.0,swapInputs = False)
+					matInfo["albedoNodeLayerGroup"].addMixLayer(hairOverOutSocket,factorOutSocket = useHairOverFactorSocket,mixType = "MULTIPLY",mixFactor = 1.0,swapInputs = False)
 				#Base layer overrides
 				if "Roughness" in matInfo["mPropDict"]:
 					roughnessNode = addPropertyNode(matInfo["mPropDict"]["Roughness"], matInfo["currentPropPos"], nodeTree)
 					matInfo["roughnessNodeLayerGroup"].addMixLayer(roughnessNode.outputs["Value"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
 				elif "Roughness_Param" in matInfo["mPropDict"]:
 					roughnessNode = addPropertyNode(matInfo["mPropDict"]["Roughness_Param"], matInfo["currentPropPos"], nodeTree)
+					matInfo["roughnessNodeLayerGroup"].addMixLayer(roughnessNode.outputs["Value"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+				elif "RoughnessParam" in matInfo["mPropDict"]:
+					roughnessNode = addPropertyNode(matInfo["mPropDict"]["RoughnessParam"], matInfo["currentPropPos"], nodeTree)
 					matInfo["roughnessNodeLayerGroup"].addMixLayer(roughnessNode.outputs["Value"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
 				
 				
@@ -851,40 +926,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				
 				#MHWilds detail map
 				#TODO - will come back to this
-				"""
-				if "Detail_ALBD_R" in matInfo["textureNodeDict"] and "DetailMaskMap" in matInfo["textureNodeDict"]:
-					MaskMapNode = matInfo["textureNodeDict"]["DetailMaskMap"]
-					MaskMapSeparateNode = nodes.new("ShaderNodeSeparateRGB")
-					MaskMapSeparateNode.location = MaskMapNode.location + Vector((300,0))
-					
-					detailMaskUVMappingGroupNode = getDualUVMappingNodeGroup(nodeTree)
-					detailMaskUVMappingGroupNode.location = MaskMapNode.location + Vector((-300,0))
-					nodeTree.links.new(UVMap1Node.outputs["UV"],detailMaskUVMappingGroupNode.inputs["UV1"])
-					nodeTree.links.new(UVMap2Node.outputs["UV"],detailMaskUVMappingGroupNode.inputs["UV2"])
-					nodeTree.links.new(detailMaskUVMappingGroupNode.outputs["Vector"],MaskMapNode.inputs["Vector"])
-					if "Use_SecodaryUV_DetailMask" in matInfo["mPropDict"]:#Yes it's not spelled right
-						detailUseSecondaryUVNode = addPropertyNode(matInfo["mPropDict"]["Use_SecodaryUV_DetailMask"], matInfo["currentPropPos"], nodeTree)
-						nodeTree.links.new(detailUseSecondaryUVNode.outputs["Value"],detailMaskUVMappingGroupNode.inputs["UseSecondaryUV"])
-					
-					currentPos = [MaskMapNode.location[0]+300,MaskMapNode.location[1]]
-					detailMappingNodeR = nodes.new("ShaderNodeMapping")
-					detailMappingNodeR.location = currentPos
-					links.new(UVMap1Node.outputs["UV"],detailMappingNodeR.inputs["Vector"])
-					
-					if "DetailTile_R" in matInfo["mPropDict"]:
-						links.new(addPropertyNode(matInfo["mPropDict"]["DetailTile_R"], matInfo["currentPropPos"], nodeTree).outputs["Value"],detailMappingNodeR.inputs["Scale"])
-					detailALBDNode_R = matInfo["textureNodeDict"]["Detail_ALBD_R"]
-					detailNRRHNode_R = matInfo["textureNodeDict"]["Detail_NRRH_R"]
-					links.new(detailMappingNodeR.outputs["Vector"],detailALBDNode_R.inputs["Vector"])
-					links.new(detailMappingNodeR.outputs["Vector"],detailNRRHNode_R.inputs["Vector"])
-					
-					
-					detailMapGroupNode =  getMHWildsDetailMapNodeGroup(nodeTree)
-					detailMapGroupNode.location = MaskMapNode.location + Vector((600,0))
-					links.new(detailUseSecondaryUVNode.outputs["Value"],detailMaskUVMappingGroupNode.inputs["UseSecondaryUV"])
-					links.new(detailALBDNode_R.outputs["Color"],detailMapGroupNode.inputs["ColorLayer_R"])
-					
-					"""
+				
 				#RE4 detail map
 				if "DetailMap" in matInfo["textureNodeDict"]:
 					detailMapNode = matInfo["textureNodeDict"]["DetailMap"]
@@ -1050,15 +1092,30 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					
 					matInfo["sheenSocket"] = reduceSheenMultNode.outputs["Value"]
 				
-				
+				if "ColorParam" in matInfo["mPropDict"]:
+					baseColorFactorSocket = None
+					if "ColorParam_MetalMasked" in matInfo["mPropDict"]:#WILDS
+						matInfo["disableAO"] = True#Disable AO to make eye not appear dark
+						#MH Wilds uses dielectric as a mask for eye color
+						if matInfo["metallicNodeLayerGroup"].currentOutSocket != None:
+							invertNode = nodes.new("ShaderNodeInvert")
+							invertNode.location = matInfo["metallicNodeLayerGroup"].currentOutSocket.node.location + Vector((300,0))
+							
+							links.new(matInfo["metallicNodeLayerGroup"].currentOutSocket,invertNode.inputs["Color"])
+							baseColorFactorSocket = invertNode.outputs["Color"]
+							
+							metalMaskNode = addPropertyNode(matInfo["mPropDict"]["ColorParam_MetalMasked"], matInfo["currentPropPos"], nodeTree)
+							matInfo["albedoNodeLayerGroup"].addMixLayer(metalMaskNode.outputs["Color"],factorOutSocket = matInfo["metallicNodeLayerGroup"].currentOutSocket,mixType = "MULTIPLY",mixFactor = 1.0)
+							#Disable metallic since it's not supposed to be used
+							matInfo["metallicNodeLayerGroup"].currentOutSocket = None
+					baseColorNode = addPropertyNode(matInfo["mPropDict"]["ColorParam"], matInfo["currentPropPos"], nodeTree)
+					matInfo["albedoNodeLayerGroup"].addMixLayer(baseColorNode.outputs["Color"],factorOutSocket = baseColorFactorSocket,mixType = "MULTIPLY",mixFactor = 1.0)
 				#mmtr specific nodes
 				#if "eye" in matInfo["mmtrName"]:
-				if "eye" in matInfo["blenderMaterial"].name or "eye" in matInfo["mmtrName"].lower() or matInfo["mmtrName"].lower().endswith("_ao.mmtr"):
+				if "eye" in matInfo["blenderMaterial"].name or "eye" in matInfo["mmtrName"] or matInfo["mmtrName"].endswith("_ao.mmtr"):
 					#Tearline mat setup
-					if "ColorParam" in matInfo["mPropDict"] and matInfo["gameName"] != "MHWILDS":  
-						baseColorNode = addPropertyNode(matInfo["mPropDict"]["ColorParam"], matInfo["currentPropPos"], nodeTree)
-						matInfo["albedoNodeLayerGroup"].addMixLayer(baseColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
-					elif "TearColor" in matInfo["mPropDict"]:  
+					
+					if "TearColor" in matInfo["mPropDict"]:  
 						baseColorNode = addPropertyNode(matInfo["mPropDict"]["TearColor"], matInfo["currentPropPos"], nodeTree)
 						matInfo["albedoNodeLayerGroup"].addMixLayer(baseColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
 						
@@ -1076,12 +1133,24 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						alphaNode = addPropertyNode(matInfo["mPropDict"]["DisappearanceRate"], matInfo["currentPropPos"], nodeTree)
 						matInfo["alphaSocket"] = alphaNode.outputs["Value"]
 					
-					if "Alpha" in matInfo["mPropDict"] or "Transparent" in matInfo["mPropDict"] or "TearBlendRate" in matInfo["mPropDict"]:#Add property node for this later
+					if "Alpha" in matInfo["mPropDict"] or "Transparent" in matInfo["mPropDict"] or "TearBlendRate" in matInfo["mPropDict"] or "basealpha_emit_roughtransparent" in matInfo["mmtrName"]:#Add property node for this later
 						matInfo["isAlphaBlend"] = True
 					
 					if "BaseAlphaMap" in matInfo["textureNodeDict"]:
 						node = nodes["BaseAlphaMap"]
 						matInfo["alphaSocket"] = node.outputs["Alpha"]
+				if matInfo["gameName"] == "MHWILDS":
+					if "ColorParam" in nodes and matInfo["alphaSocket"] != None:
+						alphaMultNode = nodes.new("ShaderNodeMath")
+						alphaMultNode.location = nodes["ColorParam"].location + Vector((300,0))
+						alphaMultNode.operation = "MULTIPLY"
+						
+						links.new(matInfo["alphaSocket"],alphaMultNode.inputs[0])
+						links.new(nodes["ColorParam"].outputs["Alpha"],alphaMultNode.inputs[1])
+						matInfo["alphaSocket"] = alphaMultNode.outputs["Value"]
+					if "lens" in matInfo["blenderMaterial"].name.lower():
+						matInfo["isAlphaBlend"] = True
+						
 				if "Alpha" in matInfo["mPropDict"]:  
 					alphaNode = addPropertyNode(matInfo["mPropDict"]["Alpha"], matInfo["currentPropPos"], nodeTree)
 					if matInfo["alphaSocket"] == None:
@@ -1117,6 +1186,140 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						matInfo["alphaSocket"] = alphaMultNode.outputs["Value"]
 			
 				
+			#MH WILDS FIXES
+				if matInfo["gameName"] == "MHWILDS":
+					#Doshaguma fix
+					if "MT_ShellFur" in blenderMaterial.name:
+						matInfo["isAlphaBlend"] = True
+						
+					if matInfo["mmtrName"].startswith("mas_"):
+						#minimap paper shader
+						if matInfo["mmtrName"] == "mas_st000_02_00.mmtr":
+							
+							
+							
+							if "Tex_Dirty" in matInfo["textureNodeDict"]:
+								
+								
+								currentMaskNode = matInfo["textureNodeDict"]["Tex_Dirty"]
+								currentPos = [currentMaskNode.location[0]-300,currentMaskNode.location[1]]
+								
+								#Fix base color node, too bright by default
+								colorAdjustNode = nodes.new("ShaderNodeRGB")
+								colorAdjustNode.outputs["Color"].default_value = (0.5,0.45,0.5,1.0)
+								colorAdjustNode.location = currentPos
+								matInfo["albedoNodeLayerGroup"].addMixLayer(colorAdjustNode.outputs["Color"],factorOutSocket = None,mixType = "BURN",mixFactor = 1.0)
+								
+								currentMappingNode = nodes.new("ShaderNodeMapping")
+								currentMappingNode.location = currentPos
+								currentMappingNode.inputs["Scale"].default_value = (10.0,10.0,1.0)
+								links.new(UVMap1Node.outputs["UV"],currentMappingNode.inputs["Vector"])
+								links.new(currentMappingNode.outputs["Vector"],currentMaskNode.inputs["Vector"])
+								currentPos[0] += 600
+								
+								currentMaskSepNode = nodes.new("ShaderNodeSeparateRGB")
+								currentMaskSepNode.location = currentPos
+								links.new(currentMaskNode.outputs["Color"],currentMaskSepNode.inputs["Image"])
+								matInfo["albedoNodeLayerGroup"].addMixLayer(currentMaskSepNode.outputs["G"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 0.3)
+								matInfo["roughnessNodeLayerGroup"].addMixLayer(currentMaskNode.outputs["Alpha"],factorOutSocket = None,mixType = "MIX",mixFactor = 1.0)
+								
+								#Add gradation lines
+								currentPos[0] += 300
+								
+								geometryNode = nodes.new("ShaderNodeNewGeometry")
+								geometryNode.location = currentPos
+								
+								currentPos[0] += 300
+								sepXYZNode = nodes.new("ShaderNodeSeparateXYZ")
+								sepXYZNode.location = currentPos
+								links.new(geometryNode.outputs["True Normal"],sepXYZNode.inputs["Vector"])
+								currentPos[0] += 300
+								
+								colorRampNode = nodes.new("ShaderNodeValToRGB")
+								colorRampNode.location = currentPos
+								colorRampNode.color_ramp.elements[1].position = 0.0
+								colorRampNode.color_ramp.elements[0].position = 0.85
+								links.new(sepXYZNode.outputs["Z"],colorRampNode.inputs["Fac"])
+								
+								matInfo["albedoNodeLayerGroup"].addMixLayer(currentMaskSepNode.outputs["B"],factorOutSocket = colorRampNode.outputs["Color"],mixType = "MULTIPLY",mixFactor = 0.3)
+								
+								if "tex_noise" in matInfo["textureNodeDict"]:
+									currentMaskNode = matInfo["textureNodeDict"]["tex_noise"]
+									currentPos = [currentMaskNode.location[0]-300,currentMaskNode.location[1]]
+									
+									currentMappingNode = nodes.new("ShaderNodeMapping")
+									currentMappingNode.location = currentPos
+									currentMappingNode.inputs["Scale"].default_value = (10.0,10.0,1.0)
+									links.new(UVMap1Node.outputs["UV"],currentMappingNode.inputs["Vector"])
+									links.new(currentMappingNode.outputs["Vector"],currentMaskNode.inputs["Vector"])
+							
+									matInfo["albedoNodeLayerGroup"].addMixLayer(currentMaskNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 0.3)
+								
+								if "Tex_Normal" in matInfo["textureNodeDict"]:
+									currentMaskNode = matInfo["textureNodeDict"]["Tex_Normal"]
+									currentPos = [currentMaskNode.location[0]-300,currentMaskNode.location[1]]
+									
+									currentMappingNode = nodes.new("ShaderNodeMapping")
+									currentMappingNode.location = currentPos
+									currentMappingNode.inputs["Scale"].default_value = (10.0,10.0,1.0)
+									links.new(UVMap1Node.outputs["UV"],currentMappingNode.inputs["Vector"])
+									links.new(currentMappingNode.outputs["Vector"],currentMaskNode.inputs["Vector"])
+							
+									matInfo["albedoNodeLayerGroup"].addMixLayer(currentMaskNode.outputs["Alpha"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 0.3)
+									
+								if blenderMaterial.name.startswith("mainOther00"):#Shallow Water Material
+									currentMaskNode = matInfo["textureNodeDict"]["Tex_Effect"]
+									currentPos = [currentMaskNode.location[0]-300,currentMaskNode.location[1]]
+									
+									currentMappingNode = nodes.new("ShaderNodeMapping")
+									currentMappingNode.location = currentPos
+									currentMappingNode.inputs["Scale"].default_value = (100.0,100.0,1.0)
+									links.new(UVMap1Node.outputs["UV"],currentMappingNode.inputs["Vector"])
+									links.new(currentMappingNode.outputs["Vector"],currentMaskNode.inputs["Vector"])
+									currentPos[0] += 600
+									currentMaskSepNode = nodes.new("ShaderNodeSeparateRGB")
+									currentMaskSepNode.location = currentPos
+									links.new(currentMaskNode.outputs["Color"],currentMaskSepNode.inputs["Image"])
+									currentPos[0] += 300
+									invertNode = nodes.new("ShaderNodeInvert")
+									invertNode.location = currentPos
+									links.new(currentMaskSepNode.outputs["G"],invertNode.inputs["Color"])
+									matInfo["albedoNodeLayerGroup"].addMixLayer(invertNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 0.35)
+						#minimap line shader
+						elif matInfo["mmtrName"] == "mas_st000_02_02.mmtr":
+							if "tex_lineMusk" in matInfo["textureNodeDict"]:
+								matInfo["albedoNodeLayerGroup"].addMixLayer(matInfo["textureNodeDict"]["tex_lineMusk"].outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+								matInfo["roughnessNodeLayerGroup"].addMixLayer(matInfo["textureNodeDict"]["tex_lineMusk"].outputs["Alpha"],factorOutSocket = None,mixType = "MIX",mixFactor = 1.0)
+						elif matInfo["mmtrName"] == "mas_st000_02_03.mmtr":
+							if "Tex2D_0" in matInfo["textureNodeDict"]:
+								matInfo["albedoNodeLayerGroup"].addMixLayer(matInfo["textureNodeDict"]["Tex2D_0"].outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+								matInfo["roughnessNodeLayerGroup"].addMixLayer(matInfo["textureNodeDict"]["Tex2D_0"].outputs["Alpha"],factorOutSocket = None,mixType = "MIX",mixFactor = 1.0)
+						#minimap wall shader
+						elif matInfo["mmtrName"] == "mas_st000_02_04.mmtr":
+							if "Tex2D_0" in matInfo["textureNodeDict"]:
+								currentMaskNode = matInfo["textureNodeDict"]["Tex2D_0"]
+								currentPos = [currentMaskNode.location[0]-300,currentMaskNode.location[1]]
+								
+								currentMappingNode = nodes.new("ShaderNodeMapping")
+								currentMappingNode.location = currentPos
+								if "UV" in matInfo["mPropDict"]:
+									uvPropNode = addPropertyNode(matInfo["mPropDict"]["UV"], matInfo["currentPropPos"], nodeTree)
+									links.new(uvPropNode.outputs[0],currentMappingNode.inputs["Scale"])
+								links.new(UVMap1Node.outputs["UV"],currentMappingNode.inputs["Vector"])
+								links.new(currentMappingNode.outputs["Vector"],currentMaskNode.inputs["Vector"])
+						
+								currentMaskSepNode = nodes.new("ShaderNodeSeparateRGB")
+								currentMaskSepNode.location = currentPos
+								links.new(currentMaskNode.outputs["Color"],currentMaskSepNode.inputs["Image"])
+								
+								mixColorNode = nodes.new("ShaderNodeMixRGB")
+								mixColorNode.location = currentMaskNode.location + Vector((300,0))
+								mixColorNode.inputs["Color1"].default_value = (0.065,0.065,0.065,1.0)
+								mixColorNode.inputs["Color2"].default_value = (0.14,0.12,0.08,1.0)
+								links.new(currentMaskSepNode.outputs["G"],mixColorNode.inputs["Fac"])
+								
+								matInfo["albedoNodeLayerGroup"].addMixLayer(mixColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+								matInfo["roughnessNodeLayerGroup"].addMixLayer(currentMaskNode.outputs["Alpha"],factorOutSocket = None,mixType = "MIX",mixFactor = 1.0)
 				#Finish process by linking to bsdf shader
 				
 				
@@ -1185,7 +1388,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					links.new(fresnelNode.outputs["Fac"],fresnelClampNode.inputs["Value"])
 					
 					matInfo["metallicNodeLayerGroup"].addMixLayer(fresnelClampNode.outputs["Result"])
-				if matInfo["aoNodeLayerGroup"].currentOutSocket != None:
+				if matInfo["aoNodeLayerGroup"].currentOutSocket != None and not matInfo["disableAO"]:
 					#This isn't the correct way to apply AO but EEVEE has no good ways of doing AO maps that doesn't have downsides (such as killing screenspace reflections and subsurface)
 					
 					aoNode = nodes.new("ShaderNodeAmbientOcclusion")
@@ -1220,6 +1423,10 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					elif "Metallic_Param" in matInfo["mPropDict"]:
 						metallicNode = addPropertyNode(matInfo["mPropDict"]["Metallic_Param"], matInfo["currentPropPos"], nodeTree)
 						#matInfo["metallicNodeLayerGroup"].addMixLayer(metallicNode.outputs["Value"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+					elif "MetalParam" in matInfo["mPropDict"]:
+						metallicNode = addPropertyNode(matInfo["mPropDict"]["MetalParam"], matInfo["currentPropPos"], nodeTree)
+						#matInfo["metallicNodeLayerGroup"].addMixLayer(metallicNode.outputs["Value"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
+					
 					
 					if matInfo["isDielectric"]:
 						invertNode = nodes.new("ShaderNodeInvert")
@@ -1270,7 +1477,6 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					
 				
 				alphaClippingNode = None
-				disableShadowCast = False
 				#if hasAlpha:
 				if matInfo["alphaSocket"] != None:
 					
@@ -1313,10 +1519,10 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						dissolveNode = addPropertyNode(matInfo["mPropDict"]["DissolveThreshold"], matInfo["currentPropPos"], nodeTree)
 						clippingThresholdOutSocket = dissolveNode.outputs["Value"]
 					
-					if not matInfo["isAlphaBlend"] and "reflectivetransparent" not in matInfo["mmtrName"].lower() and "alphadissolve" not in matInfo["mmtrName"].lower():
+					if not matInfo["isAlphaBlend"] and "reflectivetransparent" not in matInfo["mmtrName"] and "alphadissolve" not in matInfo["mmtrName"] and "decal_basealpha" not in matInfo["mmtrName"]:
 						
 						
-						if "hair" not in matInfo["mmtrName"].lower() and "BaseAlphaMap" not in matInfo["textureNodeDict"]:
+						if "hair" not in matInfo["mmtrName"] and "BaseAlphaMap" not in matInfo["textureNodeDict"]:
 							alphaClippingNode = nodes.new("ShaderNodeMath")
 							alphaClippingNode.location = nodeBSDF.location + Vector((-300,-400))
 							alphaClippingNode.operation = "GREATER_THAN"
@@ -1340,7 +1546,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						else:
 							matInfo["blenderMaterial"].surface_render_method = "BLENDED"
 							matInfo["blenderMaterial"].use_transparent_shadow = True
-							disableShadowCast = True
+							matInfo["disableShadowCast"] = True
 						
 						links.new(matInfo["alphaSocket"],nodeBSDF.inputs["Alpha"])
 					#Blender removed blend and shadow method in 4.2+ so everything will just be alpha hashed now
@@ -1353,12 +1559,29 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					else:
 						links.new(matInfo["sheenSocket"],nodeBSDF.inputs["Sheen Weight"])
 				
+				if matInfo["subsurfaceSocket"] != None:
+					if matInfo["gameName"] == "MHWILDS":
+						if "SSSProfile" in matInfo["mPropDict"] and matInfo["mPropDict"]["SSSProfile"].propValue[0] == 1.0:#Skin SSS profile
+							sssParamNode = None
+							if "SSSParam" in matInfo["mPropDict"]:
+								sssParamNode = addPropertyNode(matInfo["mPropDict"]["SSSParam"], matInfo["currentPropPos"], nodeTree)
+							
+							sssMultNode = nodes.new("ShaderNodeMath")
+							sssMultNode.location = matInfo["subsurfaceSocket"].node.location + Vector((300,0))
+							sssMultNode.operation = "MULTIPLY"
+							
+							links.new(matInfo["subsurfaceSocket"],sssMultNode.inputs[0])
+							sssMultNode.inputs[1].default_value = 1.0
+							if sssParamNode != None:
+								links.new(sssParamNode.outputs["Value"],sssMultNode.inputs[1])
+							if "Subsurface Weight" in nodeBSDF.inputs:	
+								links.new(sssMultNode.outputs["Value"],nodeBSDF.inputs["Subsurface Weight"])	
 				#Mix Shaders
 				
 				currentPos = [nodeBSDF.location[0]+300,nodeBSDF.location[1]]
 				
 				#Only enabled for hair and MHR wing materials atm since it doesn't look right on much else
-				if IMPORT_TRANSLUCENT and matInfo["translucentSocket"] != None and ("Translucency" in matInfo["mPropDict"] or "Translucency_Param" in matInfo["mPropDict"]) and ("wing" in matInfo["mmtrName"].lower() or "hair" in matInfo["mmtrName"].lower()) and matInfo["gameName"] != "DMC5":
+				if IMPORT_TRANSLUCENT and matInfo["translucentSocket"] != None and ("Translucency" in matInfo["mPropDict"] or "Translucency_Param" in matInfo["mPropDict"]) and ("wing" in matInfo["mmtrName"] or "hair" in matInfo["mmtrName"]) and matInfo["gameName"] != "DMC5":
 					
 					gammaNode = nodes.new("ShaderNodeGamma")#Needs a gamma change for the mixed shader nodes to look right
 					gammaNode.location = currentPos
@@ -1427,7 +1650,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					matInfo["currentShaderOutput"] = mixShader.outputs["Shader"]
 					currentPos[0] += 300
 					
-				if disableShadowCast:
+				if matInfo["disableShadowCast"]:
 					#Blender 4.2 made it such a pain to disable shadow casting on a material
 					#Used to be just a drop down menu :/
 					transparentNode = nodes.new("ShaderNodeBsdfTransparent")
@@ -1474,7 +1697,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					#TODO Force blender to update node dimensions so that a large margin doesn't need to be used as a workaround
 					arrangeNodeTree(blenderMaterial.node_tree,margin_x = 300,margin_y = 300,centerNodes = True)
 			except Exception as err:
-				raiseWarning(f"Material Importing Failed ({str(materialName)}). Error During Node Detection: {str(err)}\nIf you're on the latest version of RE Mesh Editor, please report this error.")
+				raiseWarning(f"Material Importing Failed ({str(materialName)}). Error During Node Detection. \nIf you're on the latest version of RE Mesh Editor, please report this error.")
+				traceback.print_exception(type(err), err, err.__traceback__)
 				inErrorState = True
 		else:
 			print("Material \"" + materialName + "\" is not in the MDF, cannot import")

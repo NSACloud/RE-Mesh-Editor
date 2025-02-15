@@ -619,7 +619,8 @@ class dynamicColorMixLayerNodeGroup():
 	@currentOutSocket.setter
 	def currentOutSocket(self,value):
 		self._currentOutSocket = value
-		self.nodeLoc = value.node.location
+		if value != None:
+			self.nodeLoc = value.node.location
 	
 	def addMixLayer(self,colorOutSocket,factorOutSocket = None,mixType = "MIX",mixFactor = 0.5,swapInputs = False):
 		
@@ -993,6 +994,9 @@ def newEMINode (nodeTree,textureType,matInfo):
 	if "Emissive_color" in matInfo["mPropDict"]:
 		emiColorNode = addPropertyNode(matInfo["mPropDict"]["Emissive_color"], matInfo["currentPropPos"], nodeTree)
 		matInfo["emissionColorNodeLayerGroup"].addMixLayer(emiColorNode.outputs["Color"],mixType = "MULTIPLY",mixFactor = 1.0)
+	elif "Emissive_Color" in matInfo["mPropDict"]:
+		emiColorNode = addPropertyNode(matInfo["mPropDict"]["Emissive_Color"], matInfo["currentPropPos"], nodeTree)
+		matInfo["emissionColorNodeLayerGroup"].addMixLayer(emiColorNode.outputs["Color"],mixType = "MULTIPLY",mixFactor = 1.0)
 	elif "EmissiveColor" in matInfo["mPropDict"]:
 		emiColorNode = addPropertyNode(matInfo["mPropDict"]["EmissiveColor"], matInfo["currentPropPos"], nodeTree)
 		matInfo["emissionColorNodeLayerGroup"].addMixLayer(emiColorNode.outputs["Color"],mixType = "MULTIPLY",mixFactor = 1.0)
@@ -1003,6 +1007,8 @@ def newEMINode (nodeTree,textureType,matInfo):
 		emiIntensityNode = addPropertyNode(matInfo["mPropDict"]["Emissive_Intensity"], matInfo["currentPropPos"], nodeTree)
 	elif "EmissiveIntensity" in matInfo["mPropDict"]:#I should have lower cased the prop dict
 		emiIntensityNode = addPropertyNode(matInfo["mPropDict"]["EmissiveIntensity"], matInfo["currentPropPos"], nodeTree)
+	elif "Emissive_Power" in matInfo["mPropDict"]:
+		emiIntensityNode = addPropertyNode(matInfo["mPropDict"]["Emissive_Power"], matInfo["currentPropPos"], nodeTree)
 	if emiIntensityNode != None:
 		bwNode = nodeTree.nodes.new('ShaderNodeRGBToBW')
 		bwNode.location = currentPos
@@ -1259,11 +1265,11 @@ def newATOSNode (nodeTree,textureType,matInfo):
 	
 	separateNode = nodeTree.nodes.new('ShaderNodeSeparateRGB')
 	separateNode.location = currentPos
-	useLegacyHairUV2Occlusion = (matInfo["gameName"] in legacyUV2HairOcclusionList and "hair" in matInfo["mmtrName"].lower())
+	useLegacyHairUV2Occlusion = (matInfo["gameName"] in legacyUV2HairOcclusionList and "hair" in matInfo["mmtrName"])
 	
 	#RE2 puts other masks in the alpha channel sometimes
 	#Check for nullblack to avoid issues with SF6
-	isMTOS = imageNode.image != None and "_mtos" in imageNode.image.filepath.lower() or "BaseAlphaMap" in matInfo["textureNodeDict"] or "nullblack" in imageNode.image.filepath.lower()
+	isMTOS = hasattr(imageNode, "image") and imageNode.image != None and "_mtos" in imageNode.image.filepath.lower() or "BaseAlphaMap" in matInfo["textureNodeDict"] or (hasattr(imageNode, "image") and "nullblack" in imageNode.image.filepath.lower())
 	isMaskAlpha = matInfo["isMaskAlphaMMTR"]
 	
 	#Have to do this hack since there's no good way of telling whether the alpha channel is actually alpha with this game

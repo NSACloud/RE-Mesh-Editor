@@ -588,7 +588,7 @@ def importREMeshFile(filePath,options):
 			gameName = resolveMeshGameNameConflict(gameName, filePath)
 	else:
 		gameName = None
-		
+	#print(f"Game Name:{gameName}")	
 	warningList = []
 	errorList = []
 	
@@ -670,7 +670,7 @@ def importREMeshFile(filePath,options):
 		if options["mdfPath"] != "":
 			mdfPath = options["mdfPath"]
 		else:
-			mdfPath = findMDFPathFromMeshPath(filePath)
+			mdfPath = findMDFPathFromMeshPath(filePath,gameName)
 			#print(mdfPath)
 		try:
 			if mdfPath != None:

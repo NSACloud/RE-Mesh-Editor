@@ -19,6 +19,8 @@ IMPORT_BLEND_SHAPES = False#Disabled by default because it's broken at the momen
 #RE4R leon face "I:\RE4_EXTRACT\re_chunk_000\natives\STM\_Chainsaw\Character\ch\cha0\cha000\10\cha000_10.mesh.221108797"
 #SF6 chun li body "J:\SF6_EXTRACT\re_chunk_000\natives\stm\product\model\esf\esf004\001\01\esf004_001_01.mesh.230110883"
 
+IMPORT_MPLY = False
+#Not implemented fully yet, need to figure out vertex pos data format
 
 from ..gen_functions import splitNativesPath,getPaddedPos,getBit,setBit,getPaddingAmount,textColors,raiseWarning,raiseError,read_uint,read_int,read_int64,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_int64,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte,read_string,write_string
 import os
@@ -29,6 +31,8 @@ from itertools import chain
 import ctypes
 
 import time
+
+from .file_re_mesh_mply import REMeshMPLY
 
 timeFormat = "%d"
 #Mesh version numbers do not always increase for newer versions of the file format
@@ -1433,6 +1437,7 @@ class FloatData():
 class REMesh():
 	def __init__(self):
 		self.meshVersion = 0
+		self.isMPLY = False
 		self.fileHeader = FileHeader()
 		self.lodHeader = None
 		self.shadowHeader = None
@@ -2303,8 +2308,11 @@ def readREMesh(filepath,lodTarget = None):
 					print(f"Loaded {len(streamingBuffer)} bytes from streaming mesh at {streamingMeshPath}")
 				except:
 					raiseError("Failed to open " + filepath)
-		
-	reMeshFile = REMesh()
+	if magic == 1498173517 and IMPORT_MPLY:#MPLY Mesh
+		reMeshFile = REMeshMPLY()
+		print("Loading MPLY mesh.")
+	else:
+		reMeshFile = REMesh()
 	reMeshFile.meshVersion = meshVersion
 	reMeshFile.read(file,version,lodTarget,streamingBuffer)
 	file.close()

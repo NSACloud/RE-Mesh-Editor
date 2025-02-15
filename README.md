@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.40 (2/9/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.41 (2/14/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -9,7 +9,7 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-![meshEditorPreview](https://github.com/user-attachments/assets/8e12f75c-83d3-4ed3-a6ac-9189b35d0be1)
+![meshEditorPreview](https://github.com/user-attachments/assets/318392e3-fce7-4b30-a23e-8abfc39e8855)
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
@@ -82,6 +82,11 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ![image](https://github.com/user-attachments/assets/2f8f949e-fabd-4c12-9081-65b962768c18)
 
+### V0.41 - 2/14/2025
+* Improved material importing for hair, skin, faces and more for MH Wilds.
+* Improved automatic MDF detection for MH Wilds, more MDF files will be found automatically now.
+* Minor bug fixes.
+
 ### V0.40 - 2/9/2025
 * Added Linux support for converting MH Wilds textures.
 * When selecting a mesh or MDF collection to export, a warning will appear if the collection is not a mesh or MDF collection.
@@ -104,6 +109,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * Removed alpha clipping from materials due to it causing issues with certain games.
 * Fixed issue where unused images weren't cleared when using the "Clear Scene" import option.
 
+<details>
+  <summary>Older Version Change Logs</summary>
+
 ### V0.38 - 1/18/2025
 * Moved .mesh and .mdf2 import/export into "RE Mesh Editor" menu under File > Import/Export.
 * MDF materials can now be renamed by changing the material name inside the parentheses. (The material name in the mdf settings will be updated upon export or reindexing). 
@@ -112,9 +120,6 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * The mod directory in the RE MDF tab is now set automatically when exporting a mesh or mdf file.
 * Fixed some issues with loading certain MH Wilds materials.
 * Fixed issue where streaming textures would not be loaded when importing an RE7 RT mesh.
-
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.37 - 12/2/2024
 * Added mesh import support for RE:Verse. 
