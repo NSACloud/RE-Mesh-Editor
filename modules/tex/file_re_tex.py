@@ -8,6 +8,7 @@ from ..gdeflate.gdeflate import GDeflate
 
 
 VERSION_MHWILDS = 240701001#mhwilds tex version
+VERSION_MHWILDS_BENCHMARK = 241106027#TODO If this is the version used upon release, update names
 
 gameNameToTexVersionDict = {
 	"DMC5":11,
@@ -404,7 +405,7 @@ class MipData():
 		
 		mipData = None#BytesIO for uncompressed texture data
 		
-		if texVersion >= VERSION_MHWILDS:
+		if texVersion == VERSION_MHWILDS or texVersion == VERSION_MHWILDS_BENCHMARK:
 			file.seek(currentImageDataHeaderOffset)
 			self.imageSize = read_uint(file)
 			self.imageOffset = read_uint(file)

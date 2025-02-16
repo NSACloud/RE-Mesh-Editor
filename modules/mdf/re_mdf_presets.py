@@ -102,7 +102,7 @@ def saveAsPreset(activeObj,presetName,gameName):
 		
 
 def readPresetJSON(filepath):
-	mdfCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.mdfCollection,None)
+	mdfCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
 	if mdfCollection != None:	
 		try:
 			with open(filepath) as jsonFile:

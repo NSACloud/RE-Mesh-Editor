@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.41 (2/14/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.42 (2/16/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -81,6 +81,10 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 **NOTE: For Monster Hunter Wilds, be sure to also extract the sub_000 .pak file and merge it with the extracted re_chunk_000.pak. Textures will be missing otherwise.
 
 ![image](https://github.com/user-attachments/assets/2f8f949e-fabd-4c12-9081-65b962768c18)
+
+### V0.42 - 2/16/2025
+* Fixed issue where adding a preset material didn't work.
+* Fixed issue where DD2 textures couldn't be converted.
 
 ### V0.41 - 2/14/2025
 * Improved material importing for hair, skin, faces and more for MH Wilds.
