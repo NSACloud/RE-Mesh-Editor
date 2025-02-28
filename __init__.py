@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 43),
+	"version": (0, 44),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -823,7 +823,18 @@ class ExportREMesh(Operator, ExportHelper):
 			elif context.scene["REMeshLastImportedMeshVersion"] == 240820143:
 				#Remap MH Wilds beta to full release
 				context.scene["REMeshLastImportedMeshVersion"] = 241111606
-
+		
+		if context.scene.get("REMeshLastExportedMeshVersion",0) in meshFileVersionToGameNameDict:
+			if context.scene["REMeshLastExportedMeshVersion"] == 231011879:
+				#DD2 version update fix
+				context.scene["REMeshLastExportedMeshVersion"] = 240423143
+			elif context.scene["REMeshLastExportedMeshVersion"] == 2102020001:
+				#Remap RE Verse to RE8
+				context.scene["REMeshLastExportedMeshVersion"] = 2101050001
+			elif context.scene["REMeshLastExportedMeshVersion"] == 240820143:
+				#Remap MH Wilds beta to full release
+				context.scene["REMeshLastExportedMeshVersion"] = 241111606
+		
 		if self.targetCollection == "":
 			
 			

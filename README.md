@@ -82,6 +82,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ![image](https://github.com/user-attachments/assets/2f8f949e-fabd-4c12-9081-65b962768c18)
 
+### V0.44 - 2/28/2025
+* Fixed issue where an error could occur when exporting a mesh from a blend file previously used to export for the MH Wilds beta.
+
 ### V0.43 - 2/28/2025
 * Support for full release of Monster Hunter Wilds.
 * Minor bug fixes.
