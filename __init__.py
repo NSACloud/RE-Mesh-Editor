@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 42),
+	"version": (0, 43),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -726,12 +726,15 @@ def update_targetMeshCollection(self,context):
 	temp = bpy.data.screens.get("temp")
 	browserSpace = None
 	if temp != None:
-	    for area in temp.areas:
-	        for space in area.spaces:
-	            if type(space.params).__name__ == "FileSelectParams":
-	                browserSpace = space
-	                break
-	                break
+		for area in temp.areas:
+			for space in area.spaces:
+				try:
+					if type(space.params).__name__ == "FileSelectParams":
+						browserSpace = space
+						break
+						break
+				except:
+					pass
 	if browserSpace != None:
 		#print(browserSpace.params.filename)
 		if ".mesh" in self.targetCollection:
@@ -760,7 +763,7 @@ class ExportREMesh(Operator, ExportHelper):
 				(".240423143", "Dragon's Dogma 2", "Dragon's Dogma 2"),
 				(".240306278", "Kunitsu-Gami", "Kunitsu-Gami"),
 				(".240424828", "Dead Rising", "Dead Rising"),
-				(".240820143", "Monster Hunter Wilds", "Monster Hunter Wilds"),
+				(".241111606", "Monster Hunter Wilds", "Monster Hunter Wilds"),
 			   ]
 		)
 	targetCollection: bpy.props.StringProperty(
@@ -817,6 +820,9 @@ class ExportREMesh(Operator, ExportHelper):
 			elif context.scene["REMeshLastImportedMeshVersion"] == 2102020001:
 				#Remap RE Verse to RE8
 				context.scene["REMeshLastImportedMeshVersion"] = 2101050001
+			elif context.scene["REMeshLastImportedMeshVersion"] == 240820143:
+				#Remap MH Wilds beta to full release
+				context.scene["REMeshLastImportedMeshVersion"] = 241111606
 
 		if self.targetCollection == "":
 			
@@ -834,7 +840,7 @@ class ExportREMesh(Operator, ExportHelper):
 				if prevCollection in bpy.data.collections:
 					self.targetCollection = prevCollection
 				if ".mesh" in prevCollection:#Remove blender suffix after .mesh if it exists
-					if context.scene.get("REMeshLastExportedMeshVersion") in meshFileVersionToGameNameDict:
+					if context.scene.get("REMeshLastImportedMeshVersion") in meshFileVersionToGameNameDict:
 						self.filename_ext = "."+str(context.scene.get("REMeshLastImportedMeshVersion",1808282334))
 					self.filepath = prevCollection.split(".mesh")[0]+".mesh" + self.filename_ext
 

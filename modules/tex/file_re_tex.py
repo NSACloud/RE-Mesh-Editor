@@ -7,8 +7,8 @@ from ..gdeflate.gdeflate import GDeflate
 
 
 
-VERSION_MHWILDS = 240701001#mhwilds tex version
-VERSION_MHWILDS_BENCHMARK = 241106027#TODO If this is the version used upon release, update names
+VERSION_MHWILDS_BETA = 240701001#mhwilds tex version
+VERSION_MHWILDS = 241106027#TODO If this is the version used upon release, update names
 
 gameNameToTexVersionDict = {
 	"DMC5":11,
@@ -25,7 +25,7 @@ gameNameToTexVersionDict = {
 	"DD2":760230703,
 	"KG":231106777,
 	"DR":240606151,
-	"MHWILDS":240701001,
+	"MHWILDS":241106027,
 	}
 
 ddsBpps = {
@@ -405,7 +405,7 @@ class MipData():
 		
 		mipData = None#BytesIO for uncompressed texture data
 		
-		if texVersion == VERSION_MHWILDS or texVersion == VERSION_MHWILDS_BENCHMARK:
+		if texVersion == VERSION_MHWILDS or texVersion == VERSION_MHWILDS_BETA:
 			file.seek(currentImageDataHeaderOffset)
 			self.imageSize = read_uint(file)
 			self.imageOffset = read_uint(file)

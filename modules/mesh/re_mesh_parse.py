@@ -2,6 +2,11 @@ import numpy as np
 import struct
 from .file_re_mesh import Matrix4x4,AABB,Sphere,CompressedSixWeightIndices,CompressedBlendShapeVertexInt
 
+#MESH VERSIONS
+VERSION_SF6 = 230110883
+VERSION_MHWILDS_BETA = 240820143
+VERSION_MHWILDS = 241111606
+
 typeNameMapping = ["Position","NorTan","UV","UV2","Weight","Color","SF6UnknownVertexDataType","ExtraWeight"]
 typeStrideDict = {
 	"Position":12,
@@ -589,7 +594,7 @@ class ParsedREMesh:
 		#Parse Vertex Buffer
 		if reMesh.meshBufferHeader != None:
 			tags = set()
-			if reMesh.meshVersion == 230110883 or reMesh.meshVersion == 240820143 or reMesh.meshVersion == 241111606:#Street Fighter 6 mesh version + MH Wilds
+			if reMesh.meshVersion == VERSION_SF6 or reMesh.meshVersion == VERSION_MHWILDS_BETA or reMesh.meshVersion == VERSION_MHWILDS:#Street Fighter 6 mesh version + MH Wilds
 				tags.add("SixWeightCompressed")#Add tag to parse compressed weights
 			#if duplicate in vertexelementlist, add shadowLOD tag
 			

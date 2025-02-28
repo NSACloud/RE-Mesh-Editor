@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.42 (2/16/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.43 (2/28/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -61,7 +61,7 @@ Support for more games may be added in the future.
   
 **Not required but strongly recommended:**
 * [RE Chain Editor](https://github.com/NSACloud/RE-Chain-Editor) - Blender addon for creation of chain files. Used to add physics to models.
-* [RE Asset Library (Blender 4.3.2 or higher required)](https://github.com/NSACloud/RE-Asset-Library) - Blender addon that allows for easy browsing and importing of RE Engine files. Reduces the need to look up file IDs to find what you're looking for.
+* [RE Asset Library (Blender 4.3.2 or higher required)](https://github.com/NSACloud/RE-Asset-Library) - Blender addon that allows for extraction and importing of RE Engine files. Reduces the need to look up file IDs to find what you're looking for.
 * [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
 ## Installation
 Download the addon from the "Download RE Mesh Editor" link at the top or click Code > Download Zip.
@@ -81,6 +81,10 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 **NOTE: For Monster Hunter Wilds, be sure to also extract the sub_000 .pak file and merge it with the extracted re_chunk_000.pak. Textures will be missing otherwise.
 
 ![image](https://github.com/user-attachments/assets/2f8f949e-fabd-4c12-9081-65b962768c18)
+
+### V0.43 - 2/28/2025
+* Support for full release of Monster Hunter Wilds.
+* Minor bug fixes.
 
 ### V0.42 - 2/16/2025
 * Fixed issue where adding a preset material didn't work.

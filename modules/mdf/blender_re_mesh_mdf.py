@@ -287,7 +287,9 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 		if not os.path.isfile(mdfPath):
 			print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
 			mdfPath = f"{fileRoot}_v00.mdf2{mdfVersion}"
-			
+		if not os.path.isfile(mdfPath):
+			print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
+			mdfPath = f"{fileRoot}_A.mdf2{mdfVersion}"	
 		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
 			
 			mdfPath = f"{fileRoot[:-1] + 'm'}.mdf2{mdfVersion}"#DD2 female armor uses male mdf, so replace _f with _m
@@ -312,7 +314,6 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 				rootPath = split[0]
 				fileName = split[1].split(".mesh")[0].lower()
 				if gameName == "MHWILDS":
-					mdfPath = os.path.join(rootPath,f"{fileName}_A.mdf2{mdfVersion}")	
 					
 					if not os.path.isfile(mdfPath) and fileName.startswith("ch"):
 						dirSplit = rootPath.split("Character",1)
