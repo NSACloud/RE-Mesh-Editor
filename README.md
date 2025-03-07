@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.43 (2/28/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.45 (3/7/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -78,9 +78,25 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
-**NOTE: For Monster Hunter Wilds, be sure to also extract the sub_000 .pak file and merge it with the extracted re_chunk_000.pak. Textures will be missing otherwise.
+### V0.45 - 3/7/2025
+* Added Tex conversion support for Monster Hunter Wilds. (Thanks to Asterisk for assisting)
 
-![image](https://github.com/user-attachments/assets/2f8f949e-fabd-4c12-9081-65b962768c18)
+IMPORTANT: Converted textures will not work unless they are contained inside a patch pak.
+
+You will get a black screen if textures are included in a loose file mod.
+
+You can create a patch pak by using the "Create Patch Pak" button in the RE MDF tab in the properties panel (press N if you don't see it).
+
+**RE Asset Library is required. If it is not installed, the button will not show up.**
+
+**Patch paks can be installed using Fluffy Manager.**
+
+**The latest version of RE Framework is required for patch paks to load.**
+
+* Minor bug fixes.
+
+<details>
+  <summary>Older Version Change Logs</summary>
 
 ### V0.44 - 2/28/2025
 * Fixed issue where an error could occur when exporting a mesh from a blend file previously used to export for the MH Wilds beta.
@@ -120,9 +136,6 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * Removed alpha clipping from materials due to it causing issues with certain games.
 * Fixed issue where unused images weren't cleared when using the "Clear Scene" import option.
 
-<details>
-  <summary>Older Version Change Logs</summary>
-
 ### V0.38 - 1/18/2025
 * Moved .mesh and .mdf2 import/export into "RE Mesh Editor" menu under File > Import/Export.
 * MDF materials can now be renamed by changing the material name inside the parentheses. (The material name in the mdf settings will be updated upon export or reindexing). 
@@ -157,6 +170,7 @@ Textures will not be imported if the extracted chunk files are not merged.
 * Added support for Monster Hunter Wilds textures. (Thanks Ando)
 NOTE: Conversion from DDS back to MH Wilds tex is not implemented yet.
 
+UPDATE 3/7/2025: Tex conversion for MH Wilds is now supported.
 
 ### V0.32 - 11/12/2024
 * Added support for secondary weights used by Dragon's Dogma 2. These weights are labeled with "SHAPEKEY_" and control the scaling of armor meshes.

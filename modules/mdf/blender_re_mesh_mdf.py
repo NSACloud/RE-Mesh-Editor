@@ -356,7 +356,7 @@ texVersionDict = {
 	".23":".28",
 	".32":".143221013",
 	".40":".760230703",
-	".45":".240701001",
+	".45":".241106027",
   }	
 def getTexPath(baseTexturePath,chunkPathList,mdfVersion):
 	
@@ -1225,6 +1225,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 								matInfo["roughnessNodeLayerGroup"].addMixLayer(currentMaskNode.outputs["Alpha"],factorOutSocket = None,mixType = "MIX",mixFactor = 1.0)
 								
 								#Add gradation lines
+								"""
 								currentPos[0] += 300
 								
 								geometryNode = nodes.new("ShaderNodeNewGeometry")
@@ -1243,7 +1244,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 								links.new(sepXYZNode.outputs["Z"],colorRampNode.inputs["Fac"])
 								
 								matInfo["albedoNodeLayerGroup"].addMixLayer(currentMaskSepNode.outputs["B"],factorOutSocket = colorRampNode.outputs["Color"],mixType = "MULTIPLY",mixFactor = 0.3)
-								
+								"""
 								if "tex_noise" in matInfo["textureNodeDict"]:
 									currentMaskNode = matInfo["textureNodeDict"]["tex_noise"]
 									currentPos = [currentMaskNode.location[0]-300,currentMaskNode.location[1]]

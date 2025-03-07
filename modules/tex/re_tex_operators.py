@@ -83,7 +83,7 @@ class WM_OT_CopyConvertedTextures(Operator):
 		texDir = os.path.realpath(bpy.context.scene.re_mdf_toolpanel.textureDirectory)
 		modDir = os.path.realpath(bpy.context.scene.re_mdf_toolpanel.modDirectory)
 		convertedDir = os.path.join(texDir,"converted")
-		mdfCollection = bpy.data.collections.get(bpy.context.scene.re_mdf_toolpanel.mdfCollection,None)
+		mdfCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
 		pathDict = {}
 		copyCount = 0
 		if mdfCollection != None and os.path.exists(modDir):
