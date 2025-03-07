@@ -1,15 +1,9 @@
-# This is a python interface for the gdeflate wrapper DLL at https://github.com/Andoryuuta/gdeflate_dll
-# The prebuilt x86_64 DLL is included, but should be generally buildable for any platform
-# at the repository linked above.
-
 import ctypes
-
-import platform
-
 from ctypes import c_bool, c_uint8, c_uint32, c_uint64, POINTER, byref
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 from enum import IntEnum
+import platform
 
 class GDeflateCompressionLevel(IntEnum):
     """
@@ -19,9 +13,16 @@ class GDeflateCompressionLevel(IntEnum):
     DEFAULT = 9     # Maps to DSTORAGE_COMPRESSION_DEFAULT
     BEST_RATIO = 12 # Maps to DSTORAGE_COMPRESSION_BEST_RATIO
 
+class GDeflateFlags (IntEnum):
+    """
+    GDeflate compression flags
+    """
+    COMPRESS_SINGLE_THREAD = 0x200
+
 class GDeflateError(Exception):
     """Custom exception for GDeflate-related errors"""
     pass
+
 
 def is_windows():
     return platform.system() == 'Windows'
@@ -40,17 +41,10 @@ class GDeflate:
     
     Args:
         dll_path (Union[str, Path], optional): Path to the GDeflate DLL. 
-            If not provided, searches in the following locations:
-            1. Same directory as this Python file
-            2. Current working directory
+            Defaults to "GDeflateWrapper-x86_64.dll" in the current directory.
     
     Raises:
         GDeflateError: If the DLL cannot be loaded or if compression/decompression fails
-        
-    Compression Levels:
-        FASTEST (1): Maps to DSTORAGE_COMPRESSION_FASTEST
-        DEFAULT (9): Maps to DSTORAGE_COMPRESSION_DEFAULT
-        BEST_RATIO (12): Maps to DSTORAGE_COMPRESSION_BEST_RATIO
     """
     
     # Expose compression levels as class attributes
@@ -58,13 +52,13 @@ class GDeflate:
     DEFAULT = GDeflateCompressionLevel.DEFAULT
     BEST_RATIO = GDeflateCompressionLevel.BEST_RATIO
     
-    def __init__(self, dll_path: Union[str, Path, None] = None):
+    def __init__(self, dll_path: Union[str, Path] = None):
         if dll_path is None:
             # Try to find the DLL next to the .py file first
             module_dir = Path(__file__).parent.absolute()
 			
             if is_windows():
-                dll_name = "GDeflateWrapper-x86_64.dll"
+                dll_name = "GDeflateWrapper.dll"
             elif is_linux():
                 dll_name = "libGDeflateWrapper.so"
 			#elif is_mac():
@@ -105,6 +99,13 @@ class GDeflate:
             POINTER(c_uint64)  # uncompressed_size
         ]
         self._get_uncompressed_size_func.restype = c_bool
+
+        # uint64_t gdeflate_get_compress_bound(uint64_t size)
+        self._get_compress_bound = self._dll.gdeflate_get_compress_bound
+        self._get_compress_bound.argtypes = [
+            c_uint64,          # input_size
+        ]
+        self._get_compress_bound.restype = c_uint64
 
         # bool gdeflate_decompress(
         #     uint8_t* output,
@@ -221,9 +222,14 @@ class GDeflate:
         Raises:
             GDeflateError: If compression fails
         """
-        # Allocate output buffer (worst case: same size as input)
-        output_size = c_uint64(len(data))
-        output_array = (c_uint8 * len(data))()
+
+        # Get size of output buffer to allocate,
+        # small inputs _can_ compress to be larger than the input buffer.
+        bounded_output_size = self._get_compress_bound(c_uint64(len(data)))
+
+        # Allocate input/output buffers and output size var.
+        output_size = c_uint64(bounded_output_size)
+        output_array = (c_uint8 * bounded_output_size)()
         input_array = (c_uint8 * len(data))(*data)
         
         success = self._compress_func(
