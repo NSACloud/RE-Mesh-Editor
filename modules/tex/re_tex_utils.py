@@ -96,10 +96,10 @@ def makeTexHeader(texVersion, ddsHeader, imageCount):
     texHeader.version = texVersion
     texHeader.width = ddsHeader.dwWidth
     texHeader.height = ddsHeader.dwHeight
-    texHeader.depth = 1
+    texHeader.depth = ddsHeader.dwDepth
     texHeader.imageCount = imageCount
     texHeader.mipCount = ddsHeader.dwMipMapCount  # For DMC5/RE2
-    texHeader.imageMipHeaderSize = ddsHeader.dwMipMapCount * 16
+    texHeader.imageMipHeaderSize = ddsHeader.dwMipMapCount << 4
     #texHeader.imageCount = (ddsHeader.dwMipMapCount << 12) | imageCount
     #print(f"imageCount {imageCount}")
     #print(f"dwMipMapCount {ddsHeader.dwMipMapCount}")

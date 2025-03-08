@@ -291,7 +291,7 @@ class MipData():
             lineBytelength = self.calculateLineBytelength(ddsBPPs, width)
             self.storeTrimmed(mipData, self.textureData,
                               self.scanlineLength, lineBytelength,
-                              endSize)
+                              expectedMipSize)
         else:
             if mipData != None:
                 self.textureData = mipData.getvalue()
