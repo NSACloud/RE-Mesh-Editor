@@ -4,7 +4,7 @@ from ..dds.file_dds import DDS, DX10_Header, DDSFile, getDDSHeader
 
 from .file_re_tex import RE_TexFile, MipData, CompressedImageHeader
 from ..gen_functions import raiseWarning
-from ..gdeflate.gdeflate import GDeflate, GDeflateCompressionLevel
+from ..gdeflate.gdeflate import GDeflate, GDeflateCompressionLevel, GDeflateError
 from ..ddsconv.directx.texconv import Texconv, unload_texconv
 from .enums import tex_format_enum as texenum
 from .enums import dxgi_format_enum as dxgienum
@@ -146,10 +146,13 @@ def packageTextures(ddsHeader, ddsList, compress, formatData):
                                    capcomScanline, ycount*z)
             uncompressedSize = capcomScanline * ycount
             if x * y >= 64 and compress:
-                compressedPaddedMipmap = compressor.compress(
-                    paddedMipmap, GDeflateCompressionLevel.BEST_RATIO)
-                s = compressor.get_uncompressed_size(compressedPaddedMipmap)
-                if len(compressedPaddedMipmap) > s:
+                try:
+                    compressedPaddedMipmap = compressor.compress(
+                        paddedMipmap, GDeflateCompressionLevel.BEST_RATIO)
+                    s = compressor.get_uncompressed_size(compressedPaddedMipmap)
+                    if len(compressedPaddedMipmap) > s:
+                        compressedPaddedMipmap = paddedMipmap
+                except GDeflateError:
                     compressedPaddedMipmap = paddedMipmap
             else:
                 compressedPaddedMipmap = paddedMipmap
