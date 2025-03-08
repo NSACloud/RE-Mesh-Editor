@@ -1473,10 +1473,10 @@ def exportREMeshFile(filePath,options):
 					#Vertex Tangent
 					
 					loopTangent = loop.tangent * 1.001 * 127
-					tx = int(floor(loopTangent[0]))
-					ty = int(floor(loopTangent[1]))
-					tz = int(floor(loopTangent[2]))
-					sign = int(floor(loop.bitangent_sign*127.0))
+					tx = int(floor(loopTangent[0])) & 0xFF
+					ty = int(floor(loopTangent[1])) & 0xFF
+					tz = int(floor(loopTangent[2])) & 0xFF
+					sign = int(floor(loop.bitangent_sign*127.0)) & 0xFF
 
 					parsedSubMesh.tangentList[currentVertIndex] = (tx, ty, tz, sign)
 					

@@ -247,7 +247,7 @@ Reconsider the life choices that led you to decide to try to export a mesh with 
 """,
 
 "MaxWeightsPerVertexExceeded":"""Max Weights Per Vertex Exceeded On Sub Mesh
-A vertex has more the maximum of 8 (or 6 for SF6) weights assigned to it.
+A vertex has more the maximum of 8 (or 6 for MH Wilds and SF6) weights assigned to it.
 	
 HOW TO FIX:
 _______________

@@ -158,7 +158,7 @@ class MipData():
         #tempFile = open(r"D:\Modding\Monster Hunter Wilds\texDataTest\tempData"+str(currentImageDataHeaderOffset),"wb")
         # tempFile.write(mipData.getvalue())
         # tempFile.close()
-        print(scanlineLength,dataLength,endSize)
+        #print(scanlineLength,dataLength,endSize)
         while currentOffset != endSize:
             #print("S",currentOffset,endSize)
             #print(f"current block offset {file.tell()}")

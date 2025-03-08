@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 45),
+	"version": (0, 46),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -129,8 +129,11 @@ def showMessageBox(message = "", title = "Message Box", icon = 'INFO'):
 
 def setModDirectoryFromFilePath(filePath):
 	if "re_chunk_000" not in filePath and "re_dlc_stm" not in filePath and "natives" in filePath:
-		bpy.context.scene.re_mdf_toolpanel.modDirectory = splitNativesPath(filePath)[0]
-		print(f"Set mod directory to {bpy.context.scene.re_mdf_toolpanel.modDirectory}")
+		try:
+			bpy.context.scene.re_mdf_toolpanel.modDirectory = splitNativesPath(filePath)[0]
+			print(f"Set mod directory to {bpy.context.scene.re_mdf_toolpanel.modDirectory}")
+		except:
+			print("ERROR: Failed to set mod directory, exported file path probably does not follow the chunk naming scheme.")
 class WM_OT_OpenTextureCacheFolder(Operator):
 	bl_label = "Open Texture Cache Folder"
 	bl_description = "Opens the texture cache folder in File Explorer"
