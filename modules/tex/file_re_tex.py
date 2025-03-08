@@ -10,8 +10,9 @@ from ..gen_functions import read_uint, read_int, read_uint64,\
 from ..gen_functions import textColors, raiseWarning, getPaddingAmount
 from ..gdeflate.gdeflate import GDeflate
 from .enums.game_version_enum import gameNameToTexVersionDict
-from .enums.dds_bpps import ddsBpps
+from .format_ops import packetSizeData
 from .enums.tex_format_enum import texFormatToDXGIStringDict
+from . import tex_math as tmath
 
 VERSION_MHWILDS_BETA = 240701001
 VERSION_MHWILDS = 241106027
@@ -44,7 +45,7 @@ class TexHeader():
         self.seven = 0
         self.one = 0
 
-        self.ddsBitsPerPixel = 0  # Internal, for reading texture data with cursed pitch
+        self.packetSizeData = None  # Internal, for reading texture data with cursed pitch
 
     def read(self, file):
         self.magic = read_uint(file)
@@ -74,8 +75,7 @@ class TexHeader():
             self.null1 = read_ushort(file)
             self.seven = read_ushort(file)
             self.one = read_ushort(file)
-        self.ddsBitsPerPixel = ddsBpps.get(
-            texFormatToDXGIStringDict.get(self.format, "UNKNOWN"), 0)
+        self.formatData = packetSizeData(texFormatToDXGIStringDict.get(self.format, "UNKNOWN"))
         #self.reserved = read_uint64(file)
 
     def write(self, file):
@@ -158,11 +158,14 @@ class MipData():
         #tempFile = open(r"D:\Modding\Monster Hunter Wilds\texDataTest\tempData"+str(currentImageDataHeaderOffset),"wb")
         # tempFile.write(mipData.getvalue())
         # tempFile.close()
+        print(scanlineLength,dataLength,endSize)
         while currentOffset != endSize:
+            #print("S",currentOffset,endSize)
             #print(f"current block offset {file.tell()}")
             target.extend(source.read(dataLength))
             source.seek(seekAmount, 1)
             currentOffset += scanlineLength
+            #print("E",currentOffset,endSize)
             if currentOffset > endSize:
                 raise BufferError("Texture Data Read Past Bounds")
             #print(f"end block offset {file.tell()}")
@@ -170,12 +173,12 @@ class MipData():
         source.close()
         return target
 
-    def calculateLineBytelength(self, ddsBPPs, width):
+    def calculateLineBytelength(self, formatData, width):
         """
         Parameters
         ----------
-        ddsBPPs : Int
-            Bytes per pixel of the compression format used in the file
+        formatData : FormatData
+            Information about texture format dimensions
         width : Int
             Texture width in pixels
 
@@ -183,28 +186,8 @@ class MipData():
         ----------
         lineBytelength : Int
             Number of bytes expected per horizontal pixel line
-
-        Raises
-        ------
-        ValueError
-            DXGI Format lacking a known bytes per pixel value
         """
-        # print(f"{width},{height}")
-        if ddsBPPs == 4 or ddsBPPs == 8:
-            texelSize = 4
-        else:
-            texelSize = ddsBPPs // 8
-
-        if ddsBPPs != 0:
-            bitAmount = (width * ddsBPPs)
-            pad = 8 - bitAmount if bitAmount < 8 else 0
-            # if not bitAmount % 8 == 0:
-            #raise ValueError("Data is not byte aligned")
-            byteReadLength = (bitAmount//8+pad) * texelSize
-            #print(f"byteReadLength: {byteReadLength}")
-        else:
-            raise ValueError("Unsupported DXGI Format")
-        return byteReadLength
+        return tmath.ruD(width,formatData.tx)*formatData.bytelen
 
     def uncompressGdeflate(self, file, headerOffset, imageOffset):
         """
@@ -246,7 +229,7 @@ class MipData():
         #print(f"Specified size: {self.uncompressedSize}")
         return mipData
 
-    def read(self, file, expectedMipSize, dimensions, ddsBPPs,
+    def read(self, file, expectedMipSize, dimensions, formatData,
              currentImageDataHeaderOffset, imageDataOffset,
              texVersion):
         """
@@ -258,8 +241,8 @@ class MipData():
             Expected size in bytes of the final texture buffer (x * y * z * bytesPerPixel)
         dimensions : Int[3]
             Height, Width and Depth of Image
-        ddsBPPs : Int
-            Bytes per pixel of the compression format used in the file
+        formatData : FormatData
+            Information about texture format dimensions
         currentImageDataHeaderOffset : Int
             Offset from the start of the file to the current Compressed Data Header
         imageDataOffset : Int
@@ -276,22 +259,24 @@ class MipData():
         file.seek(self.mipOffset)
         #print(f"mip offset {self.mipOffset}")
         # print(f"{file.tell()}")
-        endSize = self.uncompressedSize
         mipData = None  # BytesIO for uncompressed texture data
 
         if texVersion == VERSION_MHWILDS or texVersion == VERSION_MHWILDS_BETA:
             mipData = self.uncompressGdeflate(file,
                 currentImageDataHeaderOffset, imageDataOffset)
             endSize = mipData.getbuffer().nbytes
+        else:
+            mipData = BytesIO(file.read(self.uncompressedSize))
+            endSize = self.uncompressedSize
 
         #print(f"expected mip size: {expectedMipSize}\nactual mip size: {self.uncompressedSize}")
         if endSize != expectedMipSize:
-            if mipData == None:
-                mipData = BytesIO(file.read(self.uncompressedSize))
-            lineBytelength = self.calculateLineBytelength(ddsBPPs, width)
+            lineBytelength = self.calculateLineBytelength(formatData, width)
+            #print("sclLen: %d, lbLenL %d"%(self.scanlineLength,lineBytelength))
+            #print("expMpS: %d, actual: %d"%(expectedMipSize,endSize))
             self.storeTrimmed(mipData, self.textureData,
                               self.scanlineLength, lineBytelength,
-                              expectedMipSize)
+                              endSize)
         else:
             if mipData != None:
                 self.textureData = mipData.getvalue()
@@ -316,6 +301,7 @@ class Tex():
     def read(self, file):
         self.header.read(file)
         self.imageMipDataList = []
+        fmtData = self.header.formatData
         currentOverallMipIndex = 0
         currentImageDataHeaderOffset = file.tell() + \
             (self.header.mipCount * self.header.imageCount) * \
@@ -327,17 +313,14 @@ class Tex():
             imageMipDataListEntry = []
             currentXSize = self.header.width
             currentYSize = self.header.height
-            #expectedMipSize = ((currentXSize * currentYSize) * self.header.ddsBitsPerPixel) // 8
             for j in range(self.header.mipCount):
                 mipEntry = MipData()
                 mipX = max(self.header.width >> j, 1)
                 mipY = max(self.header.height >> j, 1)
                 mipZ = max(self.header.depth >> j, 1)
-                mipBitSize = (mipX*mipY*mipZ) * self.header.ddsBitsPerPixel
-                pad = 8 - mipBitSize if mipBitSize < 8 else 0
-                expectedMipSize = (mipBitSize + pad) // 8
+                expectedMipSize = tmath.ruD(mipY,fmtData.ty) * mipZ * fmtData.bytelen
                 mipEntry.read(file, expectedMipSize, (mipX, mipY, mipZ),
-                              self.header.ddsBitsPerPixel, currentImageDataHeaderOffset,
+                              fmtData, currentImageDataHeaderOffset,
                               imageDataOffset, self.header.version)
                 imageMipDataListEntry.append(mipEntry)
                 currentImageDataHeaderOffset += 8  # 8 is image data header size

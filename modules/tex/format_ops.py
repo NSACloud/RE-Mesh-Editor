@@ -41,7 +41,7 @@ def decomposeRGBFormat(rgb):
     return bitlen,channels
 
 
-class formatData():
+class FormatData():
     """ Container for Format Texel Information 
     Members: 
         tx : Int
@@ -96,7 +96,7 @@ def _packetSizeData(formatString):
         return 1,1,bitlen,bytelen,channels,rgb.groups()[-1]
 
 def packetSizeData(formatString):
-    return formatData(formatString)
+    return FormatData(formatString)
 
 def scanlineMinima(formatString):
     '''X Pixel Count, Y Pixel Count, Bitcount, Bytecount'''
