@@ -714,8 +714,9 @@ def importREMeshFile(filePath,options):
 	meshImportEndTime = time.time()
 	meshImportTime =  meshImportEndTime - meshImportStartTime
 	print(f"Mesh imported in {timeFormat%(meshImportTime * 1000)} ms.")
+
 	print("\033[92m__________________________________\nRE Mesh import finished.\033[0m")
-	return (warningList,errorList)
+	return (warningList,errorList,meshCollection)
 
 def checkObjForUVDoubling(obj):
 	hasUVDoubling = False
