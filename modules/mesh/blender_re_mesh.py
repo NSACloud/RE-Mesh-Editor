@@ -1171,10 +1171,11 @@ def exportREMeshFile(filePath,options):
 		doubledUVList = []
 		sharpEdgeSplitList = []
 		for obj in lod.objects:
+			selected = True
 			if options["selectedOnly"]:
 				selected = obj in bpy.context.selected_objects
-			else:
-				selected = True
+			if selected and options["visibleOnly"]:
+				selected = obj in bpy.context.visible_objects
 			
 				
 			if obj.type == "MESH" and not obj.get("MeshExportExclude") and selected:
