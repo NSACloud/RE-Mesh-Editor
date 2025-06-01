@@ -179,7 +179,6 @@ MiscMapTypes = set([
 	"Tex_Effect",
 	"Tex_Normal",
 	"tex_lineMusk",
-	"MaskMap",#Onimusha 2
 	"Tex2D_0"
 	
 	#"Detail_ALBD_R",
@@ -511,9 +510,10 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						textureNodeInfoList.append(("OCTD",textureType,imageList,outputPath))
 					elif autoDetectedAlbedo:
 						textureNodeInfoList.append(("ALB",textureType,imageList,outputPath))
-					elif textureType in MiscMapTypes:
-						if textureType == "MaskMap" and "srm_msk3" in baseTexturePath.lower():
-							textureNodeInfoList.append(("SRM",textureType,imageList,outputPath))
+					
+					
+					elif textureType == "MaskMap" and gameName == "ONI2" and "srm_msk3" in baseTexturePath.lower():
+						textureNodeInfoList.append(("SRM",textureType,imageList,outputPath))
 					else:
 						textureNodeInfoList.append(("UNKN",textureType,imageList,outputPath))
 						#print(os.path.join(chunkPath,nativesRoot,baseTexturePath+".tex"+textureVersion))

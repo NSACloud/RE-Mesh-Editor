@@ -78,6 +78,8 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+### V0.49 - 6/1/2025
+* Fix skin material issue introduced by last update.
 ### V0.48 - 6/1/2025
 * Added Onimusha 2 support.
 * Fixed issue where having certain characters in a path could prevent files from being found.
