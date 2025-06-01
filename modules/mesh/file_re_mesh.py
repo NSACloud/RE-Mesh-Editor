@@ -53,6 +53,8 @@ VERSION_KG = 120#file:240306278,internal:230727984
 VERSION_DD2NEW = 124#file:240423143,internal:230517984
 VERSION_DR = 125#file:240424828,internal:240423829
 #VERSION_MHWILDS = 130#file:240820143,internal:240704828# beta
+VERSION_ONI2 = 127#file:240827123,internal:240827123
+
 VERSION_MHWILDS = 130#file:241111606,internal:240704828
 
 
@@ -72,6 +74,7 @@ meshFileVersionToNewVersionDict = {
 	240423143:VERSION_DD2NEW,
 	240424828:VERSION_DR,
 	240820143:VERSION_MHWILDS,
+	240827123:VERSION_ONI2,
 	241111606:VERSION_MHWILDS,
 	}
 newVersionToMeshFileVersion = {
@@ -88,6 +91,7 @@ newVersionToMeshFileVersion = {
 	VERSION_KG:240306278,
 	VERSION_DD2NEW:240423143,
 	VERSION_DR:240424828,
+	VERSION_ONI2:240820143,
 	VERSION_MHWILDS:241111606,
 	}
 meshFileVersionToInternalVersionDict = {
@@ -104,6 +108,7 @@ meshFileVersionToInternalVersionDict = {
 	240423143:230517984,#VERSION_DD2NEW
 	240424828:240423829,#VERSION_DR
 	240820143:240704828,#VERSION_MHWILDS
+	240827123:240704828,#VERSION_ONI2
 	241111606:240704828,#VERSION_MHWILDS
 	}
 internalVersionToMeshFileVersionDict = {
@@ -120,6 +125,7 @@ internalVersionToMeshFileVersionDict = {
 	230517984:240423143,#VERSION_DD2NEW
 	240423829:240424828,#VERSION_DR
 	#240704828:240820143,#VERSION_MHWILDSBETA
+	240704828:240820143,#VERSION_ONI2
 	240704828:241111606,#VERSION_MHWILDS
 	}
 meshFileVersionToGameNameDict = {
@@ -138,6 +144,7 @@ meshFileVersionToGameNameDict = {
 	240423143:"DD2",#VERSION_DD2NEW
 	240424828:"DR",#VERSION_DR
 	240820143:"MHWILDS",#VERSION_MHWILDSBETA
+	240827123:"ONI2",#VERSION_ONI2
 	241111606:"MHWILDS",#VERSION_MHWILDS
 	}
 
@@ -909,7 +916,7 @@ class FileHeader():
 			self.boneNameRemapOffset = read_uint64(file)
 			self.blendShapeNameOffset = read_uint64(file)
 			self.nameOffsetsOffset = read_uint64(file)
-		elif version >= VERSION_SF6 and version < VERSION_MHWILDS:
+		elif version >= VERSION_SF6 and version < VERSION_ONI2:
 			self.contentFlag.read(file)
 			self.sf6UnknCount = read_short(file)
 			self.nameCount = read_short(file)
@@ -947,7 +954,7 @@ class FileHeader():
 			self.verticesOffset = read_uint64(file)#new
 			self.sf6unkn4 = read_uint64(file)#new
 			
-		elif version >= VERSION_MHWILDS:
+		elif version >= VERSION_ONI2:
 			self.wilds_unkn1 = read_uint(file)
 			self.nameCount = read_short(file)
 			self.contentFlag.read(file)
@@ -1004,7 +1011,7 @@ class FileHeader():
 			write_uint64(file, self.boneNameRemapOffset)
 			write_uint64(file, self.blendShapeNameOffset)
 			write_uint64(file, self.nameOffsetsOffset)
-		elif version >= VERSION_SF6 and version < VERSION_MHWILDS:
+		elif version >= VERSION_SF6 and version < VERSION_ONI2:
 			self.contentFlag.write(file)
 			write_short(file, self.sf6UnknCount)
 			write_short(file, self.nameCount)
@@ -1035,7 +1042,7 @@ class FileHeader():
 				
 			write_uint64(file, self.verticesOffset)#new
 			write_uint64(file, self.sf6unkn4)#new
-		elif version >= VERSION_MHWILDS:
+		elif version >= VERSION_ONI2:
 			write_uint(file, self.wilds_unkn1)
 			write_short(file, self.nameCount)
 			self.contentFlag.write(file)
@@ -1263,7 +1270,7 @@ class BlendShapeHeader():
 		
 	def read(self,file,version):
 		self.count = read_uint64(file)
-		if version < VERSION_MHWILDS:
+		if version < VERSION_ONI2:
 			self.mainOffset = read_uint64(file)
 			self.zero = read_uint64(file)
 		else:

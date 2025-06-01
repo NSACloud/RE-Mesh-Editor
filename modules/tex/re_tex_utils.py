@@ -204,7 +204,7 @@ def storeTextures(ddsHeader, texFile, miptex, compress):
 
 def getTexFileFromDDS(ddsList, texVersion, streamingFlag=False):
     ddsHeader = ddsList[0].header
-    isGDeflate = texVersion == VERSION_MHWILDS or texVersion == VERSION_MHWILDS_BETA
+    isGDeflate = texVersion == VERSION_MHWILDS# or texVersion == VERSION_MHWILDS_BETA
     newTexFile = makeTexHeader(texVersion, ddsHeader, len(ddsList))
     formatData = format_ops.packetSizeData(newTexFile.tex.header.formatString)
     miptex = packageTextures(ddsHeader, ddsList, isGDeflate, formatData)

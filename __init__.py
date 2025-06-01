@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 47),
+	"version": (0, 48),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -13,7 +13,7 @@ bl_info = {
 
 import bpy
 from . import addon_updater_ops
-
+from datetime import datetime, UTC
 import os
 from bpy_extras.io_utils import ExportHelper,ImportHelper
 from bpy.props import StringProperty, BoolProperty,IntProperty, EnumProperty, CollectionProperty,PointerProperty
@@ -141,11 +141,52 @@ class WM_OT_OpenTextureCacheFolder(Operator):
 
 	def execute(self, context):
 		try:
-			os.startfile(bpy.context.preferences.addons[__name__].preferences.textureCachePath)
+			os.startfile(bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath))
 		except:
 			pass
+		checkTextureCacheSize()
 		return {'FINISHED'}
-	
+
+class WM_OT_CheckTextureCacheSize(Operator):
+	bl_label = "Check Cache Size"
+	bl_description = "Shows the current size of the texture cache folder."
+	bl_idname = "re_mesh.check_texture_cache_size"
+
+	def execute(self, context):
+		checkTextureCacheSize()
+		return {'FINISHED'} 
+
+class WM_OT_ClearTextureCacheFolder(Operator):
+	bl_label = "Clear Texture Cache Folder"
+	bl_description = "Deletes all cached converted textures. Note that any saved blend files will lose their textures if the cache is cleared."
+	bl_idname = "re_mesh.clear_texture_cache_folder"
+	def draw(self,context):
+		layout = self.layout
+		layout.label(text="Are you sure you want to delete all cached textures?")
+		layout.label(text=f"Directory:")
+		layout.label(text=f"{bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath)}")
+	def invoke(self,context,event):
+		checkTextureCacheSize()
+		return context.window_manager.invoke_props_dialog(self,width = 400)
+	def execute(self, context):
+		imageExtensions = (".dds",".png",".tga",".tif",".tiff") 
+		deletionList = []
+		#I could do shutil.rmtree but deleting everything from a directory could be potentially dangerous if the path is somehow wrong.
+		#So in order to minimize potential damage, it loops through and only deletes image files in the directory.
+		for root, dirs, files in os.walk(bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath)):
+			for file in files:
+				if file.lower().endswith(imageExtensions):
+					deletionList.append(os.path.join(root,file))
+		
+		print(f"Deleting {len(deletionList)} image files...")
+		for path in deletionList:
+			try:
+				os.remove(path)
+			except Exception as err:
+				print(f"Failed to delete {path} - {str(err)}")
+		self.report({"INFO"},"Cleared texture cache.")
+		checkTextureCacheSize()
+		return {'FINISHED'}
 
 class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
     gameName: EnumProperty(
@@ -165,6 +206,7 @@ class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
 		("DD2", "Dragon's Dogma 2", ""),
 		("KG", "Kunitsu-Gami", ""),
 		("DR", "Dead Rising", ""),
+		("ONI2", "Onimusha 2", ""),
 		("MHWILDS", "Monster Hunter Wilds", ""),
 		]
     )
@@ -230,6 +272,15 @@ class MESH_UL_ChunkPathList(bpy.types.UIList):
 	def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
 		layout.prop(item,"gameName")
 		layout.prop(item,"path")
+
+def checkTextureCacheSize():
+	try:
+		bpy.context.preferences.addons[__name__].preferences.textureCacheSizeString = formatByteSize(getFolderSize(bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath)))
+		timestamp = str(datetime.now(UTC)).split(".")[0]
+		bpy.context.preferences.addons[__name__].preferences.textureCacheCheckDate = timestamp
+	except:
+		pass
+	
 class REMeshPreferences(AddonPreferences):
 	bl_idname = __name__
 	
@@ -306,6 +357,12 @@ class REMeshPreferences(AddonPreferences):
 	   name = "Show Default Export Settings",
 	   default = False)
 	
+	textureCacheSizeString: bpy.props.StringProperty(
+	    default="",
+	)
+	textureCacheCheckDate: bpy.props.StringProperty(
+	    default="",
+	)
 	
 	#Default import settings
 	
@@ -433,9 +490,28 @@ class REMeshPreferences(AddonPreferences):
 		layout.prop(self, "dragDropImportOptions")
 		layout.prop(self, "showConsole")
 		layout.prop(self, "useDDS")
-		layout.prop(self, "textureCachePath")
-		layout.label(text=f"Folder Size: {formatByteSize(getFolderSize(self.textureCachePath))}")
-		layout.operator("re_mesh.open_texture_cache_folder")
+		box = layout.box()
+		row = box.row()
+		
+		if len(self.textureCachePath) > 110:
+			row.alert = True
+			row.prop(self,"textureCachePath")
+			box.label(text="Texture cache path is very long.",icon = "ERROR")
+			box.label(text="File paths may exceed the max length of 255 characters and fail to convert.")
+			box.label(text="Consider changing this to a shorter path such as C:\REMeshTextureCache.")
+		else:
+			row.prop(self,"textureCachePath")
+		row = box.row()
+		if self.textureCacheCheckDate == "":
+			checkTextureCacheSize()
+		row.label(text=f"Cache Size: {self.textureCacheSizeString}")
+		row.operator("re_mesh.check_texture_cache_size",icon = "FILE_REFRESH",text = "")
+		box.label(text=f"Last Checked: {self.textureCacheCheckDate}")
+		
+		
+		
+		box.operator("re_mesh.open_texture_cache_folder")
+		box.operator("re_mesh.clear_texture_cache_folder")
 		
 		op.url = 'https://ko-fi.com/nsacloud'
 		
@@ -650,7 +726,7 @@ class ImportREMesh(Operator, ImportHelper):
 		
 	def execute(self, context):
 		try:
-			os.makedirs(bpy.context.preferences.addons[__name__].preferences.textureCachePath,exist_ok = True)
+			os.makedirs(bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath),exist_ok = True)
 		except:
 			raiseWarning("Could not create texture cache directory at " + bpy.context.preferences.addons[__name__].preferences.textureCachePath)
 		if self.mergeArmature:
@@ -766,6 +842,7 @@ class ExportREMesh(Operator, ExportHelper):
 				(".240423143", "Dragon's Dogma 2", "Dragon's Dogma 2"),
 				(".240306278", "Kunitsu-Gami", "Kunitsu-Gami"),
 				(".240424828", "Dead Rising", "Dead Rising"),
+				(".240827123", "Onimusha 2", "Onimusha 2"),
 				(".241111606", "Monster Hunter Wilds", "Monster Hunter Wilds"),
 			   ]
 		)
@@ -1035,6 +1112,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				(".32", "Resident Evil 4", ""),
 				(".31", "Street Fighter 6", ""),
 				(".40", "Dragon's Dogma 2 / Kunitsu-Gami / Dead Rising", "Dragon's Dogma 2, Kunitsu-Gami, Dead Rising"),
+				(".46", "Onimusha 2", "Onimusha 2"),
 				(".45", "Monster Hunter Wilds", "Monster Hunter Wilds"),
 			  ]
 		)
@@ -1114,6 +1192,8 @@ classes = [
 	ImportREMesh,
 	ExportREMesh,
 	WM_OT_OpenTextureCacheFolder,
+	WM_OT_ClearTextureCacheFolder,
+	WM_OT_CheckTextureCacheSize,
 	#mdf
 	ImportREMDF,
 	ExportREMDF,

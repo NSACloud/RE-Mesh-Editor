@@ -81,6 +81,11 @@ class WM_OT_ApplyMDFToMeshCollection(Operator):
 			for obj in meshCollection.all_objects:
 				if obj.type == "MESH" and not obj.get("MeshExportExclude"):
 					materialName = None
+					#Fix UV map naming so materials work properly on non RE meshes
+					if len(obj.data.uv_layers) > 0:
+						obj.data.uv_layers[0].name = "UVMap0"
+						if len(obj.data.uv_layers) > 1:
+							obj.data.uv_layers[1].name = "UVMap1"
 					if "__" in obj.name:
 						materialName = obj.name.split("__",1)[1].split(".")[0]
 						for material in obj.data.materials:

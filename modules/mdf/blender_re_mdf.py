@@ -394,7 +394,7 @@ def getPropValue(propertyEntry):
 def fixTexPath(path):#Fix potential path problems
 	if not path.endswith(".rtex"):
 		path = path.replace(os.sep,"/").split(".tex")[0]+".tex"#Fix incorrect directory separators and including version numbers on the tex path
-		if "natives" in path:
+		if "natives" in path.lower():
 			splitPath = splitNativesPath(path)
 			if splitPath != None:
 				path = splitPath[1]#Fix including the chunk root path in the tex path

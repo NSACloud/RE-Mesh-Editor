@@ -261,7 +261,7 @@ class MipData():
         # print(f"{file.tell()}")
         mipData = None  # BytesIO for uncompressed texture data
 
-        if texVersion == VERSION_MHWILDS or texVersion == VERSION_MHWILDS_BETA:
+        if texVersion == VERSION_MHWILDS:# or texVersion == VERSION_MHWILDS_BETA:
             mipData = self.uncompressGdeflate(file,
                 currentImageDataHeaderOffset, imageDataOffset)
             endSize = mipData.getbuffer().nbytes

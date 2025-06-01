@@ -218,6 +218,7 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 				("DD2", "Dragon's Dogma 2", ""),
 				("KG", "Kunitsu-Gami", ""),
 				("DR", "Dead Rising", ""),
+				("ONI2", "Onimusha 2", ""),
 				("MHWILDS", "Monster Hunter Wilds", ""),
 			  ]
 		)

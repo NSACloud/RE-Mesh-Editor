@@ -3,7 +3,7 @@ import os
 import bpy
 import re
 import traceback
-
+import glob
 
 from mathutils import Vector
 from ..blender_utils import arrangeNodeTree,showErrorMessageBox
@@ -179,6 +179,7 @@ MiscMapTypes = set([
 	"Tex_Effect",
 	"Tex_Normal",
 	"tex_lineMusk",
+	"MaskMap",#Onimusha 2
 	"Tex2D_0"
 	
 	#"Detail_ALBD_R",
@@ -244,7 +245,7 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 	#TODO fix this to be less of a mess
 	#Should use regex to do this
 	split = meshPath.split(".mesh")
-	fileRoot = split[0]
+	fileRoot = glob.escape(split[0])
 	meshVersion = split[1]
 	mdfVersionDict = {
 		".1808312334":".10",#RE2
@@ -265,6 +266,7 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 		".240424828":".40",#DR
 		".240820143":".45",#MHWILDS
 		".241111606":".45",#MHWILDS
+		".240827123":".46",#ONI2
 		
 		
 		}
@@ -364,10 +366,10 @@ def getTexPath(baseTexturePath,chunkPathList,mdfVersion):
 	inputPath = None
 	texVersion = texVersionDict.get(mdfVersion,"")
 	for chunkPath in chunkPathList:
-		inputPath = wildCardFileSearch(os.path.join(chunkPath,"streaming",baseTexturePath+f".tex{texVersion}*"))#Searches for texture even if the version is known because capcom can add platform or lang extensions
+		inputPath = wildCardFileSearch(glob.escape(os.path.join(chunkPath,"streaming",baseTexturePath+f".tex{texVersion}"))+"*")#Searches for texture even if the version is known because capcom can add platform or lang extensions
 		
 		if inputPath == None:
-			inputPath = wildCardFileSearch(os.path.join(chunkPath,baseTexturePath+f".tex{texVersion}*"))
+			inputPath = wildCardFileSearch(glob.escape(os.path.join(chunkPath,baseTexturePath+f".tex{texVersion}"))+"*")
 		
 		if inputPath != None:
 			break
@@ -487,6 +489,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 								textureNodeInfoList.append(("NRRT",textureType,imageList,outputPath))
 							else:
 								textureNodeInfoList.append(("NRMR",textureType,imageList,outputPath))
+						elif textureType == "NormalMap":
+							textureNodeInfoList.append(("NRM",textureType,imageList,outputPath))
 						else:
 							textureNodeInfoList.append(("NRMR",textureType,imageList,outputPath))
 						detectedNormal = True
@@ -507,6 +511,9 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						textureNodeInfoList.append(("OCTD",textureType,imageList,outputPath))
 					elif autoDetectedAlbedo:
 						textureNodeInfoList.append(("ALB",textureType,imageList,outputPath))
+					elif textureType in MiscMapTypes:
+						if textureType == "MaskMap" and "srm_msk3" in baseTexturePath.lower():
+							textureNodeInfoList.append(("SRM",textureType,imageList,outputPath))
 					else:
 						textureNodeInfoList.append(("UNKN",textureType,imageList,outputPath))
 						#print(os.path.join(chunkPath,nativesRoot,baseTexturePath+".tex"+textureVersion))

@@ -826,6 +826,12 @@ def newNRMRNode (nodeTree,textureType,matInfo):
 	matInfo["normalNodeLayerGroup"].addMixLayer(imageNode.outputs["Color"])
 	matInfo["roughnessNodeLayerGroup"].addMixLayer(imageNode.outputs["Alpha"])
 	return imageNode
+def newNRMNode (nodeTree,textureType,matInfo):
+	imageNode = nodeTree.nodes[textureType]
+	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
+	
+	matInfo["normalNodeLayerGroup"].addMixLayer(imageNode.outputs["Color"])
+	return imageNode
 def newNAMNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes[textureType]
 	currentPos = [imageNode.location[0]-300,imageNode.location[1]]
@@ -1395,6 +1401,17 @@ def newOCTDNode (nodeTree,textureType,matInfo):
 	matInfo["cavityNodeLayerGroup"].addMixLayer(separateNode.outputs["G"])
 	
 	return imageNode
+
+def newSRMNode (nodeTree,textureType,matInfo):
+	imageNode = nodeTree.nodes[textureType]
+	currentPos = [imageNode.location[0]-300,imageNode.location[1]]
+	
+	separateRGBNode = nodeTree.nodes.new("ShaderNodeSeparateRGB")
+	separateRGBNode.location = currentPos
+	nodeTree.links.new(imageNode.outputs["Color"],separateRGBNode.inputs["Image"])
+	matInfo["roughnessNodeLayerGroup"].addMixLayer(separateRGBNode.outputs["G"])
+	matInfo["metallicNodeLayerGroup"].addMixLayer(separateRGBNode.outputs["B"])
+	return imageNode
 """
 def newUNKNNode (nodeTree,textureType,matInfo):
 	imageNode = nodeTree.nodes.new('ShaderNodeTexImage')
@@ -1426,6 +1443,8 @@ nodeDict = {
 	"ATOS":newATOSNode,
 	"OCTD":newOCTDNode,
 	"NAM":newNAMNode,
+	"SRM":newSRMNode,
+	"NRM":newNRMNode,
 	#"UNKN":newUNKNNode,
 	
 	}

@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.47 (3/8/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.48 (6/1/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -51,6 +51,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - **Dragon's Dogma 2**
  - **Kunitsu-Gami: Path of the Goddess**
  - **Dead Rising Deluxe Remaster**
+ - **Onimusha 2: Samurai's Destiny**
  - **Monster Hunter Wilds**
  
 Support for more games may be added in the future.
@@ -77,6 +78,14 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+### V0.48 - 6/1/2025
+* Added Onimusha 2 support.
+* Fixed issue where having certain characters in a path could prevent files from being found.
+* Added Clear Texture Cache button in the addon preferences.
+* Fixed issue with slowdown in the addon preferences when the texture cache is very large.
+* The texture cache size is no longer automatically checked due to performance reasons.
+* The addon will warn if the texture cache path is too long and may cause issues with path lengths.
+* UV map names are now corrected automatically when when applying an MDF to a mesh.
 
 ### V0.47 - 3/8/2025
 * Added error handling for unsupported DDS formats.
