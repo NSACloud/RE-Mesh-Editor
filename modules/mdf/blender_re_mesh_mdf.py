@@ -702,7 +702,15 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					uvMappingGroupNode.location = uvTilingNode.location + Vector((300,0))
 					nodeTree.links.new(UVMap1Node.outputs["UV"],uvMappingGroupNode.inputs["UV1"])
 					nodeTree.links.new(UVMap2Node.outputs["UV"],uvMappingGroupNode.inputs["UV2"])
-					nodeTree.links.new(uvTilingNode.outputs["Value"],uvMappingGroupNode.inputs["Tiling"])
+					
+					if "Value" in uvTilingNode.outputs:
+						nodeTree.links.new(uvTilingNode.outputs["Value"],uvMappingGroupNode.inputs["Tiling"])
+					else:#Vec4
+						tilingScaleXYZNode = nodes.new("ShaderNodeCombineXYZ")
+						tilingScaleXYZNode.location = uvTilingNode.location + Vector((600,0))
+						links.new(uvTilingNode.outputs[0],tilingScaleXYZNode.inputs["X"])
+						links.new(uvTilingNode.outputs[1],tilingScaleXYZNode.inputs["Y"])
+						links.new(tilingScaleXYZNode.outputs["Vector"],uvMappingGroupNode.inputs["Tiling"])
 					if "UV_Tiling_Offset" in matInfo["mPropDict"]:
 						uvTilingLocationNode = addPropertyNode(matInfo["mPropDict"]["UV_Tiling_Offset"], matInfo["currentPropPos"], nodeTree)
 						nodeTree.links.new(uvTilingLocationNode.outputs[0],uvMappingGroupNode.inputs["OffsetX"])

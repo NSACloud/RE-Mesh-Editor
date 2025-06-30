@@ -27,6 +27,7 @@ from ..mdf.blender_re_mdf import importMDFFile
 from .re_mesh_export_errors import addErrorToDict,printErrorDict,showREMeshErrorWindow
 from ..gen_functions import splitNativesPath,raiseWarning
 from ..blender_utils import showErrorMessageBox
+from ..hashing.pymmh3 import hash
 import time
 import numpy as np																																																																												
 timeFormat = "%d"
@@ -174,6 +175,7 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 	elif targetArmatureName != "":
 		print("The specified armature to merge with could not be found. Importing the armature as a new object.")
 	boneParentList = []#List of tuples containing armature bone and parent bone name string
+	hashedNameDict = dict()
 	for bone in parsedSkeleton.boneList:
 		if bone.boneName not in armatureData.bones:
 			hashedName = False
@@ -182,12 +184,16 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 				boneName = f"#HASHED_{str(hash(boneName))}"
 				raiseWarning(f"Bone name length exceeds Blender's limit of 63 characters, hashing bone name: {bone.boneName}")
 				hashedName = True
+				hashedNameDict[bone.boneName] = boneName
 			editBone = armatureData.edit_bones.new(boneName)
 			if hashedName:
 				editBone["unhashedBoneName"] = bone.boneName
 			editBone.tail = editBone.head + Vector((.0, .0, .1))
 			if bone.parentIndex != -1:
-				boneParentList.append((editBone,boneNameIndexDict[bone.parentIndex]))#Set bone parents after all bones have been imported
+				boneParentName = boneNameIndexDict[bone.parentIndex]
+				if boneParentName in hashedNameDict:
+					boneParentName = hashedNameDict[boneParentName]
+				boneParentList.append((editBone,boneParentName))#Set bone parents after all bones have been imported
 				#editBone.parent = armatureData.edit_bones[boneNameIndexDict[bone.parentIndex]]
 			else:
 				bone.head = Vector([.0, .0, .01])

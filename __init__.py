@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 50),
+	"version": (0, 51),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -13,7 +13,7 @@ bl_info = {
 
 import bpy
 from . import addon_updater_ops
-from datetime import datetime, UTC
+from datetime import datetime
 import os
 from bpy_extras.io_utils import ExportHelper,ImportHelper
 from bpy.props import StringProperty, BoolProperty,IntProperty, EnumProperty, CollectionProperty,PointerProperty
@@ -276,7 +276,7 @@ class MESH_UL_ChunkPathList(bpy.types.UIList):
 def checkTextureCacheSize():
 	try:
 		bpy.context.preferences.addons[__name__].preferences.textureCacheSizeString = formatByteSize(getFolderSize(bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath)))
-		timestamp = str(datetime.now(UTC)).split(".")[0]
+		timestamp = str(datetime.now()).split(".")[0]
 		bpy.context.preferences.addons[__name__].preferences.textureCacheCheckDate = timestamp
 	except:
 		pass

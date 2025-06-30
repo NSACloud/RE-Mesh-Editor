@@ -318,7 +318,7 @@ def getDualUVMappingNodeGroup(nodeTree):
 			nodeGroup.interface.new_socket(name="OffsetX",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
 			nodeGroup.interface.new_socket(name="OffsetY",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
 			nodeGroup.interface.new_socket(name="Rotation",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
-			nodeGroup.interface.new_socket(name="Tiling",description="",in_out ="INPUT", socket_type="NodeSocketFloat")
+			nodeGroup.interface.new_socket(name="Tiling",description="",in_out ="INPUT", socket_type="NodeSocketVector")
 		inNode = nodeGroup.nodes.new('NodeGroupInput')
 		#inNode.outputs["UseSecondaryUV"].default_value = 0.0
 		#inNode.outputs["Tiling"].default_value = 1.0
@@ -372,7 +372,7 @@ def getDualUVMappingNodeGroup(nodeTree):
 	
 	#Set defaults
 
-	nodeGroupNode.inputs["Tiling"].default_value = 1.0
+	nodeGroupNode.inputs["Tiling"].default_value = (1.0,1.0,1.0)
 	
 	return nodeGroupNode
 	
