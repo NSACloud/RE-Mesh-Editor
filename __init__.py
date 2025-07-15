@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 51),
+	"version": (0, 52),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -1274,7 +1274,8 @@ if bpy.app.version >= (4, 1, 0):
 			return (context.area and context.area.type == 'VIEW_3D')
 	texExtensionsString = ".dds;"
 	for texVersion in gameNameToTexVersionDict.values():
-		texExtensionsString += f".{str(texVersion)};"	
+		texExtensionsString += f".{str(texVersion)};"
+	texExtensionsString += ".31;"#RE Verse tex drag and drop support
 	
 	class TEX_FH_drag_import(bpy.types.FileHandler):
 		bl_idname = "TEX_FH_drag_import"

@@ -297,10 +297,10 @@ def getBentNormalNodeGroup(nodeTree):
 	return nodeGroupNode
 
 def getDualUVMappingNodeGroup(nodeTree):
-	if "DualUVMappingNodeGroup" in bpy.data.node_groups:
-		nodeGroup = bpy.data.node_groups["DualUVMappingNodeGroup"]
+	if "DualUVMappingNodeGroupV2" in bpy.data.node_groups:
+		nodeGroup = bpy.data.node_groups["DualUVMappingNodeGroupV2"]
 	else:
-		nodeGroup = bpy.data.node_groups.new(type="ShaderNodeTree", name="DualUVMappingNodeGroup")
+		nodeGroup = bpy.data.node_groups.new(type="ShaderNodeTree", name="DualUVMappingNodeGroupV2")
 		nodes = nodeGroup.nodes
 		links = nodeGroup.links
 		if bpy.app.version < (4,0,0):
@@ -371,9 +371,13 @@ def getDualUVMappingNodeGroup(nodeTree):
 	nodeGroupNode.node_tree = nodeGroup
 	
 	#Set defaults
-
-	nodeGroupNode.inputs["Tiling"].default_value = (1.0,1.0,1.0)
-	
+	try:
+		nodeGroupNode.inputs["Tiling"].default_value = (1.0,1.0,1.0)
+	except:
+		try:
+			nodeGroupNode.inputs["Tiling"].default_value = 1.0
+		except:
+			pass
 	return nodeGroupNode
 	
 
