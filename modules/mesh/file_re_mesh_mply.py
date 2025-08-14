@@ -70,6 +70,48 @@ class ContentFlagsB(ctypes.Union):
 					("asUInt8", c_uint8)
 				]
 
+class ClusterFlagsA_bits(ctypes.LittleEndianStructure):
+	_fields_ = 	[
+					("smallPos",c_uint8,1),
+					("unkn1",c_uint8,1),
+					("unkn2",c_uint8,1),
+					("unkn3",c_uint8,1),
+					("unkn4",c_uint8,1),
+					("unkn5",c_uint8,1),
+					("smallNormal",c_uint8,1),
+					("unkn7",c_uint8,1),
+		
+				]
+	
+class ClusterFlagsA(ctypes.Union):
+	
+	_anonymous_ = ("flags",)
+	_fields_ =	[
+					("flags",    ClusterFlagsA_bits ),
+					("asUInt8", c_uint8)
+				]
+
+class ClusterFlagsB_bits(ctypes.LittleEndianStructure):
+	_fields_ = 	[
+					("unkn0",c_uint8,1),
+					("unkn1",c_uint8,1),
+					("unkn2",c_uint8,1),
+					("unkn3",c_uint8,1),
+					("unkn4",c_uint8,1),
+					("unkn5",c_uint8,1),
+					("unkn6",c_uint8,1),
+					("useUnknStruct",c_uint8,1),
+		
+				]
+	
+class ClusterFlagsB(ctypes.Union):
+	
+	_anonymous_ = ("flags",)
+	_fields_ =	[
+					("flags",    ClusterFlagsB_bits ),
+					("asUInt8", c_uint8)
+				]
+
 class FileHeader():
 	def __init__(self):
 		self.magic = 1498173517
@@ -206,11 +248,12 @@ class MeshletLayout():
 		self.gpuDataSize = 0
 		self.unkn = 0
 		self.gpuMeshletHeader = MeshletHeader()
-	def read(self,file):
+	def read(self,file,version):
 		self.gpuMeshletOffset = read_uint64(file)
 		self.meshletHeader.read(file)
-		self.wilds_unkn0 = read_uint64(file)
-		self.wilds_unkn1 = read_uint64(file)
+		if version >= VERSION_MHWILDS:
+			self.wilds_unkn0 = read_uint64(file)
+			self.wilds_unkn1 = read_uint64(file)
 		self.gpuDataSize = read_uint(file)
 		self.unkn = read_uint(file)
 		currentPos = file.tell()
@@ -401,27 +444,32 @@ class StreamingInfo():
 		write_uint(file, self.unkn1)
 		write_uint64(file, self.entryOffset)
 
-
+COMPRESSED_POS_DATA_STRIDE = 6
+NORTAN_STRIDE = 8
+UV_STRIDE = 4
+COLOR_STRIDE = 4
 
 class ClusterInfo():
 	def __init__(self):
-		self.posX = 0.0
+		self.posX = 0.0#Controls postion of meshlet, this value is the same across all meshlets in the file, likely used to move the model to the origin.
 		self.posY = 0.0
 		self.posZ = 0.0
 		self.vertexCount = 0
 		self.faceCount = 0
 		self.unkn0 = 0#Sometimes 1
 		self.unkn1 = 0
-		self.unkn2 = 0.0#Might not be float,could be hash
-		self.unkn3 = 0.0#Might not be float,could be hash
-		self.unkn4 = 0.0#Might not be float,could be hash
+		self.secondaryPosX = 0.0#Not sure how yet, but these values are used to postion each meshlet
+		self.secondaryPosY = 0.0
+		self.secondaryPosZ = 0.0
+		self.flagsA = ClusterFlagsA()
+		self.flagsB = ClusterFlagsB()
 		self.unkn5A = 0
 		self.unkn5B = 0#Stays same throughout whole file, but different across files
 		
 		self.faceBuffer = bytes()
 		self.vertexBuffer = bytes()
 		
-	def read(self,file):
+	def read(self,file,contentFlagsA):
 		self.posX = read_float(file)#AABB center maybe
 		self.posY = read_float(file)
 		self.posZ = read_float(file)
@@ -429,20 +477,39 @@ class ClusterInfo():
 		self.faceCount = read_ubyte(file)
 		self.unkn0 = read_ubyte(file)
 		self.unkn1 = read_ubyte(file)
-		self.unkn2 = read_float(file)
-		self.unkn3 = read_float(file)
-		self.unkn4 = read_float(file)
-		self.unkn5A = read_ushort(file)
-		self.unkn5B = read_ushort(file)
+		self.secondaryPosX = read_float(file)
+		self.secondaryPosY = read_float(file)
+		self.secondaryPosZ = read_float(file)
+		self.flagsA.asUInt8 = read_ubyte(file)
+		self.flagsB.asUInt8 = read_ubyte(file)
+		self.unkn5A = read_ubyte(file)
+		self.unkn5B = read_ubyte(file)
 		
 		self.faceBuffer = file.read(self.faceCount*3)#Faces are streamed from streaming mesh, max of 128 faces for non streaming
 		
 		print(self.vertexCount)
 		print(self.faceCount)
 		
-		#TODO figure out vertex pos packing/compression
-		#Rest should be Normal,UV,Color if enabled in header
-		#self.vertexBuffer
+		#Skip padding
+		file.seek(getPaddedPos(file.tell(), 4))
+		
+		print(f"vert start {file.tell()}")
+		self.posBuffer = file.read(self.vertexCount*COMPRESSED_POS_DATA_STRIDE)
+		#Skip padding again after pos since the stride isn't divisible by 4 
+		file.seek(getPaddedPos(file.tell(), 4))
+		if self.flagsA.flags.smallNormal:
+			self.normalBuffer = file.read(self.vertexCount*4)
+		else:
+			self.normalBuffer = file.read(self.vertexCount*8)
+		#TODO Read unknstruct based on flagsB here
+		#This structure varies in size, it's either 12 bytes or 16 bytes and I haven't found what indicates which struct to use yet
+			
+		self.uvBuffer = file.read(self.vertexCount*UV_STRIDE)
+		if contentFlagsA.hasVertexColor:
+			self.colorBuffer = file.read(self.vertexCount*COLOR_STRIDE)
+		else:
+			self.colorBuffer = None
+		
 	def write(self,file):
 		pass
 
@@ -451,28 +518,28 @@ class ClusterLODEntry():
 		self.entryCount = 0
 		self.entryOffsetList = []
 		self.entryList = []
-	def read(self,file,startOffset):
+	def read(self,file,startOffset,contentFlagsA):
 		self.entryCount = read_uint(file)
 		
 		for i in range(0,self.entryCount):
 			self.entryOffsetList.append(read_uint(file))
 		for offset in self.entryOffsetList:
-			print(offset)
+			#print(offset)
 			file.seek(startOffset+offset)
 			entry = ClusterInfo()
-			entry.read(file)
+			entry.read(file,contentFlagsA)
 			self.entryList.append(entry)
 
 class ClusterInfoLayout():
 	def __init__(self):
 		self.lodList = []
-	def read(self,file,startOffset,LODOffsetList):
+	def read(self,file,startOffset,LODOffsetList,contentFlagsA):
 		
 		for offset in LODOffsetList:
 			if offset != 0:
 				file.seek(startOffset + offset)
 				entry = ClusterLODEntry()
-				entry.read(file,startOffset)
+				entry.read(file,startOffset,contentFlagsA)
 				self.lodList.append(entry)
 			
 	def write(self,file):
@@ -506,7 +573,7 @@ class REMeshMPLY():
 		self.fileHeader.read(file,version)
 		if self.fileHeader.meshletLayoutOffset:
 			file.seek(self.fileHeader.meshletLayoutOffset)
-			self.meshletLayout.read(file)
+			self.meshletLayout.read(file,version)
 			
 		if self.fileHeader.meshletBVHOffset:
 			file.seek(self.fileHeader.meshletBVHOffset)
@@ -534,10 +601,10 @@ class REMeshMPLY():
 			self.streamingInfoHeader.read(file)
 			if self.streamingInfoHeader.entryCount != 0 and streamingBuffer == None:
 				raise Exception("Streaming file associated with mesh is missing, can't import.")
-		
 		if self.fileHeader.gpuMeshletOffset and self.meshletLayout.gpuDataSize != 0:
+			
 			self.clusterInfoLayout = ClusterInfoLayout()
-			self.clusterInfoLayout.read(file, self.meshletLayout.gpuMeshletOffset, self.meshletLayout.gpuMeshletHeader.lodClustersOffset)
+			self.clusterInfoLayout.read(file, self.meshletLayout.gpuMeshletOffset, self.meshletLayout.gpuMeshletHeader.lodClustersOffset,self.fileHeader.contentFlagsA.flags)
 			
 			#file.seek(self.fileHeader.gpuMeshletOffset)
 			#self.gpuData = file.read(self.meshletLayout.gpuDataSize)

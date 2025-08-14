@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 52),
+	"version": (0, 53),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -36,6 +36,7 @@ from .modules.mdf.ui_re_mdf_panels import (
 	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
 	OBJECT_PT_MDFMaterialGPBFDataListPanel,
 	OBJECT_PT_MDFMaterialLoadSettingsPanel,
+	OBJECT_PT_REAssetExtensionPanel,
 	)
 from .modules.mdf.re_mdf_propertyGroups import (
 	MDFToolPanelPropertyGroup,
@@ -1224,6 +1225,7 @@ classes = [
 	OBJECT_PT_MDFMaterialGPBFDataListPanel,
 	
 	
+	
 	#operators
 	WM_OT_NewMDFHeader,
 	WM_OT_ReindexMaterials,
@@ -1240,6 +1242,8 @@ classes = [
 	#ui panels
 	OBJECT_PT_TexConversionPanel,
 	
+	#RE asset extra tools
+	OBJECT_PT_REAssetExtensionPanel,
 	
 	]
 

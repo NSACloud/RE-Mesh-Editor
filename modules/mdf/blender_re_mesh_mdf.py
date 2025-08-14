@@ -769,7 +769,14 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					
 					layerMaskUVMappingGroupNode =  getDualUVMappingNodeGroup(nodeTree)
 					layerMaskUVMappingGroupNode.location = LYMONode.location + Vector((-300,0))
-					layerMaskUVMappingGroupNode.inputs["Tiling"].default_value = 1.0
+					
+					try:
+						layerMaskUVMappingGroupNode.inputs["Tiling"].default_value = (1.0,1.0,1.0)
+					except:
+						try:
+							layerMaskUVMappingGroupNode.inputs["Tiling"].default_value = 1.0
+						except:
+							pass
 					nodeTree.links.new(UVMap1Node.outputs["UV"],layerMaskUVMappingGroupNode.inputs["UV1"])
 					nodeTree.links.new(UVMap2Node.outputs["UV"],layerMaskUVMappingGroupNode.inputs["UV2"])
 					if "LayerMask_Use_SecondaryUV" in matInfo["mPropDict"]:
@@ -868,7 +875,13 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					
 					dirtMapUVMappingGroupNode = getDualUVMappingNodeGroup(nodeTree)
 					dirtMapUVMappingGroupNode.location = DirtWearNode.location + Vector((-300,0))
-					dirtMapUVMappingGroupNode.inputs["Tiling"].default_value = 1.0
+					try:
+						dirtMapUVMappingGroupNode.inputs["Tiling"].default_value = (1.0,1.0,1.0)
+					except:
+						try:
+							dirtMapUVMappingGroupNode.inputs["Tiling"].default_value = 1.0
+						except:
+							pass
 					nodeTree.links.new(UVMap1Node.outputs["UV"],dirtMapUVMappingGroupNode.inputs["UV1"])
 					nodeTree.links.new(UVMap2Node.outputs["UV"],dirtMapUVMappingGroupNode.inputs["UV2"])
 					if "DirtMap_Use_SecondaryUV" in matInfo["mPropDict"]:

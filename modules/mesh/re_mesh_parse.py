@@ -97,6 +97,22 @@ def readPackedBitsVec3Array(packedIntArray, numBits):
 		#print(val)
 	return vec3Array
 
+#MPLY
+
+def ReadNorBuffer(norBuffer,tags):
+	norArray = np.frombuffer(norBuffer,dtype="<4b")
+	norArray = np.delete(norArray, 3, axis=1)
+	return (norArray.tolist())
+
+def ReadCompressedPosBuffer(vertexPosBuffer,tags):
+	#TODO
+	
+	posArray = np.frombuffer(vertexPosBuffer,dtype="<3H")
+	posArray = posArray.astype(dtype="f")
+	posList = np.divide(posArray,32767.0).tolist()
+	#print(posList)
+	return posList
+
 BufferReadDict = {
 	"Position":ReadPosBuffer,
 	"NorTan":ReadNorTanBuffer,
@@ -244,6 +260,7 @@ class SubMesh:
 		#DD2 shape key weights
 		self.secondaryWeightList = []
 		self.secondaryWeightIndicesList = []
+		self.boundingBox = None#MPLY
 class ParsedBone:
 	def __init__(self):
 		self.boneName = "BONE"
@@ -668,10 +685,29 @@ class ParsedREMesh:
 					submesh.materialIndex = clusterHeader.bitfield.fields.materialId
 					submesh.subMeshIndex = submeshIndex
 					#print(f"{submeshIndex} - {submesh.materialIndex}")
+					meshEntry = reMesh.clusterInfoLayout.lodList[lodIndex].entryList[submeshIndex]
 					
 					#TEMP
-					submesh.vertexPosList = [(0.0,0.0,0.0),(0.0,1.0,0.0),(0.0,0.0,1.0)]
-					submesh.faceList = [(0,1,2)]
+					tags = set()
+					submesh.vertexPosList = ReadCompressedPosBuffer(meshEntry.posBuffer, tags)
+					if meshEntry.flagsA.flags.smallNormal:
+						submesh.normalList = ReadNorBuffer(meshEntry.normalBuffer,tags)
+					else:
+						normalList,tangentList = ReadNorTanBuffer(meshEntry.normalBuffer,tags)
+						submesh.normalList = normalList
+						submesh.tangentList = tangentList
+					
+					submesh.uvList = ReadUVBuffer(meshEntry.uvBuffer, tags)
+					if meshEntry.colorBuffer != None:
+						submesh.colorList = ReadColorBuffer(meshEntry.colorBuffer, tags)
+					if reMesh.streamingBuffer != None:
+						
+						faceStartOffset = clusterHeader.indexOffsetBytes
+						faceEndOffset = clusterHeader.indexOffsetBytes + (clusterHeader.bitfield.fields.indexCount*2)
+						#print(f"LOD {lodIndex} sub {submeshIndex} - face start: {faceStartOffset} end: {faceEndOffset}")
+						submesh.faceList = ReadFaceBuffer(reMesh.streamingBuffer[faceStartOffset:faceEndOffset])
+					else:
+						submesh.faceList = ReadFaceBuffer(meshEntry.faceBuffer)
 					group.subMeshList.append(submesh)
 				lod.visconGroupList.append(group)
 				self.mainMeshLODList.append(lod)

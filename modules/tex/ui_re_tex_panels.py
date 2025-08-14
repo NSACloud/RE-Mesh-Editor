@@ -33,8 +33,4 @@ class OBJECT_PT_TexConversionPanel(Panel):
 		layout.prop(re_mdf_toolpanel, "openConvertedFolder")
 		layout.operator("re_tex.copy_converted_tex")
 		
-		if hasattr(bpy.types, "OBJECT_PT_re_pak_panel"):
-			try:
-				layout.operator("re_asset.create_pak_patch")
-			except:
-				pass
+		

@@ -234,7 +234,7 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 			obj.select_set(True)
 	return armatureObj
 
-IMPORT_EXTRA_WEIGHTS = False#Does not work correctly atm
+IMPORT_EXTRA_WEIGHTS = True
 
 def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalList = [],vertexColor0List = [],vertexColor1List = [],UV0List = [],UV1List = [],UV2List = [],boneNameList = [],vertexGroupWeightList = [],vertexGroupBoneIndicesList = [],extraVertexGroupWeightList = [],extraVertexGroupBoneIndicesList = [],vertexGroupWeightListSecondary = [],vertexGroupBoneIndicesListSecondary = [],boneNameRemapList = [],material="Material",armature = None,collection = None,rotate90 = True,blendShapeList = []):
 	#print(f"\n{meshName}, Vertex Count: {len(vertexList)}, Face Count: {len(faceList)}\n")
@@ -1524,9 +1524,10 @@ def exportREMeshFile(filePath,options):
 							addErrorToDict(errorDict, "InvalidWeights", rawsubmesh.name)
 						"""
 						#print(weightIndicesList)
-						if len(weightList) > maxWeightsPerVertex:#Extended weights are not correct yet
-							#parsedMesh.bufferHasExtraWeight = True
-							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
+						if len(weightList) > maxWeightsPerVertex:
+							parsedMesh.bufferHasExtraWeight = True
+							if gameName != "MHWILDS":#Limit extra vertex weights to MH Wilds for now since I haven't tested which games extra weights can work on.
+								addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
 							
 							parsedSubMesh.extraWeightList[currentVertIndex] = list(pad(weightList[maxWeightsPerVertex:],size=8,padding=0.0))
 							parsedSubMesh.extraWeightIndicesList[currentVertIndex] = list(pad(weightIndicesList[maxWeightsPerVertex:],size=8,padding=0))
@@ -1535,7 +1536,7 @@ def exportREMeshFile(filePath,options):
 							#print(parsedSubMesh.extraWeightList[currentVertIndex])
 							#print(parsedSubMesh.extraWeightIndicesList[currentVertIndex])
 							if len(weightList) > maxWeightsPerVertexExtended:
-								addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
+								addErrorToDict(errorDict, "ExtendedMaxWeightsPerVertexExceeded", rawsubmesh.name)
 						else:
 							parsedSubMesh.extraWeightList[currentVertIndex] = [0.0]*8
 							parsedSubMesh.extraWeightIndicesList[currentVertIndex] = [0]*8

@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.52 (7/15/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.53 (8/13/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -78,6 +78,20 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.53 - 7/15/2025
+* Added MDF updater buttons in the RE MDF tab under the RE Asset Extensions tab.
+This allows for outdated MDF files to be updated with the click of a button.
+RE Asset Library is required to use this feature.
+Be sure to update to the latest version for both the addon and asset libraries themselves.
+
+* Added extra weight support for MH Wilds.
+This extends the allowed amount of weights on a vertex from 6 to 12.
+This may also be usable on other games to extend the weight limit from 8 to 16, but for now the addon only allows MH Wilds to exceed the limit.
+
+* Fixed issue where Import All LODs didn't work with MH Wilds.
+* Fixed issue where MH Wilds would crash when a monster is slain if it's model was edited.
+* Fixed material import error related to tiling.
 
 ### V0.52 - 7/15/2025
 * Fixed issue where materials would fail to import if materials had previously been loaded in a blend file using an older addon version.

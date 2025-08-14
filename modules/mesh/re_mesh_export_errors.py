@@ -247,12 +247,27 @@ Reconsider the life choices that led you to decide to try to export a mesh with 
 """,
 
 "MaxWeightsPerVertexExceeded":"""Max Weights Per Vertex Exceeded On Sub Mesh
-A vertex has more the maximum of 8 (or 6 for MH Wilds and SF6) weights assigned to it.
+A vertex has more the maximum of 8 (or 6 for SF6) weights assigned to it.
 	
 HOW TO FIX:
 _______________
 	
 Limit total weights to 8 in weight paint mode and normalize all weights from the Weights menu.
+
+OR
+
+Use the "Limit Total and Normalize All Weights" button in RE Toolbox.
+
+""",
+
+
+"ExtendedMaxWeightsPerVertexExceeded":"""Extended Max Weights Per Vertex Exceeded On Sub Mesh
+A vertex has more the maximum of 16 (or 12 for SF6 and MH Wilds) weights assigned to it.
+	
+HOW TO FIX:
+_______________
+	
+Limit total weights to 16 in weight paint mode and normalize all weights from the Weights menu.
 
 OR
 

@@ -20,7 +20,7 @@ IMPORT_BLEND_SHAPES = False#Disabled by default because it's broken at the momen
 #SF6 chun li body "J:\SF6_EXTRACT\re_chunk_000\natives\stm\product\model\esf\esf004\001\01\esf004_001_01.mesh.230110883"
 
 IMPORT_MPLY = False
-#Not implemented fully yet, need to figure out vertex pos data format
+#Not implemented fully yet, need to figure out unkn struct and how meshlets get positioned
 
 from ..gen_functions import splitNativesPath,getPaddedPos,getBit,setBit,getPaddingAmount,textColors,raiseWarning,raiseError,read_uint,read_int,read_int64,read_uint64,read_float,read_short,read_ushort,read_ubyte,read_unicode_string,read_byte,write_uint,write_int,write_int64,write_uint64,write_float,write_short,write_ushort,write_ubyte,write_unicode_string,write_byte,read_string,write_string
 import os
@@ -708,7 +708,7 @@ class MeshBufferHeader():
 				
 				
 				currentPos = file.tell()
-				file.seek(self.streamingVertexElementOffset + i * (8*self.mainVertexElementCount))#8 is vertex element size
+				file.seek(self.streamingVertexElementOffset + (i * getPaddedPos(8*self.mainVertexElementCount,16)))#8 is vertex element size
 				
 				#print(f"vertex element {i} start {file.tell()}")
 				for j in range(0,self.mainVertexElementCount):
@@ -1878,6 +1878,8 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 		reMesh.lodHeader.skinWeightCount = 18
 		if version == VERSION_SF6:
 			reMesh.lodHeader.skinWeightCount = 9
+		elif version == VERSION_MHWILDS:
+			reMesh.lodHeader.skinWeightCount = 25#Not sure why but this fixes monsters causing crashes and dead hitbox issues
 		if parsedMesh.bufferHasUV2:#This is wrong, uv count is determined by something else. However uv count is unused by the game so it doesn't really matter
 			reMesh.lodHeader.uvCount = 2
 		else:

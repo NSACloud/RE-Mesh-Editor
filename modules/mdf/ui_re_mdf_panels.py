@@ -265,3 +265,35 @@ class OBJECT_PT_MDFMaterialGPBFDataListPanel(Panel):
 			rows = 3,
 			type='DEFAULT'
 			)	
+		
+class OBJECT_PT_REAssetExtensionPanel(Panel):
+	bl_label = "RE Asset Extensions"
+	bl_idname = "OBJECT_PT_re_asset_extension_panel"
+	bl_space_type = "VIEW_3D"  
+	bl_region_type = "UI"
+	bl_category = "RE MDF"   
+	bl_context = "objectmode"
+
+	@classmethod
+	def poll(self,context):
+		return context is not None and "HIDE_RE_MDF_EDITOR_TAB" not in context.scene
+
+	def draw(self, context):
+		layout = self.layout
+		scene = context.scene
+		if hasattr(bpy.types, "OBJECT_PT_re_pak_panel"):
+			try:
+				layout.operator("re_asset.create_pak_patch")
+			except:
+				pass
+			
+		if hasattr(bpy.types, "RE_ASSET_OT_batch_mdf_updater"):
+			
+			try:
+				layout.operator("re_asset.blender_mdf_updater")
+				layout.operator("re_asset.batch_mdf_updater")
+			except:
+				pass
+		else:
+			layout.label(text="Update RE Asset Library for more options.")
+				
