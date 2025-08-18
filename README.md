@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.53 (8/13/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.54 (8/17/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -79,7 +79,11 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 
 ## Change Log
 
-### V0.53 - 7/15/2025
+### V0.54 - 8/17/2025
+* Fixed issue where certain meshes using extra weights in MH Wilds couldn't be imported.
+* Fixed detail normal map direction.
+
+### V0.53 - 8/13/2025
 * Added MDF updater buttons in the RE MDF tab under the RE Asset Extensions tab.
 This allows for outdated MDF files to be updated with the click of a button.
 RE Asset Library is required to use this feature.

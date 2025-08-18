@@ -202,9 +202,10 @@ class FileHeader():
 			self.gpuMeshletOffset = read_uint64(file)
 		self.sdfPathOffset = read_uint64(file)
 		currentPos = file.tell()
-		file.seek(self.sdfPathOffset)
-		self.sdfPath = read_unicode_string(file)
-		file.seek(currentPos)
+		if self.sdfPathOffset != 0:
+			file.seek(self.sdfPathOffset)
+			self.sdfPath = read_unicode_string(file)
+			file.seek(currentPos)
 			
 	def write(self,file,version):
 		pass#TODO
@@ -458,9 +459,12 @@ class ClusterInfo():
 		self.faceCount = 0
 		self.unkn0 = 0#Sometimes 1
 		self.unkn1 = 0
-		self.secondaryPosX = 0.0#Not sure how yet, but these values are used to postion each meshlet
-		self.secondaryPosY = 0.0
-		self.secondaryPosZ = 0.0
+		self.relPosX = 0
+		self.unknVal0 = 0
+		self.relPosY = 0
+		self.unknVal1 = 0
+		self.relPosZ = 0
+		self.unknVal2 = 0
 		self.flagsA = ClusterFlagsA()
 		self.flagsB = ClusterFlagsB()
 		self.unkn5A = 0
@@ -477,9 +481,13 @@ class ClusterInfo():
 		self.faceCount = read_ubyte(file)
 		self.unkn0 = read_ubyte(file)
 		self.unkn1 = read_ubyte(file)
-		self.secondaryPosX = read_float(file)
-		self.secondaryPosY = read_float(file)
-		self.secondaryPosZ = read_float(file)
+		self.relPosX = read_ushort(file)
+		self.unknVal0 = read_ushort(file)#Bounding box length/height/width maybe
+		self.relPosY = read_ushort(file)
+		self.unknVal1 = read_ushort(file)#Bounding box length/height/width maybe
+		self.relPosZ = read_ushort(file)
+		self.unknVal2 = read_ushort(file)#Bounding box length/height/width maybe
+		self.relPos = (self.relPosX/65535,self.relPosY/65535,self.relPosZ/65535)
 		self.flagsA.asUInt8 = read_ubyte(file)
 		self.flagsB.asUInt8 = read_ubyte(file)
 		self.unkn5A = read_ubyte(file)
@@ -501,7 +509,11 @@ class ClusterInfo():
 			self.normalBuffer = file.read(self.vertexCount*4)
 		else:
 			self.normalBuffer = file.read(self.vertexCount*8)
-		#TODO Read unknstruct based on flagsB here
+		#TODO
+		if self.flagsB.flags.useUnknStruct:
+			self.unknStructBuffer = file.read(12)
+		else:
+			self.unknStructBuffer = None
 		#This structure varies in size, it's either 12 bytes or 16 bytes and I haven't found what indicates which struct to use yet
 			
 		self.uvBuffer = file.read(self.vertexCount*UV_STRIDE)

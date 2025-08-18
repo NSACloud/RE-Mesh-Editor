@@ -1397,6 +1397,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						
 						normalVectorRotateNode = nodeTree.nodes.new("ShaderNodeVectorRotate")
 						normalVectorRotateNode.location = (detailNodeLoc[0] + 900,detailNodeLoc[1])
+						normalVectorRotateNode.invert = True
 						
 						links.new(normalNode.outputs["Normal"],normalVectorRotateNode.inputs["Vector"])
 						links.new(crossProductNode.outputs["Vector"],normalVectorRotateNode.inputs["Axis"])

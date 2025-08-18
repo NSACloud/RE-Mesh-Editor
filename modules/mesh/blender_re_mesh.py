@@ -127,6 +127,21 @@ def findArmatureObjFromData(armatureData):
 			armatureObj = obj
 			break
 	return armatureObj
+def createEmpty(name,propertyList,parent = None,collection = None):
+	obj = bpy.data.objects.new( name, None )
+	obj.empty_display_size = .10
+	obj.empty_display_type = 'PLAIN_AXES'
+	obj.parent = parent
+	for property in propertyList:
+ 
+		obj[property[0]] = property[1]
+	if collection == None:
+		collection = bpy.context.scene.collection
+		
+	collection.objects.link(obj)
+		
+		
+	return obj
 def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatureName = None):
 	mergedArmature = False
 	#Merging with existing armature if specified in import menu
@@ -301,7 +316,7 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 		#print(boneNameList)
 		if len(boneNameList) > 1:
 			#print(boneNameList)
-			usedBoneIndices = sorted(list({x for vertex in vertexGroupBoneIndicesList for x in vertex}))#Get all used bone indices in hierarchy order
+			usedBoneIndices = sorted(list({x for vertex in vertexGroupBoneIndicesList for x in vertex} | {x for vertex in extraVertexGroupBoneIndicesList for x in vertex}))#Get all used bone indices in hierarchy order
 			#print(usedBoneIndices)
 			for boneIndex in usedBoneIndices:
 				boneName = boneNameList[boneIndex]
@@ -432,7 +447,8 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 	if not importAllLODs and targetLODList != []:
 		targetLODList = [targetLODList[0]]
 	
-	
+	if parsedMesh.isMPLY:
+		MPLYRoot = createEmpty(f"MPLY Root" +  f" - {meshCollection.name}" if meshCollection != None else "", [("~TYPE","RE_MESH_MPLY_ROOT")],collection = meshCollection)
 	for lodIndex,lod in enumerate(targetLODList):
 		shadowLODString = ""
 		if importShadowMeshes:
@@ -487,6 +503,13 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 						rotate90 = rotate90,
 						blendShapeList = subMesh.blendShapeList
 						)
+					if parsedMesh.isMPLY:
+						meshObj.parent = MPLYRoot
+						
+						if rotate90:
+							meshObj.location = (subMesh.relPos[0],subMesh.relPos[2],subMesh.relPos[1])
+						else:
+							meshObj.location = subMesh.relPos
 					if mergeGroups:
 						objMergeList.append(meshObj)
 					meshOffsetDict[subMesh.meshVertexOffset] = meshObj

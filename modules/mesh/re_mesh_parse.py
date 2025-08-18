@@ -260,7 +260,9 @@ class SubMesh:
 		#DD2 shape key weights
 		self.secondaryWeightList = []
 		self.secondaryWeightIndicesList = []
-		self.boundingBox = None#MPLY
+		#MPLY
+		self.relPos = None
+		self.posOffset = None
 class ParsedBone:
 	def __init__(self):
 		self.boneName = "BONE"
@@ -708,6 +710,7 @@ class ParsedREMesh:
 						submesh.faceList = ReadFaceBuffer(reMesh.streamingBuffer[faceStartOffset:faceEndOffset])
 					else:
 						submesh.faceList = ReadFaceBuffer(meshEntry.faceBuffer)
+					submesh.relPos = meshEntry.relPos
 					group.subMeshList.append(submesh)
 				lod.visconGroupList.append(group)
 				self.mainMeshLODList.append(lod)
