@@ -90,35 +90,38 @@ os.system("color")#Enable console colors
 
 #Used to circumvent the issue of properties not being able to used as defaults for other properties at startup
 def setMeshImportDefaults(self):
-	self.clearScene = bpy.context.preferences.addons[__name__].preferences.default_clearScene
-	self.loadMaterials = bpy.context.preferences.addons[__name__].preferences.default_loadMaterials
-	self.loadMDFData = bpy.context.preferences.addons[__name__].preferences.default_loadMDFData
-	self.loadUnusedTextures = bpy.context.preferences.addons[__name__].preferences.default_loadUnusedTextures
-	self.loadUnusedProps = bpy.context.preferences.addons[__name__].preferences.default_loadUnusedProps
-	self.useBackfaceCulling = bpy.context.preferences.addons[__name__].preferences.default_useBackfaceCulling
-	self.reloadCachedTextures = bpy.context.preferences.addons[__name__].preferences.default_reloadCachedTextures
-	self.createCollections = bpy.context.preferences.addons[__name__].preferences.default_createCollections
-	self.importArmatureOnly = bpy.context.preferences.addons[__name__].preferences.default_importArmatureOnly
-	self.importAllLODs = bpy.context.preferences.addons[__name__].preferences.default_importAllLODs
-	self.rotate90 = bpy.context.preferences.addons[__name__].preferences.default_rotate90
-	self.importBlendShapes = bpy.context.preferences.addons[__name__].preferences.default_importBlendShapes
-	self.importShadowMeshes = bpy.context.preferences.addons[__name__].preferences.default_importShadowMeshes
-	self.mergeGroups = bpy.context.preferences.addons[__name__].preferences.default_mergeGroups
-	self.importOcclusionMeshes = bpy.context.preferences.addons[__name__].preferences.default_importOcclusionMeshes
-	self.importBoundingBoxes = bpy.context.preferences.addons[__name__].preferences.default_importBoundingBoxes
-	#print("RE Mesh Editor: Loaded Default Import Settings")
+    prefs = bpy.context.preferences.addons[__name__].preferences
+    self.clearScene = prefs.default_clearScene
+    self.loadMaterials = prefs.default_loadMaterials
+    self.loadMDFData = prefs.default_loadMDFData
+    self.loadUnusedTextures = prefs.default_loadUnusedTextures
+    self.loadUnusedProps = prefs.default_loadUnusedProps
+    self.useBackfaceCulling = prefs.default_useBackfaceCulling
+    self.reloadCachedTextures = prefs.default_reloadCachedTextures
+    self.createCollections = prefs.default_createCollections
+    self.importArmatureOnly = prefs.default_importArmatureOnly
+    self.importAllLODs = prefs.default_importAllLODs
+    self.rotate90 = prefs.default_rotate90
+    self.importBlendShapes = prefs.default_importBlendShapes
+    self.importShadowMeshes = prefs.default_importShadowMeshes
+    self.mergeGroups = prefs.default_mergeGroups
+    self.importOcclusionMeshes = prefs.default_importOcclusionMeshes
+    self.importBoundingBoxes = prefs.default_importBoundingBoxes
+    # print("RE Mesh Editor: Loaded Default Import Settings")
 	
 def setMeshExportDefaults(self):
-	self.selectedOnly = bpy.context.preferences.addons[__name__].preferences.default_selectedOnly
-	self.exportAllLODs = bpy.context.preferences.addons[__name__].preferences.default_exportAllLODs
-	self.exportBlendShapes = bpy.context.preferences.addons[__name__].preferences.default_exportBlendShapes
-	self.rotate90 = bpy.context.preferences.addons[__name__].preferences.default_rotate90export
-	self.autoSolveRepeatedUVs = bpy.context.preferences.addons[__name__].preferences.default_autoSolveRepeatedUVs
-	self.preserveSharpEdges = bpy.context.preferences.addons[__name__].preferences.default_preserveSharpEdges
-	self.useBlenderMaterialName = bpy.context.preferences.addons[__name__].preferences.default_useBlenderMaterialName
-	self.preserveBoneMatrices = bpy.context.preferences.addons[__name__].preferences.default_preserveBoneMatrices
-	self.exportBoundingBoxes = bpy.context.preferences.addons[__name__].preferences.default_exportBoundingBoxes
-	#print("RE Mesh Editor: Loaded Default Export Settings")
+    prefs = bpy.context.preferences.addons[__name__].preferences
+    self.selectedOnly = prefs.default_selectedOnly
+    self.visibleOnly = prefs.default_visibleOnly
+    self.exportAllLODs = prefs.default_exportAllLODs
+    self.exportBlendShapes = prefs.default_exportBlendShapes
+    self.rotate90 = prefs.default_rotate90export
+    self.autoSolveRepeatedUVs = prefs.default_autoSolveRepeatedUVs
+    self.preserveSharpEdges = prefs.default_preserveSharpEdges
+    self.useBlenderMaterialName = prefs.default_useBlenderMaterialName
+    self.preserveBoneMatrices = prefs.default_preserveBoneMatrices
+    self.exportBoundingBoxes = prefs.default_exportBoundingBoxes
+    # print("RE Mesh Editor: Loaded Default Export Settings")
 	
 
 def showMessageBox(message = "", title = "Message Box", icon = 'INFO'):
@@ -306,6 +309,17 @@ class REMeshPreferences(AddonPreferences):
 		description = "Use DDS textures instead of converting to TIF.\nThis greatly improves mesh import speed but is only usable on Blender 4.2 or higher.\nIf the Blender version is less than 4.2, this option will do nothing",
 		default = False if bpy.app.version < (4,2,0) else True
 	)
+
+	exportToBatchExport: BoolProperty(
+		name="Exports to Batch Export List",
+		description="Automatically adds exported file paths to RE Toolbox's batch export list.\nPaths will be added with the same options used when exporting.",
+		default = True
+	)
+	importToBatchExport: BoolProperty(
+		name="Imports to Batch Export List",
+		description="Automatically adds imported file paths to RE Toolbox's batch export list.\nPaths will be added with the default export options.",
+		default = False
+	)
 	
 	saveChunkPaths: BoolProperty(
 		name="Save Chunk Paths Automatically",
@@ -443,6 +457,11 @@ class REMeshPreferences(AddonPreferences):
 	   description = "Limit export to selected objects",
 	   default = False)
 
+	default_visibleOnly : BoolProperty(
+	   name = "Visible Objects Only",
+	   description = "Limit export to visible objects",
+	   default = False)
+
 	default_exportAllLODs : BoolProperty(
 	   name = "Export All LODs",
 	   description = "Export all LODs. If disabled, only LOD0 will be exported. Note that LODs meshes must be grouped inside a collection for each level and that collection must be contained in another collection. See a mesh with LODs imported for reference on how it should look. A target collection must also be set",
@@ -548,6 +567,7 @@ class REMeshPreferences(AddonPreferences):
 		column2 = split.column()
 		if self.showExportOptions:
 			column2.prop(self, "default_selectedOnly")
+			column2.prop(self, "default_visibleOnly")
 			column2.prop(self, "default_exportAllLODs")
 			column2.prop(self,"default_autoSolveRepeatedUVs")
 			column2.prop(self,"default_preserveSharpEdges")
@@ -555,7 +575,11 @@ class REMeshPreferences(AddonPreferences):
 			column2.prop(self, "default_useBlenderMaterialName")
 			column2.prop(self, "default_preserveBoneMatrices")
 			column2.prop(self, "default_exportBoundingBoxes")
-		
+
+		layout.label(text = "RE Toolbox Integration")
+		layout.prop(self, "exportToBatchExport")
+		layout.prop(self, "importToBatchExport")
+
 		layout.label(text = "Chunk Path List")
 		layout.prop(self, "saveChunkPaths")
 		layout.template_list("MESH_UL_ChunkPathList", "", self, "chunkPathList_items", self, "chunkPathList_index",rows = 3)
@@ -766,7 +790,26 @@ class ImportREMesh(Operator, ImportHelper):
 			if os.path.isfile(filepath):
 				success = importREMeshFile(filepath,options)
 				options["clearScene"] = False#Disable clear scene after first mesh is imported
-				if not success: hasImportErrors = True
+				if success:
+					prefs = bpy.context.preferences.addons[__name__].preferences
+					importedCollection = success[2]
+					if importedCollection and prefs.importToBatchExport and hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
+						if not any(item.path == filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
+							newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
+							newExportItem.fileType = "MESH"
+							newExportItem.path = filepath
+							newExportItem.meshCollection = importedCollection.name
+							# Load export defaults
+							newExportItem.exportAllLODs = prefs.default_exportAllLODs
+							newExportItem.preserveSharpEdges = prefs.default_preserveSharpEdges
+							newExportItem.rotate90 = prefs.default_rotate90export
+							newExportItem.exportBlendShapes = prefs.default_exportBlendShapes
+							newExportItem.useBlenderMaterialName = prefs.default_useBlenderMaterialName
+							newExportItem.preserveBoneMatrices = prefs.default_preserveBoneMatrices
+							newExportItem.exportBoundingBoxes = prefs.default_exportBoundingBoxes
+							print("Added path to RE Toolbox Batch Export list.")
+				else:
+					hasImportErrors = True
 			else:
 				hasImportErrors = True
 				raiseWarning(f"Path does not exist, cannot import file. If you are importing multiple files at once, they must all be in the same directory.\nInvalid Path:{filepath}")
@@ -856,7 +899,10 @@ class ExportREMesh(Operator, ExportHelper):
 	   name = "Selected Objects Only",
 	   description = "Limit export to selected objects",
 	   default = False)
-
+	visibleOnly : BoolProperty(
+	   name = "Visible Objects Only",
+	   description = "Limit export to visible objects",
+	   default = False)	
 	
 	exportAllLODs : BoolProperty(
 	   name = "Export All LODs",
@@ -962,6 +1008,7 @@ class ExportREMesh(Operator, ExportHelper):
 			row.label(icon="ERROR",text="Chosen collection doesn't exist.")
 			row.alert=True
 		layout.prop(self, "selectedOnly")
+		layout.prop(self, "visibleOnly")
 		layout.label(text = "Advanced Options")
 		layout.prop(self, "exportAllLODs")
 		#layout.prop(self, "exportBlendShapes")
@@ -980,7 +1027,7 @@ class ExportREMesh(Operator, ExportHelper):
 		layout.prop(self, "exportBoundingBoxes")
 	
 	def execute(self, context):
-		options = {"targetCollection":self.targetCollection,"selectedOnly":self.selectedOnly,"exportAllLODs":self.exportAllLODs,"exportBlendShapes":self.exportBlendShapes,"rotate90":self.rotate90,"useBlenderMaterialName":self.useBlenderMaterialName,"preserveBoneMatrices":self.preserveBoneMatrices,"exportBoundingBoxes":self.exportBoundingBoxes,"autoSolveRepeatedUVs":self.autoSolveRepeatedUVs,"preserveSharpEdges":self.preserveSharpEdges}
+		options = {"targetCollection":self.targetCollection,"selectedOnly":self.selectedOnly,"visibleOnly":self.visibleOnly,"exportAllLODs":self.exportAllLODs,"exportBlendShapes":self.exportBlendShapes,"rotate90":self.rotate90,"useBlenderMaterialName":self.useBlenderMaterialName,"preserveBoneMatrices":self.preserveBoneMatrices,"exportBoundingBoxes":self.exportBoundingBoxes,"autoSolveRepeatedUVs":self.autoSolveRepeatedUVs,"preserveSharpEdges":self.preserveSharpEdges}
 		try:
 			meshVersion = int(os.path.splitext(self.filepath)[1].replace(".",""))
 		except:
@@ -1002,7 +1049,7 @@ class ExportREMesh(Operator, ExportHelper):
 		if success:
 			self.report({"INFO"},"Exported RE Mesh successfully.")
 			
-			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
+			if bpy.context.preferences.addons[__name__].preferences.exportToBatchExport and hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
 				if not any(item.path == self.filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
 					newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
 					newExportItem.fileType = "MESH"
@@ -1059,8 +1106,19 @@ class ImportREMDF(bpy.types.Operator, ImportHelper):
 			if multiFileImport:
 				print(f"Multi MDF Import ({index+1}/{len(self.files)})")
 			if os.path.isfile(filepath):
-				success = importMDFFile(filepath)
-				if not success: hasImportErrors = True
+				mdfCollection = importMDFFile(filepath)
+				if mdfCollection:
+					#Add batch export entry to RE Toolbox if it doesn't already have one
+					prefs = bpy.context.preferences.addons[__name__].preferences
+					if prefs.importToBatchExport and hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
+						if not any(item.path == filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
+							newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
+							newExportItem.fileType = "MDF"
+							newExportItem.path = filepath
+							newExportItem.mdfCollection = mdfCollection.name
+							print("Added path to RE Toolbox Batch Export list.")
+				else:
+					hasImportErrors = True
 			else:
 				hasImportErrors = True
 				raiseWarning(f"Path does not exist, cannot import file. If you are importing multiple files at once, they must all be in the same directory.\nInvalid Path:{filepath}")
@@ -1167,7 +1225,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				setModDirectoryFromFilePath(self.filepath)
 			
 			#Add batch export entry to RE Toolbox if it doesn't already have one
-			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
+			if bpy.context.preferences.addons[__name__].preferences.exportToBatchExport and hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
 				if not any(item.path == self.filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
 					newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
 					newExportItem.fileType = "MDF"

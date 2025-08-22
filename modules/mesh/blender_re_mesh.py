@@ -743,8 +743,9 @@ def importREMeshFile(filePath,options):
 	meshImportEndTime = time.time()
 	meshImportTime =  meshImportEndTime - meshImportStartTime
 	print(f"Mesh imported in {timeFormat%(meshImportTime * 1000)} ms.")
+
 	print("\033[92m__________________________________\nRE Mesh import finished.\033[0m")
-	return (warningList,errorList)
+	return (warningList,errorList,meshCollection)
 
 def checkObjForUVDoubling(obj):
 	hasUVDoubling = False
@@ -1200,10 +1201,11 @@ def exportREMeshFile(filePath,options):
 		doubledUVList = []
 		sharpEdgeSplitList = []
 		for obj in lod.objects:
+			selected = True
 			if options["selectedOnly"]:
 				selected = obj in bpy.context.selected_objects
-			else:
-				selected = True
+			if selected and options["visibleOnly"]:
+				selected = obj in bpy.context.visible_objects
 			
 				
 			if obj.type == "MESH" and not obj.get("MeshExportExclude") and selected:
