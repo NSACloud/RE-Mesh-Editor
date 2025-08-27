@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.54 (8/17/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.55 (8/27/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -9,12 +9,14 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-![meshEditorPreview](https://github.com/user-attachments/assets/318392e3-fce7-4b30-a23e-8abfc39e8855)
+<img width="1736" height="1019" alt="meshEditorPreview" src="https://github.com/user-attachments/assets/74e026a0-73bc-41e8-a3f6-2d931f5c7dc0" />
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
  - Allows for importing and exporting of RE Engine mdf2 (material) files.
- - MDF material editing from within Blender.<details>
+ - MDF material editing from within Blender.
+ <details>
+ 
     <summary>Video Preview</summary>
   
     https://github.com/user-attachments/assets/48be61bc-7c40-440f-881b-534809d3232f
@@ -38,7 +40,8 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
     https://github.com/user-attachments/assets/fa1ba74e-8a57-4115-b6cd-9585a2a92a21
    
     </details>
-   
+ - Additional supported file types:
+  - **.fbxskel** - (Skeleton)
  ## Supported Games
  - **Devil May Cry 5**
  - **Resident Evil 2/3 Remake (Supports both RT and Non RT Versions)**
@@ -63,7 +66,6 @@ Support for more games may be added in the future.
 **Not required but strongly recommended:**
 * [RE Chain Editor](https://github.com/NSACloud/RE-Chain-Editor) - Blender addon for creation of chain files. Used to add physics to models.
 * [RE Asset Library (Blender 4.3.2 or higher required)](https://github.com/NSACloud/RE-Asset-Library) - Blender addon that allows for extraction and importing of RE Engine files. Reduces the need to look up file IDs to find what you're looking for.
-* [RE Toolbox](https://github.com/NSACloud/RE-Toolbox) - Blender addon containing additional utilities to make working with RE Engine files easier. Allows for batch exporting.
 ## Installation
 Download the addon from the "Download RE Mesh Editor" link at the top or click Code > Download Zip.
 
@@ -78,6 +80,24 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.55 - 8/27/2025
+* Added partial MPLY (stage mesh) support.
+Note that not all stage meshes are fully working yet.
+
+For more info on current issues with stage meshes, see the issues page.
+
+* The RE MDF tab has been renamed to RE Mesh.
+* Tool panels have been reorganized.
+* Added .fbxskel (skeleton) import/export support. This allows for proportional changes to armatures.
+Note that certain animations and cutscenes can override the .fbxskel file's changes.
+* Added "Link Armature Bones" button to the RE Mesh tab. This can be used to constrain bones from several armatures to an fbxskel armature. 
+* Fixed issue where normals could become incorrect if a model was not triangulated prior to export.
+* Added RE Mesh Tools panel.
+
+The RE Toolbox addon is now deprecated, as it's functionality has been integrated in the RE Mesh tab.
+
+Uninstalling is recommended.
 
 ### V0.54 - 8/17/2025
 * Fixed issue where certain meshes using extra weights in MH Wilds couldn't be imported.

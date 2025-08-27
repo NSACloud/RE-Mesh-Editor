@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 54),
+	"version": (0, 55),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -24,11 +24,26 @@ from .modules.blender_utils import operator_exists
 #mesh
 from .modules.mesh.file_re_mesh import meshFileVersionToGameNameDict
 from .modules.mesh.blender_re_mesh import importREMeshFile,exportREMeshFile
+from .modules.mesh.re_mesh_operators import (
+	WM_OT_DeleteLoose,
+	WM_OT_RenameMeshToREFormat,
+	WM_OT_RemoveZeroWeightVertexGroups,
+	WM_OT_LimitTotalNormalizeAll,
+	WM_OT_CreateMeshCollection,
+
+)
+from .modules.mesh.ui_re_mesh_panels import (
+	OBJECT_PT_MeshObjectModePanel,
+	OBJECT_PT_MeshArmatureToolsPanel,
+	OBJECT_PT_REAssetExtensionPanel,
+	)
 #mdf
 from.modules.mdf.file_re_mdf import gameNameMDFVersionDict
 from .modules.mdf.blender_re_mdf import importMDFFile,exportMDFFile
 from .modules.mdf.ui_re_mdf_panels import (
 	OBJECT_PT_MDFObjectModePanel,
+	OBJECT_PT_MDFMaterialPresetPanel,
+	OBJECT_PT_MDFMaterialPreviewPanel,
 	OBJECT_PT_MDFMaterialPanel,
 	OBJECT_PT_MDFFlagsPanel,
 	OBJECT_PT_MDFMaterialPropertyListPanel,
@@ -36,7 +51,6 @@ from .modules.mdf.ui_re_mdf_panels import (
 	OBJECT_PT_MDFMaterialMMTRSIndexListPanel,
 	OBJECT_PT_MDFMaterialGPBFDataListPanel,
 	OBJECT_PT_MDFMaterialLoadSettingsPanel,
-	OBJECT_PT_REAssetExtensionPanel,
 	)
 from .modules.mdf.re_mdf_propertyGroups import (
 	MDFToolPanelPropertyGroup,
@@ -84,7 +98,16 @@ from .modules.mesh.re_mesh_export_errors import  (
 	MESH_UL_REMeshErrorList,
 	WM_OT_ShowREMeshErrorWindow,
 	)
-
+#fbxskel
+from .modules.fbxskel.blender_re_fbxskel import importFBXSkelFile,exportFBXSkelFile
+from .modules.fbxskel.re_fbxskel_operators import (
+	WM_OT_LinkArmatureBones,
+	WM_OT_ClearBoneLinkages
+	)
+from .modules.fbxskel.re_fbxskel_propertyGroups import (
+	ToggleStringPropertyGroup,
+	FBXSKEL_UL_ObjectCheckList
+	)
 os.system("color")#Enable console colors
 
 
@@ -1001,7 +1024,7 @@ class ExportREMesh(Operator, ExportHelper):
 		success = exportREMeshFile(self.filepath,options)
 		if success:
 			self.report({"INFO"},"Exported RE Mesh successfully.")
-			
+			"""
 			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
 				if not any(item.path == self.filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
 					newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
@@ -1016,6 +1039,7 @@ class ExportREMesh(Operator, ExportHelper):
 					newExportItem.preserveBoneMatrices = self.preserveBoneMatrices
 					newExportItem.exportBoundingBoxes = self.exportBoundingBoxes
 					print("Added path to RE Toolbox Batch Export list.")
+			"""
 		else:
 			self.report({"INFO"},"RE Mesh export failed. See Window > Toggle System Console for info on how to fix it.")
 		
@@ -1179,6 +1203,121 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 			self.report({"INFO"},"Failed to export RE MDF. Check Window > Toggle System Console for details.")
 			return {"CANCELLED"}
 
+class ImportREFBXSkel(bpy.types.Operator, ImportHelper):
+	'''Import RE Engine FBXSkel File'''
+	bl_idname = "re_fbxskel.importfile"
+	bl_label = "Import RE FBXSkel"
+	bl_options = {'PRESET', "REGISTER", "UNDO"}
+	files : CollectionProperty(
+			name="File Path",
+			type=OperatorFileListElement,
+			)
+	directory : StringProperty(
+			subtype='DIR_PATH',
+			options={'SKIP_SAVE'}
+			)
+	filename_ext = ".fbxskel.*"
+	filter_glob: StringProperty(default="*.fbxskel.*", options={'HIDDEN'})
+	
+	def invoke(self, context, event):
+		if self.directory:
+			return self.execute(context)
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}
+	def execute(self, context):
+		success = importFBXSkelFile(self.filepath)
+		if success:
+			return {"FINISHED"}
+		else:
+			self.report({"INFO"},"Failed to import RE FBXSkel.")
+			return {"CANCELLED"}
+
+def update_targetFBXSkelArmature(self,context):
+	temp = bpy.data.screens.get("temp")
+	browserSpace = None
+	if temp != None:
+	    for area in temp.areas:
+	        for space in area.spaces:
+	            if type(space.params).__name__ == "FileSelectParams":
+	                browserSpace = space
+	                break
+	                break
+	if browserSpace != None:
+		#print(browserSpace.params.filename)
+		if ".fbxskel" in self.targetArmature:
+			browserSpace.params.filename = self.targetArmature.split(".fbxskel")[0]+".fbxskel" + self.filename_ext	
+		
+class ExportREFBXSkel(bpy.types.Operator, ExportHelper):
+	'''Export RE Engine FBXSkel File'''
+	bl_idname = "re_fbxskel.exportfile"
+	bl_label = "Export RE FBXSkel"
+	bl_options = {'PRESET'}
+	filename_ext: EnumProperty(
+		name="",
+		description="Set which game to export the FBXSkel for",
+		items=[ (".3", "DMC5 (.3)", ""),
+				(".4", "RERT (.4)", ""),
+				(".5", "RE4R (.5)", ""),
+				(".6", "DD2 (.6)", ""),
+				(".7", "MHWILDS (.7)", ""),
+
+			   ],
+		default = ".7"
+		)
+	
+	filter_glob: StringProperty(default="*.fbxskel*", options={'HIDDEN'})
+	targetArmature : StringProperty(
+	   name = "",
+	   description = "Set the armature to be exported",
+	   default = "",
+	   update = update_targetFBXSkelArmature)
+	
+	def invoke(self, context, event):
+		if self.targetArmature == "":
+			if context.active_object != None:
+				if context.active_object.type == "ARMATURE":
+					self.targetArmature = context.active_object.name
+					self.filepath = self.targetArmature.split(".fbxskel")[0]+".fbxskel" + self.filename_ext
+			else:
+				for obj in bpy.context.scene.objects:
+					if obj.type == "ARMATURE" and ".fbxskel" in obj.name:
+						self.targetArmature = obj.name
+						self.filepath = self.targetArmature.split(".fbxskel")[0]+".fbxskel" + self.filename_ext
+						break
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}
+	
+	def draw(self, context):
+		layout = self.layout
+		layout.label(text = "FBXSkel Version:")
+		layout.prop(self,"filename_ext")
+		layout.label(text = "FBXSkel Armature:")
+		layout.prop_search(self, "targetArmature",bpy.data,"objects",icon = "ARMATURE_DATA")
+		if self.targetArmature in bpy.data.objects:
+			obj = bpy.data.objects[self.targetArmature]
+			if not obj.type == "ARMATURE":
+				row = layout.row()
+				row.alert=True
+				row.label(icon = "ERROR",text="Object is not an armature.")
+		elif self.targetArmature == "":
+			row = layout.row()
+			row.alert=True
+			row.label(icon = "ERROR",text="No armature is selected.")
+			
+		else:
+			row = layout.row()
+			row.label(icon="ERROR",text="Armature doesn't exist.")
+			row.alert=True
+	
+	def execute(self, context):
+		success = exportFBXSkelFile(self.filepath,self.targetArmature)
+		if success:
+			self.report({"INFO"},"Exported RE FBXSkel successfully.")
+			return {"FINISHED"}
+		else:
+			self.report({"INFO"},"Failed to export RE FBXSkel. Check Window > Toggle System Console for details.")
+			return {"CANCELLED"}
+
 # Registration
 classes = [
 	#preferences
@@ -1192,6 +1331,11 @@ classes = [
 	
 	ImportREMesh,
 	ExportREMesh,
+	WM_OT_DeleteLoose,
+	WM_OT_RenameMeshToREFormat,
+	WM_OT_RemoveZeroWeightVertexGroups,
+	WM_OT_LimitTotalNormalizeAll,
+	WM_OT_CreateMeshCollection,
 	WM_OT_OpenTextureCacheFolder,
 	WM_OT_ClearTextureCacheFolder,
 	WM_OT_CheckTextureCacheSize,
@@ -1216,7 +1360,11 @@ classes = [
 	
 	#ui panels
 	OBJECT_PT_MDFObjectModePanel,
+	OBJECT_PT_MDFMaterialPresetPanel,
+	OBJECT_PT_MDFMaterialPreviewPanel,
 	OBJECT_PT_MDFMaterialLoadSettingsPanel,
+	OBJECT_PT_MeshObjectModePanel,
+	OBJECT_PT_MeshArmatureToolsPanel,
 	OBJECT_PT_MDFMaterialPanel,
 	OBJECT_PT_MDFFlagsPanel,
 	OBJECT_PT_MDFMaterialTextureBindingListPanel,
@@ -1241,6 +1389,17 @@ classes = [
 	WM_OT_ConvertDDSTexFile,
 	#ui panels
 	OBJECT_PT_TexConversionPanel,
+	
+	#fbxskel
+	ImportREFBXSkel,
+	ExportREFBXSkel,
+	#property groups
+	ToggleStringPropertyGroup,
+	FBXSKEL_UL_ObjectCheckList,
+	#operators
+	WM_OT_LinkArmatureBones,
+	WM_OT_ClearBoneLinkages,
+	
 	
 	#RE asset extra tools
 	OBJECT_PT_REAssetExtensionPanel,
@@ -1290,6 +1449,18 @@ if bpy.app.version >= (4, 1, 0):
 		@classmethod
 		def poll_drop(cls, context):
 			return (context.area and context.area.type == 'VIEW_3D')
+		
+	fbxSkelExtensionsString = ".4;.5;.6;.7;"#RE Verse tex drag and drop support
+	
+	class FBXSKEL_FH_drag_import(bpy.types.FileHandler):
+		bl_idname = "FBXSKEL_FH_drag_import"
+		bl_label = "File handler for RE FBXSkel importing"
+		bl_import_operator = "re_fbxskel.importfile"
+		bl_file_extensions = fbxSkelExtensionsString
+	
+		@classmethod
+		def poll_drop(cls, context):
+			return (context.area and context.area.type == 'VIEW_3D')
 class GU_PT_collection_custom_properties(bpy.types.Panel, PropertyPanel): #For adding custom properties to collections, fixed on 3.3 and up so not needed there
     _context_path = "collection"
     _property_type = bpy.types.Collection
@@ -1322,6 +1493,7 @@ class IMPORT_MT_re_mesh_editor(bpy.types.Menu):
         
         layout.operator(ImportREMesh.bl_idname, text="RE Mesh (.mesh.x) (Model)",icon = "MESH_DATA")
         layout.operator(ImportREMDF.bl_idname, text="RE MDF (.mdf2.x) (Materials)",icon = "MATERIAL")
+        layout.operator(ImportREFBXSkel.bl_idname, text="RE FBXSkel (.fbxskel.x) (Skeleton)",icon = "ARMATURE_DATA")
 
 def re_mesh_editor_import(self, context):
 	self.layout.menu("IMPORT_MT_re_mesh_editor",icon = "MOD_LINEART")
@@ -1335,6 +1507,7 @@ class EXPORT_MT_re_mesh_editor(bpy.types.Menu):
         
         layout.operator(ExportREMesh.bl_idname, text="RE Mesh (.mesh.x) (Model)",icon = "MESH_DATA")
         layout.operator(ExportREMDF.bl_idname, text="RE MDF (.mdf2.x) (Materials)",icon = "MATERIAL")
+        layout.operator(ExportREFBXSkel.bl_idname, text="RE FBXSkel (.fbxskel.x) (Skeleton)",icon = "ARMATURE_DATA")
 
 def re_mesh_editor_export(self, context):
 	self.layout.menu("EXPORT_MT_re_mesh_editor",icon = "MOD_LINEART")
@@ -1370,6 +1543,8 @@ def register():
 		bpy.utils.register_class(MESH_FH_drag_import)
 		bpy.utils.register_class(MDF_FH_drag_import)
 		bpy.utils.register_class(TEX_FH_drag_import)
+		bpy.utils.register_class(FBXSKEL_FH_drag_import)
+		
 	
 def unregister():
 	addon_updater_ops.unregister()
@@ -1395,6 +1570,7 @@ def unregister():
 		bpy.utils.unregister_class(MESH_FH_drag_import)
 		bpy.utils.unregister_class(MDF_FH_drag_import)
 		bpy.utils.unregister_class(TEX_FH_drag_import)
+		bpy.utils.unregister_class(FBXSKEL_FH_drag_import)
 if __name__ == '__main__':
 	register()
 	

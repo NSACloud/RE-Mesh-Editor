@@ -104,14 +104,37 @@ def ReadNorBuffer(norBuffer,tags):
 	norArray = np.delete(norArray, 3, axis=1)
 	return (norArray.tolist())
 
-def ReadCompressedPosBuffer(vertexPosBuffer,tags):
-	#TODO
+def ReadCompressedPosBuffer(vertexPosBuffer,use32BitPos,positionModifier,scaleModifier,partCenter):
 	
-	posArray = np.frombuffer(vertexPosBuffer,dtype="<3H")
-	posArray = posArray.astype(dtype="f")
-	posList = np.divide(posArray,32767.0).tolist()
-	#print(posList)
-	return posList
+	
+	if use32BitPos:
+		packedIntArray = np.frombuffer(vertexPosBuffer,dtype="<I")
+		posArray = np.zeros(len(packedIntArray),np.dtype("<3f"))
+		
+		#11-10-11 packing
+		"""
+		posArray[:,0] = (packedIntArray & 2047) / 2047
+		posArray[:,1] = ((packedIntArray >> 11) & 1023) / 1023
+		posArray[:,2] = ((packedIntArray >> 21) & 2047) / 2047
+		"""
+		#10-10-10 packing
+		posArray[:,0] = (packedIntArray & 1023) / 1023
+		posArray[:,1] = ((packedIntArray >> 10) & 1023) / 1023
+		posArray[:,2] = ((packedIntArray >> 20) & 1023) / 1023
+		#TODO
+		#Scaling or pos doesn't seem right on meshlets that have 10 bit packed pos
+	else:
+		posArray = np.frombuffer(vertexPosBuffer,dtype="<3H")
+		posArray = posArray.astype(dtype="f")
+		posArray /= 32767.0
+	#posArray += AABBOffset
+	
+	#
+	posArray *= scaleModifier
+	posArray += positionModifier
+	#TODO Correct the position offset, the game does this using the part center value
+	
+	return posArray.tolist()
 
 BufferReadDict = {
 	"Position":ReadPosBuffer,
@@ -262,7 +285,8 @@ class SubMesh:
 		self.secondaryWeightIndicesList = []
 		#MPLY
 		self.relPos = None
-		self.posOffset = None
+		self.boundingBox = None
+		self.boundingBoxCenter = None
 class ParsedBone:
 	def __init__(self):
 		self.boneName = "BONE"
@@ -672,6 +696,20 @@ class ParsedREMesh:
 		#TODO Add occlusion mesh
 		
 		if self.isMPLY:
+			
+			minAABB = reMesh.meshletLayout.meshletHeader.minAABB
+			maxAABB = reMesh.meshletLayout.meshletHeader.maxAABB
+			self.boundingBox.min.x = minAABB[0]
+			self.boundingBox.min.y = minAABB[1]
+			self.boundingBox.min.z = minAABB[2]
+			self.boundingBox.max.x = maxAABB[0]
+			self.boundingBox.max.y = maxAABB[1]
+			self.boundingBox.max.z = maxAABB[2]
+			
+			
+			AABBCenter = (np.array(minAABB) + np.array(maxAABB))/2
+			AABBOffset = np.array(reMesh.meshletBVH.offset)
+			AABBScale = reMesh.meshletBVH.scale
 			print("Parsing MPLY.")
 			self.mainMeshLODList = []
 			self.materialNameList = reMesh.rawNameList
@@ -691,8 +729,80 @@ class ParsedREMesh:
 					
 					#TEMP
 					tags = set()
-					submesh.vertexPosList = ReadCompressedPosBuffer(meshEntry.posBuffer, tags)
-					if meshEntry.flagsA.flags.smallNormal:
+					
+					#Calculate bounding box
+					submesh.boundingBox = AABB()
+					
+					center = np.array(meshEntry.bboxAABBCenter)
+					extent = np.array(meshEntry.bboxExtent)
+					
+					subAABBMin = center - extent
+					subAABBMin *= AABBScale
+					subAABBMin += AABBOffset
+					
+					
+					subAABBMax = center + extent
+					subAABBMax *= AABBScale
+					subAABBMax += AABBOffset
+					#submesh.relPos = (center * AABBScale) + AABBOffset
+					submesh.relPos = (0.0,0.0,0.0)
+					
+					submesh.boundingBox.min.x = subAABBMin[0]
+					submesh.boundingBox.min.y = subAABBMin[1]
+					submesh.boundingBox.min.z = subAABBMin[2]
+					
+					submesh.boundingBox.max.x = subAABBMax[0]
+					submesh.boundingBox.max.y = subAABBMax[1]
+					submesh.boundingBox.max.z = subAABBMax[2]
+					
+					positionScaling = 2.0
+					if meshEntry.bitFlag.flags.usePosScalingMaybe:
+						if meshEntry.bitFlag.flags.positionScaling2x:
+							positionScaling *= 2
+						if meshEntry.bitFlag.flags.positionScaling4x:
+							positionScaling *= 4
+						if meshEntry.bitFlag.flags.positionScaling8x:
+							positionScaling *= 8
+						if meshEntry.bitFlag.flags.positionScaling256x:
+							positionScaling *= 256
+					else:
+						positionScaling = 1.0
+						if not meshEntry.bitFlag.flags.positionScaling2x:
+							positionScaling *= 0.5
+						if not meshEntry.bitFlag.flags.positionScaling4x:
+							positionScaling *= 0.25
+						if not meshEntry.bitFlag.flags.positionScaling8x:
+							positionScaling *= 0.125
+						if not meshEntry.bitFlag.flags.positionScaling256x:
+							positionScaling *= 0.0625
+						
+					positionModifier = center.copy() * positionScaling
+					
+					scaleModifier = 1.0
+					if meshEntry.bitFlag.flags.useScalingMaybe:
+						if meshEntry.bitFlag.flags.scale2x:
+							scaleModifier *= 2
+						if meshEntry.bitFlag.flags.scale4x:
+							scaleModifier *= 4
+						if meshEntry.bitFlag.flags.scale8x:
+							scaleModifier *= 8
+						if meshEntry.bitFlag.flags.scale256x:
+							scaleModifier *= 256
+					else:#If the flag is false, the scaling flags get flipped
+						scaleModifier = 0.5
+						
+						if not meshEntry.bitFlag.flags.scale2x:
+							scaleModifier *= .5
+						if not meshEntry.bitFlag.flags.scale4x:
+							scaleModifier *= .25
+						if not meshEntry.bitFlag.flags.scale8x:
+							scaleModifier *= .125
+						if not meshEntry.bitFlag.flags.scale256x:
+							scaleModifier *= .0625
+					#print(f"Transform: {positionModifier}")
+					#print(f"Scaling: {scaleModifier}")
+					submesh.vertexPosList = ReadCompressedPosBuffer(meshEntry.posBuffer,meshEntry.bitFlag.flags.use32BitPos,positionModifier,scaleModifier,np.array(meshEntry.partAABBCenter))
+					if meshEntry.bitFlag.flags.isMeshletNoTangent:
 						submesh.normalList = ReadNorBuffer(meshEntry.normalBuffer,tags)
 					else:
 						normalList,tangentList = ReadNorTanBuffer(meshEntry.normalBuffer,tags)
@@ -700,6 +810,10 @@ class ParsedREMesh:
 						submesh.tangentList = tangentList
 					
 					submesh.uvList = ReadUVBuffer(meshEntry.uvBuffer, tags)
+					if meshEntry.uv2Buffer != None:
+						submesh.uv2List = ReadUVBuffer(meshEntry.uv2Buffer, tags)
+					if meshEntry.uv3Buffer != None:
+						submesh.uv3List = ReadUVBuffer(meshEntry.uv3Buffer, tags)
 					if meshEntry.colorBuffer != None:
 						submesh.colorList = ReadColorBuffer(meshEntry.colorBuffer, tags)
 					if reMesh.streamingBuffer != None:
@@ -710,7 +824,8 @@ class ParsedREMesh:
 						submesh.faceList = ReadFaceBuffer(reMesh.streamingBuffer[faceStartOffset:faceEndOffset])
 					else:
 						submesh.faceList = ReadFaceBuffer(meshEntry.faceBuffer)
-					submesh.relPos = meshEntry.relPos
+					
+					
 					group.subMeshList.append(submesh)
 				lod.visconGroupList.append(group)
 				self.mainMeshLODList.append(lod)

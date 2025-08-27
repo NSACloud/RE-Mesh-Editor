@@ -15,13 +15,13 @@ def tag_redraw(context, space_type="PROPERTIES", region_type="WINDOW"):
 					if region.type == region_type:
 						region.tag_redraw()
 
-
+		
 class OBJECT_PT_MDFObjectModePanel(Panel):
 	bl_label = "RE MDF Tools"
 	bl_idname = "OBJECT_PT_mdf_tools_panel"
 	bl_space_type = "VIEW_3D"   
 	bl_region_type = "UI"
-	bl_category = "RE MDF"   
+	bl_category = "RE Mesh"   
 	bl_context = "objectmode"
 
 	@classmethod
@@ -38,27 +38,68 @@ class OBJECT_PT_MDFObjectModePanel(Panel):
 		layout.label(text = "Active Game")
 		layout.prop(re_mdf_toolpanel, "activeGame")
 		layout.operator("re_mdf.reindex_materials")
-		layout.label(text="Material Preset")
-		layout.prop(re_mdf_toolpanel, "materialPresets")
-		layout.operator("re_mdf.add_preset_material")
 		
-		layout.operator("re_mdf.save_selected_as_preset")
-		layout.operator("re_mdf.open_preset_folder")
-		layout.label(text="Apply MDF to Mesh")
-		layout.label(text = "Mesh Collection")
-		layout.prop_search(re_mdf_toolpanel, "meshCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_01")
-		layout.label(text = "Mod Directory")
-		layout.prop(re_mdf_toolpanel, "modDirectory")
-		layout.operator("re_mdf.apply_mdf")
 		
+		
+class OBJECT_PT_MDFMaterialPresetPanel(Panel):
+	bl_label = "MDF Material Presets"
+	bl_idname = "OBJECT_PT_mdf_material_preset_panel"
+	bl_parent_id = "OBJECT_PT_mdf_tools_panel"  # Specify the ID of the parent panel
+	bl_space_type = "VIEW_3D"   
+	bl_region_type = "UI"
+	bl_category = "RE Mesh"   
+	bl_options = {'DEFAULT_CLOSED'}
+	
+	def draw(self, context):
+		layout = self.layout
+		obj = context.active_object
+		re_mdf_toolpanel = context.scene.re_mdf_toolpanel
+		row = layout.row()
+		row.emboss = "PULLDOWN_MENU"
+		row.label(text="Premade MDF materials.")
+		split = layout.split(factor=0.025)#Indent list slightly to make it more clear it's a part of a sub panel
+		col1 = split.column()
+		col2 = split.column()
+		col2.prop(re_mdf_toolpanel, "materialPresets")
+		col2.operator("re_mdf.add_preset_material")
+		
+		col2.operator("re_mdf.save_selected_as_preset")
+		col2.operator("re_mdf.open_preset_folder")
+
+class OBJECT_PT_MDFMaterialPreviewPanel(Panel):
+	bl_label = "MDF Preview"
+	bl_idname = "OBJECT_PT_mdf_material_preview_panel"
+	bl_parent_id = "OBJECT_PT_mdf_tools_panel"  # Specify the ID of the parent panel
+	bl_space_type = "VIEW_3D"   
+	bl_region_type = "UI"
+	bl_category = "RE Mesh"   
+	bl_options = {'DEFAULT_CLOSED'}
+	
+	def draw(self, context):
+		layout = self.layout
+		obj = context.active_object
+		re_mdf_toolpanel = context.scene.re_mdf_toolpanel
+		row = layout.row()
+		row.emboss = "PULLDOWN_MENU"
+		row.label(text="View MDF materials in Blender.")
+		split = layout.split(factor=0.025)#Indent list slightly to make it more clear it's a part of a sub panel
+		col1 = split.column()
+		col2 = split.column()
+		
+		
+		col2.label(text = "Mesh Collection")
+		col2.prop_search(re_mdf_toolpanel, "meshCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_01")
+		col2.label(text = "Mod Directory")
+		col2.prop(re_mdf_toolpanel, "modDirectory")
+		col2.operator("re_mdf.apply_mdf")
 
 class OBJECT_PT_MDFMaterialLoadSettingsPanel(Panel):
 	bl_label = "MDF Load Settings"
 	bl_idname = "OBJECT_PT_mdf_material_load_settings_panel"
-	bl_parent_id = "OBJECT_PT_mdf_tools_panel"  # Specify the ID of the parent panel
+	bl_parent_id = "OBJECT_PT_mdf_material_preview_panel"  # Specify the ID of the parent panel
 	bl_space_type = "VIEW_3D"   
 	bl_region_type = "UI"
-	bl_category = "RE MDF"   
+	bl_category = "RE Mesh"   
 	bl_options = {'DEFAULT_CLOSED'}
 	
 	def draw(self, context):
@@ -265,35 +306,3 @@ class OBJECT_PT_MDFMaterialGPBFDataListPanel(Panel):
 			rows = 3,
 			type='DEFAULT'
 			)	
-		
-class OBJECT_PT_REAssetExtensionPanel(Panel):
-	bl_label = "RE Asset Extensions"
-	bl_idname = "OBJECT_PT_re_asset_extension_panel"
-	bl_space_type = "VIEW_3D"  
-	bl_region_type = "UI"
-	bl_category = "RE MDF"   
-	bl_context = "objectmode"
-
-	@classmethod
-	def poll(self,context):
-		return context is not None and "HIDE_RE_MDF_EDITOR_TAB" not in context.scene
-
-	def draw(self, context):
-		layout = self.layout
-		scene = context.scene
-		if hasattr(bpy.types, "OBJECT_PT_re_pak_panel"):
-			try:
-				layout.operator("re_asset.create_pak_patch")
-			except:
-				pass
-			
-		if hasattr(bpy.types, "RE_ASSET_OT_batch_mdf_updater"):
-			
-			try:
-				layout.operator("re_asset.blender_mdf_updater")
-				layout.operator("re_asset.batch_mdf_updater")
-			except:
-				pass
-		else:
-			layout.label(text="Update RE Asset Library for more options.")
-				

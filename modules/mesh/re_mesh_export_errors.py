@@ -195,7 +195,7 @@ Select the listed mesh in edit mode, press A to select all vertices. In the menu
 
 OR
 
-Press the "Delete Loose" button in RE Toolbox to delete loose vertices on all meshes.
+Press the "Delete Loose Geometry" button in the RE Mesh tab to delete loose vertices on all meshes.
 """,
 
 "NonTriangulatedFace":"""Non Triangulated Faces
@@ -206,9 +206,7 @@ _______________
 	
 Select the listed mesh in edit mode, press A to select all vertices. Press Ctrl + T to triangulate faces.
 
-OR
 
-Press the "Triangulate Meshes" button in RE Toolbox to triangulate all meshes.
 """,
 "MultipleUVsAssignedToVertex":"""Multiple UVs Assigned To Vertex
 A mesh has multiple uvs assigned to a single vertex.
@@ -223,7 +221,7 @@ Press V to rip the vertices and then press Esc so that the vertices stay in the 
 
 OR
 
-Press the "Solve Repeated UVs" button in RE Toolbox to do this process automatically.
+Check the "Auto Solve Repeated UVs" box when exporting the mesh.
 """,
 "MaxVerticesExceeded":"""Max Vertices Exceeded On Sub Mesh
 A mesh exceeded the limit of 4294967295 vertices.
@@ -256,7 +254,7 @@ Limit total weights to 8 in weight paint mode and normalize all weights from the
 
 OR
 
-Use the "Limit Total and Normalize All Weights" button in RE Toolbox.
+Use the "Limit Total and Normalize All Weights" button in the RE Mesh tab.
 
 """,
 
@@ -271,7 +269,7 @@ Limit total weights to 16 in weight paint mode and normalize all weights from th
 
 OR
 
-Use the "Limit Total and Normalize All Weights" button in RE Toolbox.
+Use the "Limit Total and Normalize All Weights" button the RE Mesh tab.
 
 """,
 

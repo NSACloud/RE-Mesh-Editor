@@ -34,10 +34,20 @@ timeFormat = "%d"
 rotateNeg90Matrix = Matrix.Rotation(radians(-90.0), 4, 'X')
 rotate90Matrix = Matrix.Rotation(radians(90.0), 4, 'X')
 def triangulateMesh(mesh):
+     #BMesh triangulation screws up normals, so save them and reset them after triangulation
+    custom_normals = None
+    if mesh.has_custom_normals:
+        custom_normals = [0.0]*len(mesh.vertices)
+        for vertex in mesh.vertices:
+            custom_normals[vertex.index] = vertex.normal.copy()
+
     bm = bmesh.new()
     bm.from_mesh(mesh)
-    bmesh.ops.triangulate(bm, faces = bm.faces[:])
+    bmesh.ops.triangulate(bm, faces = bm.faces[:],quad_method='BEAUTY', ngon_method='BEAUTY')
     bm.to_mesh(mesh)
+    bm.free()
+    if custom_normals:
+        mesh.normals_split_custom_set_from_vertices(custom_normals)
 
 def pad_infinite(iterable, padding=None):
 	return chain(iterable, repeat(padding))
@@ -423,7 +433,7 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 	
 	return meshObj
 
-def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict,importAllLODs = False,createCollections = True,importShadowMeshes = False,rotate90 = True,mergeGroups = False):
+def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict,importAllLODs = False,createCollections = True,importShadowMeshes = False,rotate90 = True,mergeGroups = False,importBoundingBoxes = False):
 	
 	if meshType == "Main Mesh":
 		shortName = "Main"
@@ -448,7 +458,7 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 		targetLODList = [targetLODList[0]]
 	
 	if parsedMesh.isMPLY:
-		MPLYRoot = createEmpty(f"MPLY Root" +  f" - {meshCollection.name}" if meshCollection != None else "", [("~TYPE","RE_MESH_MPLY_ROOT")],collection = meshCollection)
+		MPLYRoot = createEmpty(f"Meshlet Root" +  f" - {meshCollection.name}" if meshCollection != None else "", [("~TYPE","RE_MESH_MPLY_ROOT")],collection = meshCollection)
 	for lodIndex,lod in enumerate(targetLODList):
 		shadowLODString = ""
 		if importShadowMeshes:
@@ -510,6 +520,9 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 							meshObj.location = (subMesh.relPos[0],subMesh.relPos[2],subMesh.relPos[1])
 						else:
 							meshObj.location = subMesh.relPos
+							
+						if importBoundingBoxes:
+							importBoundingBox(subMesh.boundingBox, f"BBOX: {LODNum}Group_{str(visconGroup.visconGroupNum)}_Sub_{str(subMesh.subMeshIndex)}__{materialName}", meshCollection,rotate90 = rotate90)
 					if mergeGroups:
 						objMergeList.append(meshObj)
 					meshOffsetDict[subMesh.meshVertexOffset] = meshObj
@@ -676,7 +689,7 @@ def importREMeshFile(filePath,options):
 	meshOffsetDict = dict()
 	
 	if not options["importArmatureOnly"]:
-		importLODGroup(parsedMesh,"Main Mesh",meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict,options["importAllLODs"],options["createCollections"],options["importShadowMeshes"],options["rotate90"],options["mergeGroups"])
+		importLODGroup(parsedMesh,"Main Mesh",meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict,options["importAllLODs"],options["createCollections"],options["importShadowMeshes"],options["rotate90"],options["mergeGroups"],options["importBoundingBoxes"])
 	"""
 	if options["importShadowMeshes"] and parsedMesh.shadowMeshLODList != []:
 		importLODGroup(parsedMesh,"Shadow Mesh",meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict)
@@ -739,7 +752,10 @@ def importREMeshFile(filePath,options):
 			boundingBoxCollection["~TYPE"] = "RE_MESH_BOUNDING_BOX_COLLECTION"
 		else:
 			boundingBoxCollection = meshCollection
-		importBoundingBoxes(parsedMesh.boundingBox,parsedMesh.boundingSphere,boundingBoxCollection,armatureObj,parsedMesh.skeleton,options["rotate90"])
+		if not parsedMesh.isMPLY:
+			importBoundingBoxes(parsedMesh.boundingBox,parsedMesh.boundingSphere,boundingBoxCollection,armatureObj,parsedMesh.skeleton,options["rotate90"])
+		else:
+			importBoundingBox(parsedMesh.boundingBox,f"{meshFileName} Bounding Box",boundingBoxCollection,rotate90 = options["rotate90"])
 	meshImportEndTime = time.time()
 	meshImportTime =  meshImportEndTime - meshImportStartTime
 	print(f"Mesh imported in {timeFormat%(meshImportTime * 1000)} ms.")
@@ -1337,16 +1353,18 @@ def exportREMeshFile(filePath,options):
 			visconGroup.visconGroupNum = visconGroupID
 			#Sort by submesh number
 			for submeshIndex,rawsubmesh in enumerate(sorted(visconDict[visconGroupID],key=lambda obj: obj.name)):
-				
+				print(f"    Sub Mesh {str(submeshIndex)}:{rawsubmesh.name}")
 				evaluatedSubMeshData = bpy.data.objects[cloneMeshNameDict[rawsubmesh.name]].data
 				vertexGroupCount = len(rawsubmesh.vertex_groups)#For checking out of bound weight indices
-				triangulateMesh(evaluatedSubMeshData)
+				if any(len(face.vertices) != 3 for face in evaluatedSubMeshData.polygons):
+					#Triagulate only if there's non triangle faces
+					print(f"Triangulated {rawsubmesh.name}")
+					triangulateMesh(evaluatedSubMeshData)
 				if len((evaluatedSubMeshData.vertices)) == 0:
 					addErrorToDict(errorDict, "NoVerticesOnSubMesh", rawsubmesh.name)
 					
 				if len((evaluatedSubMeshData.polygons)) == 0:
 					addErrorToDict(errorDict, "NoFacesOnSubMesh", rawsubmesh.name)
-				print(f"    Sub Mesh {str(submeshIndex)}:{rawsubmesh.name}")
 				parsedSubMesh = SubMesh()
 				parsedSubMesh.subMeshIndex = submeshIndex
 				materialName = "NO_ASSIGNED_MATERIAL"

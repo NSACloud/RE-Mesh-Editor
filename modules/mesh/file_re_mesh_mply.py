@@ -70,47 +70,55 @@ class ContentFlagsB(ctypes.Union):
 					("asUInt8", c_uint8)
 				]
 
-class ClusterFlagsA_bits(ctypes.LittleEndianStructure):
+class ClusterFlags_bits(ctypes.LittleEndianStructure):
 	_fields_ = 	[
-					("smallPos",c_uint8,1),
-					("unkn1",c_uint8,1),
-					("unkn2",c_uint8,1),
-					("unkn3",c_uint8,1),
-					("unkn4",c_uint8,1),
-					("unkn5",c_uint8,1),
-					("smallNormal",c_uint8,1),
-					("unkn7",c_uint8,1),
-		
-				]
-	
-class ClusterFlagsA(ctypes.Union):
-	
-	_anonymous_ = ("flags",)
-	_fields_ =	[
-					("flags",    ClusterFlagsA_bits ),
-					("asUInt8", c_uint8)
-				]
-
-class ClusterFlagsB_bits(ctypes.LittleEndianStructure):
-	_fields_ = 	[
-					("unkn0",c_uint8,1),
-					("unkn1",c_uint8,1),
-					("unkn2",c_uint8,1),
-					("unkn3",c_uint8,1),
-					("unkn4",c_uint8,1),
+					("isMeshletCompressedNormal",c_uint8,1),
+					("isMeshletCompressedTexcoord1",c_uint8,1),
+					("isMeshletCompressedTexcoord2",c_uint8,1),
+					("isMeshletCompressedTexcoord3",c_uint8,1),
+					("isMeshletCompressedVertexColor",c_uint8,1),
+					("isMeshletCompressedSkinned",c_uint8,1),
+					("isMeshletNoTangent",c_uint8,1),
+					("Reserved",c_uint8,1),
+					
+					("isMeshletUseVertexColor",c_uint8,1),
+					("isMeshletUseTexcoord2",c_uint8,1),
+					("isMeshletUseTexcoord3",c_uint8,1),
+					("isMeshletUseSkinned",c_uint8,1),
+					("use32BitPos",c_uint8,1),
 					("unkn5",c_uint8,1),
 					("unkn6",c_uint8,1),
 					("useUnknStruct",c_uint8,1),
+					
+					("positionScaling2x",c_uint8,1),
+					("positionScaling4x",c_uint8,1),
+					("positionScaling8x",c_uint8,1),
+					("positionScaling256x",c_uint8,1),
+					("unkn12",c_uint8,1),#Setting to 1 makes model disappear
+					("unkn13",c_uint8,1),#Setting to 1 makes model disappear
+					("unkn14",c_uint8,1),#Setting to 1 makes model disappear
+					("usePosScalingMaybe",c_uint8,1),#Setting to 0 makes model disappear, files that have it set to 0 have flags that make no sense
+					
+					("scale2x",c_uint8,1),
+					("scale4x",c_uint8,1),
+					("scale8x",c_uint8,1),
+					("scale256x",c_uint8,1),
+					("killPerformance",c_uint8,1),#Don't know what this is doing but it murders FPS if true
+					("unkn21",c_uint8,1),#Setting to 1 makes model disappear
+					("unkn22",c_uint8,1),#Setting to 1 makes model disappear
+					("useScalingMaybe",c_uint8,1),#Setting to 0 makes model disappear
+		
 		
 				]
 	
-class ClusterFlagsB(ctypes.Union):
+class ClusterFlags(ctypes.Union):
 	
 	_anonymous_ = ("flags",)
 	_fields_ =	[
-					("flags",    ClusterFlagsB_bits ),
-					("asUInt8", c_uint8)
+					("flags",    ClusterFlags_bits ),
+					("asUInt32", c_uint32)
 				]
+
 
 class FileHeader():
 	def __init__(self):
@@ -452,75 +460,96 @@ COLOR_STRIDE = 4
 
 class ClusterInfo():
 	def __init__(self):
-		self.posX = 0.0#Controls postion of meshlet, this value is the same across all meshlets in the file, likely used to move the model to the origin.
-		self.posY = 0.0
-		self.posZ = 0.0
+		self.partAABBCenter = (0.0,0.0,0.0)#AABB of full mesh
 		self.vertexCount = 0
 		self.faceCount = 0
-		self.unkn0 = 0#Sometimes 1
-		self.unkn1 = 0
-		self.relPosX = 0
-		self.unknVal0 = 0
-		self.relPosY = 0
-		self.unknVal1 = 0
-		self.relPosZ = 0
-		self.unknVal2 = 0
-		self.flagsA = ClusterFlagsA()
-		self.flagsB = ClusterFlagsB()
-		self.unkn5A = 0
-		self.unkn5B = 0#Stays same throughout whole file, but different across files
+		self.materialID = 0#Sometimes 1
+		self.partIndex = 0
+		self.bboxAABBCenterXRaw = 0
+		self.bboxExtentX = 0
+		self.bboxAABBCenterYRaw = 0
+		self.bboxExtentY = 0
+		self.bboxAABBCenterZRaw = 0
+		self.bboxExtentZ = 0
+		self.bitFlag = ClusterFlags()
 		
 		self.faceBuffer = bytes()
 		self.vertexBuffer = bytes()
 		
-	def read(self,file,contentFlagsA):
-		self.posX = read_float(file)#AABB center maybe
-		self.posY = read_float(file)
-		self.posZ = read_float(file)
+	def read(self,file):
+		self.partAABBCenter = (read_float(file),read_float(file),read_float(file))
 		self.vertexCount = read_ubyte(file)
 		self.faceCount = read_ubyte(file)
-		self.unkn0 = read_ubyte(file)
-		self.unkn1 = read_ubyte(file)
-		self.relPosX = read_ushort(file)
-		self.unknVal0 = read_ushort(file)#Bounding box length/height/width maybe
-		self.relPosY = read_ushort(file)
-		self.unknVal1 = read_ushort(file)#Bounding box length/height/width maybe
-		self.relPosZ = read_ushort(file)
-		self.unknVal2 = read_ushort(file)#Bounding box length/height/width maybe
-		self.relPos = (self.relPosX/65535,self.relPosY/65535,self.relPosZ/65535)
-		self.flagsA.asUInt8 = read_ubyte(file)
-		self.flagsB.asUInt8 = read_ubyte(file)
-		self.unkn5A = read_ubyte(file)
-		self.unkn5B = read_ubyte(file)
+		self.materialID = read_ubyte(file)
+		self.partIndex = read_ubyte(file)
+		self.bboxAABBCenterXRaw = read_ushort(file)
+		self.bboxExtentXRaw = read_ushort(file)
+		self.bboxAABBCenterYRaw = read_ushort(file)
+		self.bboxExtentYRaw = read_ushort(file)
+		self.bboxAABBCenterZRaw = read_ushort(file)
+		self.bboxExtentZRaw = read_ushort(file)
+		
+		self.bboxAABBCenter = (self.bboxAABBCenterXRaw/65535,self.bboxAABBCenterYRaw/65535,self.bboxAABBCenterZRaw/65535)
+		self.bboxExtent = (self.bboxExtentXRaw/65535,self.bboxExtentYRaw/65535,self.bboxExtentZRaw/65535)
+		self.bitFlag.asUInt32 = read_uint(file)
 		
 		self.faceBuffer = file.read(self.faceCount*3)#Faces are streamed from streaming mesh, max of 128 faces for non streaming
 		
-		print(self.vertexCount)
-		print(self.faceCount)
+		#print(self.vertexCount)
+		#print(self.faceCount)
 		
 		#Skip padding
 		file.seek(getPaddedPos(file.tell(), 4))
 		
-		print(f"vert start {file.tell()}")
-		self.posBuffer = file.read(self.vertexCount*COMPRESSED_POS_DATA_STRIDE)
+		#print(f"vert start {file.tell()}")
+		if self.bitFlag.flags.use32BitPos:
+			self.posBuffer = file.read(self.vertexCount*4)
+		else:
+			self.posBuffer = file.read(self.vertexCount*6)
 		#Skip padding again after pos since the stride isn't divisible by 4 
 		file.seek(getPaddedPos(file.tell(), 4))
-		if self.flagsA.flags.smallNormal:
-			self.normalBuffer = file.read(self.vertexCount*4)
+		if self.bitFlag.flags.isMeshletNoTangent:
+			if self.bitFlag.flags.isMeshletCompressedNormal:
+				self.normalBuffer = file.read(4)*self.vertexCount
+			else:
+				self.normalBuffer = file.read(self.vertexCount*4)
 		else:
 			self.normalBuffer = file.read(self.vertexCount*8)
-		#TODO
-		if self.flagsB.flags.useUnknStruct:
-			self.unknStructBuffer = file.read(12)
+			
+		
+		if self.bitFlag.flags.useUnknStruct:
+			dataSize = (self.vertexCount // 32 + (self.vertexCount % 32 > 0))*4
+			self.unknStructBuffer = file.read(dataSize)
 		else:
 			self.unknStructBuffer = None
-		#This structure varies in size, it's either 12 bytes or 16 bytes and I haven't found what indicates which struct to use yet
+		
+		if self.bitFlag.flags.isMeshletCompressedTexcoord1:	
+			self.uvBuffer = file.read(UV_STRIDE)*self.vertexCount
+		else:
+			self.uvBuffer = file.read(self.vertexCount*UV_STRIDE)
 			
-		self.uvBuffer = file.read(self.vertexCount*UV_STRIDE)
-		if contentFlagsA.hasVertexColor:
-			self.colorBuffer = file.read(self.vertexCount*COLOR_STRIDE)
+		if self.bitFlag.flags.isMeshletUseTexcoord2:
+			if self.bitFlag.flags.isMeshletCompressedTexcoord2:	
+				self.uv2Buffer = file.read(UV_STRIDE)*self.vertexCount
+			else:
+				self.uv2Buffer = file.read(self.vertexCount*UV_STRIDE)
+		else:
+			self.uv2Buffer = None
+		if self.bitFlag.flags.isMeshletUseTexcoord3:
+			if self.bitFlag.flags.isMeshletCompressedTexcoord3:	
+				self.uv3Buffer = file.read(UV_STRIDE)*self.vertexCount
+			else:
+				self.uv3Buffer = file.read(self.vertexCount*UV_STRIDE)
+		else:
+			self.uv3Buffer = None
+		if self.bitFlag.flags.isMeshletUseVertexColor:
+			if self.bitFlag.flags.isMeshletCompressedVertexColor:	
+				self.colorBuffer = file.read(COLOR_STRIDE)*self.vertexCount
+			else:
+				self.colorBuffer = file.read(self.vertexCount*COLOR_STRIDE)
 		else:
 			self.colorBuffer = None
+		#TODO find something that uses weights
 		
 	def write(self,file):
 		pass
@@ -530,7 +559,7 @@ class ClusterLODEntry():
 		self.entryCount = 0
 		self.entryOffsetList = []
 		self.entryList = []
-	def read(self,file,startOffset,contentFlagsA):
+	def read(self,file,startOffset):
 		self.entryCount = read_uint(file)
 		
 		for i in range(0,self.entryCount):
@@ -539,19 +568,19 @@ class ClusterLODEntry():
 			#print(offset)
 			file.seek(startOffset+offset)
 			entry = ClusterInfo()
-			entry.read(file,contentFlagsA)
+			entry.read(file)
 			self.entryList.append(entry)
 
 class ClusterInfoLayout():
 	def __init__(self):
 		self.lodList = []
-	def read(self,file,startOffset,LODOffsetList,contentFlagsA):
+	def read(self,file,startOffset,LODOffsetList):
 		
 		for offset in LODOffsetList:
 			if offset != 0:
 				file.seek(startOffset + offset)
 				entry = ClusterLODEntry()
-				entry.read(file,startOffset,contentFlagsA)
+				entry.read(file,startOffset)
 				self.lodList.append(entry)
 			
 	def write(self,file):
@@ -616,7 +645,7 @@ class REMeshMPLY():
 		if self.fileHeader.gpuMeshletOffset and self.meshletLayout.gpuDataSize != 0:
 			
 			self.clusterInfoLayout = ClusterInfoLayout()
-			self.clusterInfoLayout.read(file, self.meshletLayout.gpuMeshletOffset, self.meshletLayout.gpuMeshletHeader.lodClustersOffset,self.fileHeader.contentFlagsA.flags)
+			self.clusterInfoLayout.read(file, self.meshletLayout.gpuMeshletOffset, self.meshletLayout.gpuMeshletHeader.lodClustersOffset)
 			
 			#file.seek(self.fileHeader.gpuMeshletOffset)
 			#self.gpuData = file.read(self.meshletLayout.gpuDataSize)

@@ -12,7 +12,7 @@ class OBJECT_PT_TexConversionPanel(Panel):
 	bl_idname = "OBJECT_PT_tex_tools_panel"
 	bl_space_type = "VIEW_3D"  
 	bl_region_type = "UI"
-	bl_category = "RE MDF"   
+	bl_category = "RE Mesh"   
 	bl_context = "objectmode"
 
 	@classmethod
@@ -23,7 +23,9 @@ class OBJECT_PT_TexConversionPanel(Panel):
 		layout = self.layout
 		scene = context.scene
 		re_mdf_toolpanel = scene.re_mdf_toolpanel
-		
+		row = layout.row()
+		row.emboss = "PULLDOWN_MENU"
+		row.label(text="Drag files onto the 3D view to convert.")
 		layout.operator("re_tex.convert_tex_dds_files")
 		
 		layout.label(text = "Convert Image Directory")
