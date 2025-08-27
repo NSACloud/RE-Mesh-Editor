@@ -14,8 +14,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
  - Allows for importing and exporting of RE Engine mdf2 (material) files.
- - MDF material editing from within Blender.
- <details>
+ - MDF material editing from within Blender.<details>
  
     <summary>Video Preview</summary>
   
