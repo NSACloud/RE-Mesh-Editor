@@ -35,19 +35,19 @@ rotateNeg90Matrix = Matrix.Rotation(radians(-90.0), 4, 'X')
 rotate90Matrix = Matrix.Rotation(radians(90.0), 4, 'X')
 def triangulateMesh(mesh):
      #BMesh triangulation screws up normals, so save them and reset them after triangulation
-    custom_normals = None
-    if mesh.has_custom_normals:
-        custom_normals = [0.0]*len(mesh.vertices)
-        for vertex in mesh.vertices:
-            custom_normals[vertex.index] = vertex.normal.copy()
+    #custom_normals = None
+    #if mesh.has_custom_normals:
+    #    custom_normals = [0.0]*len(mesh.vertices)
+    #    for vertex in mesh.vertices:
+    #        custom_normals[vertex.index] = vertex.normal.copy()
 
     bm = bmesh.new()
     bm.from_mesh(mesh)
-    bmesh.ops.triangulate(bm, faces = bm.faces[:],quad_method='BEAUTY', ngon_method='BEAUTY')
+    bmesh.ops.triangulate(bm, faces = bm.faces[:])
     bm.to_mesh(mesh)
     bm.free()
-    if custom_normals:
-        mesh.normals_split_custom_set_from_vertices(custom_normals)
+    #if custom_normals:
+        #mesh.normals_split_custom_set_from_vertices(custom_normals)
 
 def pad_infinite(iterable, padding=None):
 	return chain(iterable, repeat(padding))
