@@ -133,6 +133,7 @@ def exportFBXSkelFile(filepath,targetArmature,usePose=True):
 			parsedBone.translation = transform
 			parsedBone.rotation = (rotation[1],rotation[2],rotation[3],rotation[0])
 			parsedBone.scale = scale
+			fbxSkelFile.boneEntryList.append(parsedBone)
 			
 		if exportArmatureData != None:
 			bpy.data.armatures.remove(exportArmatureData)
