@@ -166,6 +166,7 @@ class OBJECT_PT_MDFFlagsPanel(Panel):
 		col1 = split.column()
 		col2 = split.column()
 		col2.alignment='RIGHT'
+		col2.prop(flags, "hideMaterialInGame")
 		col2.prop(flags, "ver32Unknown")
 		col2.prop(flags, "ver32Unknown1")
 		col2.prop(flags, "ver32Unknown2")

@@ -275,6 +275,11 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 	   default = True)
 	
 class MDFFlagsPropertyGroup(bpy.types.PropertyGroup):
+	hideMaterialInGame: BoolProperty(
+		name = "Hide Material In Game",
+		description="If checked, any meshes using this material will appear invisible in game.\nThis works by making the game unable to find the material hash.\nUsing this option is not recommended. Deleting the materials from the MDF and the objects using them in the mesh files is the correct way to do this.\nOnly use this if there's some reason you can't alter the mesh file.",
+		default = False
+	)
 	ver32Unknown: IntProperty(
 		name = "Version 31 Unknown",
 		description="Unknown value for version 31 and above, likely flags",#TODO Add description

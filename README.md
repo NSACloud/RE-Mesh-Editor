@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.57 (10/2/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.58 (10/26/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -26,7 +26,6 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - Supports LOD (level of detail) import and export.
  - Texture conversion tools.
  - Collection based system that allows for export with multiple mesh files in a scene.
- - RE Toolbox batch export integration. Any files exported will be added to the RE Toolbox batch export list.
  - Drag and drop dds/tex conversion. (Blender 4.1 and higher)<details>
     <summary>Video Preview</summary>
   
@@ -39,6 +38,8 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
     https://github.com/user-attachments/assets/fa1ba74e-8a57-4115-b6cd-9585a2a92a21
    
     </details>
+ - **(New in 0.58)** Batch exporting for all supported RE Engine file types.
+ - **(New in 0.58)** Unpacking and repacking of mod pak files. (RE Asset Library Required)
  - Additional supported file types:
   - **.fbxskel** - (Skeleton)
  ## Supported Games
@@ -79,6 +80,15 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+### V0.58 - 10/26/2025
+* Added new "RE Batch Exporter" button under the RE Mesh tab. This allows for batch exporting of all supported file types.
+* Added "Unpack Mod Pak" button in the RE Mesh tab.
+* Added "Hide Material In Game" flag in the MDF material flags. Any materials with this option checked will appear invisible in game.
+* Added dialog that allows the amount of weights to be specified when using "Limit Total and Normalize All".
+* Fixed issue where certain MDF parameters in SF6 would be changed upon importing to Blender. They are now corrected upon export.
+* Fixed issue where imported vertex groups on meshes could be assigned incorrectly on certain models.
+* Temporarily disabled exporting more than 6 weights for MH Wilds due to issues with implementation.
+
 ### V0.57 - 10/2/2025
 * Fixed issue preventing FBXSkel exports from working.
 

@@ -251,6 +251,7 @@ class GPBFEntry():
 
 class Material():
 	def __init__(self):
+		self.hideInGame = False#For skipping hash calculation
 		self.matNameOffset = 0
 		self.matNameHash = 0
 		self.propBlockSize = 0
@@ -480,7 +481,11 @@ class MDFFile():
 			textureEntriesSize += len(material.textureList) * self.sizeData.TEXTURE_ENTRY_SIZE
 			propertyEntriesSize += len(material.propertyList) * self.sizeData.PROPERTY_ENTRY_SIZE
 			gpbfEntriesSize += len(material.gpbfBufferNameList) * 2 * self.sizeData.GPBF_ENTRY_SIZE
-			material.matNameHash = hash_wide(material.materialName)
+			if material.hideInGame:
+				material.matNameHash = 0
+			else:
+				material.matNameHash = hash_wide(material.materialName)
+			
 			material.propBlockSize = 0
 			material.textureCount = len(material.textureList)
 			material.propertyCount = len(material.propertyList)

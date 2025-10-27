@@ -175,7 +175,7 @@ def importSkeleton(parsedSkeleton,armatureName,collection,rotate90,targetArmatur
 	bpy.ops.object.mode_set(mode='EDIT')
 	
 	boneNameIndexDict = {index: bone.boneName for index, bone in enumerate(parsedSkeleton.boneList)}
-	
+	#print(boneNameIndexDict)
 	#Debug - print symmetry and sibling bone assignments
 	"""
 	for bone in parsedSkeleton.boneList:
@@ -447,6 +447,7 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 	
 	if parsedMesh.skeleton != None:
 		if parsedMesh.skeleton.weightedBones != []:
+			#print(parsedMesh.skeleton.weightedBones)
 			boneNameList = parsedMesh.skeleton.weightedBones
 		elif len(parsedMesh.skeleton.boneList) != 0:#No bone remap table
 			boneNameList = [parsedMesh.skeleton.boneList[0].boneName]
@@ -677,7 +678,13 @@ def importREMeshFile(filePath,options):
 		meshCollection = getCollection(meshFileName,parentCollection,makeNew = True)
 		meshCollection.color_tag = "COLOR_01"
 		meshCollection["~TYPE"] = "RE_MESH_COLLECTION"
-		
+		try:
+				split = splitNativesPath(filePath)
+				if split != None:
+					assetPath = os.path.splitext(split[1])[0].replace(os.sep,"/")
+					meshCollection["~ASSETPATH"] = assetPath#Used to determine where to export automatically
+		except:
+			print("Failed to set asset path from file path, file is likely not in a natives folder.")
 		bpy.context.scene.re_mdf_toolpanel.meshCollection = meshCollection
 	else:
 		meshCollection = bpy.context.scene.collection
@@ -1567,8 +1574,9 @@ def exportREMeshFile(filePath,options):
 						#print(weightIndicesList)
 						if len(weightList) > maxWeightsPerVertex:
 							parsedMesh.bufferHasExtraWeight = True
-							if gameName != "MHWILDS":#Limit extra vertex weights to MH Wilds for now since I haven't tested which games extra weights can work on.
-								addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
+							#Disabled extra weights temporarily due to issues with export
+							#if gameName != "MHWILDS":#Limit extra vertex weights to MH Wilds for now since I haven't tested which games extra weights can work on.
+							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
 							
 							parsedSubMesh.extraWeightList[currentVertIndex] = list(pad(weightList[maxWeightsPerVertex:],size=8,padding=0.0))
 							parsedSubMesh.extraWeightIndicesList[currentVertIndex] = list(pad(weightIndicesList[maxWeightsPerVertex:],size=8,padding=0))

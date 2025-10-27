@@ -244,11 +244,21 @@ def importMDFFile(filePath,parentCollection = None):
 			bpy.context.scene.re_mdf_toolpanel.activeGame = gameName
 		else:
 			gameName = -1
+			
 	except:
 		print("Unable to parse mdf version number in file path.")
 		gameName = -1
+		mdfVersion = 45
 	#headerObj = createEmpty("MDF_HEADER ("+os.path.split(filePath)[1]+")",[("~TYPE","RE_MDF_HEADER"),("unknHeaderValue",mdfFile.Header.version),("MDFVersion",os.path.splitext(filePath)[1].split(".")[1])],None,"MDFData")
 	mdfCollection = createMDFCollection(mdfFileName,parentCollection)
+	bpy.context.scene["REMeshLastImportedMDFVersion"] = mdfVersion
+	try:
+			split = splitNativesPath(filePath)
+			if split != None:
+				assetPath = os.path.splitext(split[1])[0].replace(os.sep,"/")
+				mdfCollection["~ASSETPATH"] = assetPath#Used to determine where to export automatically
+	except:
+		print("Failed to set asset path from file path, file is likely not in a natives folder.")
 	#MATERIALS IMPORT
 	for index, material in enumerate(mdfFile.materialList):
 		name = "Material "+str(index).zfill(2)+ " ("+material.materialName+")"
@@ -424,6 +434,8 @@ def buildMDF(mdfCollectionName,mdfVersion = None):
 			materialEntry.ver32Unkn1 = materialObj.re_mdf_material.flags.ver32Unknown1
 			materialEntry.ver32Unkn2 = materialObj.re_mdf_material.flags.ver32Unknown2
 			
+			materialEntry.hideInGame = materialObj.re_mdf_material.flags.hideMaterialInGame
+			
 			materialEntry.flags.asInt32 = materialObj.re_mdf_material.flags.flagIntValue
 			for textureBinding in materialObj.re_mdf_material.textureBindingList_items:
 				textureEntry = TextureBinding()
@@ -467,6 +479,15 @@ def buildMDF(mdfCollectionName,mdfVersion = None):
 					
 					materialEntry.gpbfBufferNameList.append(nameEntry)
 					materialEntry.gpbfBufferPathList.append(pathEntry)
+			if mdfVersion == 31:#SF6
+			#Set altered customize values back to original values since some files do use them
+				for prop in materialEntry.propertyList:
+					if "CustomizeRoughness" in prop.propName or "CustomizeMetal" in prop.propName:
+						if prop.propValue[0] == 1.0:
+							prop.propValue = [0.0]
+					elif "CustomizeColor"  in prop.propName:
+						if prop.propValue == [1.0,1.0,1.0,1.0]:
+							prop.propValue = [0.501960813999176, 0.501960813999176, 0.501960813999176, 1.0]
 			newMDFFile.materialList.append(materialEntry)
 		return newMDFFile
 	else:

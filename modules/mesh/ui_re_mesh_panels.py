@@ -39,6 +39,7 @@ class OBJECT_PT_MeshObjectModePanel(Panel):
 		#layout.operator("re_mesh.solve_repeated_uvs")
 		layout.operator("re_mesh.remove_zero_weight_vertex_groups")
 		layout.operator("re_mesh.limit_total_normalize")
+		layout.operator("re_mesh.batch_exporter")
 		
 class OBJECT_PT_MeshArmatureToolsPanel(Panel):
 	bl_label = "Armature Tools"
@@ -75,6 +76,11 @@ class OBJECT_PT_REAssetExtensionPanel(Panel):
 				layout.operator("re_asset.create_pak_patch")
 			except:
 				pass
+		if hasattr(bpy.types, "RE_ASSET_OT_unpack_mod_pak"):
+			try:
+				layout.operator("re_asset.unpack_mod_pak")
+			except:
+				pass
 			
 		if hasattr(bpy.types, "RE_ASSET_OT_batch_mdf_updater"):
 			
@@ -84,13 +90,11 @@ class OBJECT_PT_REAssetExtensionPanel(Panel):
 			except:
 				pass
 		
-		#Not ready yet
-		#if hasattr(bpy.types, "RE_ASSET_OT_batch_rsz_updater"):
-		#	try:
-		#		layout.operator("re_asset.batch_rsz_updater")
-		#		layout.operator("re_asset.unpack_mod_pak")
-		#	except:
-		#		pass
-		#else:
-		#	layout.label(text="Update RE Asset Library for more options.")
+		if hasattr(bpy.types, "RE_ASSET_OT_batch_rsz_updater"):
+			try:
+				layout.operator("re_asset.batch_rsz_updater")
+			except:
+				pass
+		else:
+			layout.label(text="Update RE Asset Library for more options.")
 				

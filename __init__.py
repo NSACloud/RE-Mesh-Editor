@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 57),
+	"version": (0, 58),
 	"blender": (2, 93, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -24,12 +24,17 @@ from .modules.blender_utils import operator_exists
 #mesh
 from .modules.mesh.file_re_mesh import meshFileVersionToGameNameDict
 from .modules.mesh.blender_re_mesh import importREMeshFile,exportREMeshFile
+from .modules.mesh.re_mesh_propertyGroups import (
+	ExporterNodePropertyGroup,
+	MESH_UL_REExporterList
+	)
 from .modules.mesh.re_mesh_operators import (
 	WM_OT_DeleteLoose,
 	WM_OT_RenameMeshToREFormat,
 	WM_OT_RemoveZeroWeightVertexGroups,
 	WM_OT_LimitTotalNormalizeAll,
 	WM_OT_CreateMeshCollection,
+	WM_OT_REBatchExporter,
 
 )
 from .modules.mesh.ui_re_mesh_panels import (
@@ -37,6 +42,8 @@ from .modules.mesh.ui_re_mesh_panels import (
 	OBJECT_PT_MeshArmatureToolsPanel,
 	OBJECT_PT_REAssetExtensionPanel,
 	)
+
+
 #mdf
 from.modules.mdf.file_re_mdf import gameNameMDFVersionDict
 from .modules.mdf.blender_re_mdf import importMDFFile,exportMDFFile
@@ -65,9 +72,6 @@ from .modules.mdf.re_mdf_propertyGroups import (
 	MESH_UL_MDFTextureBindingList,
 	MESH_UL_MDFMMTRSDataList,
 	MESH_UL_MDFGPBFDataList,
-	
-	
-	
 	)
 
 from .modules.mdf.re_mdf_operators import (
@@ -1024,22 +1028,14 @@ class ExportREMesh(Operator, ExportHelper):
 		success = exportREMeshFile(self.filepath,options)
 		if success:
 			self.report({"INFO"},"Exported RE Mesh successfully.")
-			"""
-			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
-				if not any(item.path == self.filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
-					newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
-					newExportItem.fileType = "MESH"
-					newExportItem.path = self.filepath
-					newExportItem.meshCollection = self.targetCollection
-					newExportItem.exportAllLODs = self.exportAllLODs
-					newExportItem.preserveSharpEdges = self.preserveSharpEdges
-					newExportItem.rotate90 = self.rotate90
-					newExportItem.exportBlendShapes = self.exportBlendShapes
-					newExportItem.useBlenderMaterialName = self.useBlenderMaterialName
-					newExportItem.preserveBoneMatrices = self.preserveBoneMatrices
-					newExportItem.exportBoundingBoxes = self.exportBoundingBoxes
-					print("Added path to RE Toolbox Batch Export list.")
-			"""
+			bpy.data.collections[self.targetCollection]["BatchExport_path"] = self.filepath
+			bpy.data.collections[self.targetCollection]["BatchExport_exportAllLODs"] = self.exportAllLODs
+			bpy.data.collections[self.targetCollection]["BatchExport_preserveSharpEdges"] = self.preserveSharpEdges
+			bpy.data.collections[self.targetCollection]["BatchExport_rotate90"] = self.rotate90
+			bpy.data.collections[self.targetCollection]["BatchExport_exportBlendShapes"] = self.exportBlendShapes
+			bpy.data.collections[self.targetCollection]["BatchExport_useBlenderMaterialName"] = self.useBlenderMaterialName
+			bpy.data.collections[self.targetCollection]["BatchExport_preserveBoneMatrices"] = self.preserveBoneMatrices
+			bpy.data.collections[self.targetCollection]["BatchExport_exportBoundingBoxes"] = self.exportBoundingBoxes
 		else:
 			self.report({"INFO"},"RE Mesh export failed. See Window > Toggle System Console for info on how to fix it.")
 		
@@ -1190,14 +1186,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 			if bpy.context.scene.re_mdf_toolpanel.modDirectory == "":
 				setModDirectoryFromFilePath(self.filepath)
 			
-			#Add batch export entry to RE Toolbox if it doesn't already have one
-			if hasattr(bpy.types, "OBJECT_PT_re_tools_quick_export_panel"):
-				if not any(item.path == self.filepath for item in bpy.context.scene.re_toolbox_toolpanel.batchExportList_items):
-					newExportItem = bpy.context.scene.re_toolbox_toolpanel.batchExportList_items.add()
-					newExportItem.fileType = "MDF"
-					newExportItem.path = self.filepath
-					newExportItem.mdfCollection = self.targetCollection
-					print("Added path to RE Toolbox Batch Export list.")
+			bpy.data.collections[self.targetCollection]["BatchExport_path"] = self.filepath
 			return {"FINISHED"}
 		else:
 			self.report({"INFO"},"Failed to export RE MDF. Check Window > Toggle System Console for details.")
@@ -1313,6 +1302,7 @@ class ExportREFBXSkel(bpy.types.Operator, ExportHelper):
 		success = exportFBXSkelFile(self.filepath,self.targetArmature)
 		if success:
 			self.report({"INFO"},"Exported RE FBXSkel successfully.")
+			bpy.data.objects[self.targetArmature]["BatchExport_path"] = self.filepath
 			return {"FINISHED"}
 		else:
 			self.report({"INFO"},"Failed to export RE FBXSkel. Check Window > Toggle System Console for details.")
@@ -1339,6 +1329,11 @@ classes = [
 	WM_OT_OpenTextureCacheFolder,
 	WM_OT_ClearTextureCacheFolder,
 	WM_OT_CheckTextureCacheSize,
+	ExporterNodePropertyGroup,
+	MESH_UL_REExporterList,
+	WM_OT_REBatchExporter,
+	
+	
 	#mdf
 	ImportREMDF,
 	ExportREMDF,
