@@ -2,8 +2,8 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 58),
-	"blender": (2, 93, 0),
+	"version": (0, 59),
+	"blender": (3, 3, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
 	"warning": "",

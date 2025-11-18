@@ -1,7 +1,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.58 (10/26/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.59 (11/12/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -9,7 +9,7 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-<img width="1736" height="1019" alt="meshEditorPreview" src="https://github.com/user-attachments/assets/74e026a0-73bc-41e8-a3f6-2d931f5c7dc0" />
+<img width="1950" height="1164" alt="meshEditorPreview" src="https://github.com/user-attachments/assets/104dd8c4-7dfb-41e2-9634-5b9223a71669" />
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
@@ -60,7 +60,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
 Support for more games may be added in the future.
 
 ## Requirements
-* [Blender 2.93 or higher (4.3.2 or higher recommended)](https://www.blender.org/download/)
+* [Blender 3.3 or higher (4.3.2 or higher recommended)](https://www.blender.org/download/)
 
   
 **Not required but strongly recommended:**
@@ -80,6 +80,11 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.59 - 11/12/2025
+* Added support for Blender 5.0.
+* Removed support for Blender versions older than 3.3. This is due to certain shader nodes not being available on older versions.
+
 ### V0.58 - 10/26/2025
 * Added new "RE Batch Exporter" button under the RE Mesh tab. This allows for batch exporting of all supported file types.
 * Added "Unpack Mod Pak" button in the RE Mesh tab.
@@ -88,6 +93,9 @@ To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and pre
 * Fixed issue where certain MDF parameters in SF6 would be changed upon importing to Blender. They are now corrected upon export.
 * Fixed issue where imported vertex groups on meshes could be assigned incorrectly on certain models.
 * Temporarily disabled exporting more than 6 weights for MH Wilds due to issues with implementation.
+
+<details>
+  <summary>Older Version Change Logs</summary>
 
 ### V0.57 - 10/2/2025
 * Fixed issue preventing FBXSkel exports from working.
@@ -179,9 +187,6 @@ You can create a patch pak by using the "Create Patch Pak" button in the RE MDF 
 **The latest version of RE Framework is required for patch paks to load.**
 
 * Minor bug fixes.
-
-<details>
-  <summary>Older Version Change Logs</summary>
 
 ### V0.44 - 2/28/2025
 * Fixed issue where an error could occur when exporting a mesh from a blend file previously used to export for the MH Wilds beta.
