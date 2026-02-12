@@ -72,11 +72,12 @@ def convertTexFileToDDS(texPath, outputPath):
     texFile.read(texPath)
 
     texInfo = {"isArray": texFile.tex.header.imageCount >
-               1, "arrayNum": texFile.tex.header.imageCount}
+               1, "arrayNum": texFile.tex.header.imageCount,"outDDSList":[]}
     if texFile.tex.header.imageCount == 1:
         ddsFile = DDSFile()
         ddsFile.dds = TexToDDS(texFile.tex, 0)
         ddsFile.write(outputPath)
+        texInfo["outDDSList"].append(outputPath)
     else:
         digitCount = len(str(texFile.tex.header.imageCount))
         #print("TEX ARRAY FOUND")
@@ -86,6 +87,7 @@ def convertTexFileToDDS(texPath, outputPath):
             ddsFile = DDSFile()
             ddsFile.dds = TexToDDS(texFile.tex, i)
             ddsFile.write(newOutputPath)
+            texInfo["outDDSList"].append(newOutputPath)
             #print(f"Wrote {newOutputPath}")
     return texInfo
 
@@ -267,3 +269,20 @@ def DDSToTex(ddsPathList, texVersion, outPath, streamingFlag=False):
 
             texFile = getTexFileFromDDS(ddsList, texVersion, streamingFlag)
             texFile.write(outPath)
+
+def ImageListToDDS(imageConvertList,outDir,generateMipMaps):
+
+    texConv = Texconv()
+	#Tuple containing image path, dds format
+    for inPath,ddsFormat in imageConvertList:
+        try:
+	        texConv.convert_to_dds(
+				file = inPath,
+				dds_fmt = ddsFormat,
+				out = outDir,
+				no_mip = not generateMipMaps,
+				verbose = True
+	        )
+        except Exception as err:
+            print(f"Failed to convert {inPath} - {err}")
+    unload_texconv()

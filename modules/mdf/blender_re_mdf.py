@@ -302,12 +302,8 @@ def importMDFFile(filePath,parentCollection = None):
 
 #MDF EXPORT
 
-def reindexMaterials(collectionName):
+def reindexMaterials(mdfCollection):
 	
-	if bpy.data.collections.get(collectionName,None) != None:
-		mdfCollection = bpy.data.collections[collectionName]
-	else:
-		mdfCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
 	if mdfCollection != None:
 		
 		currentIndex = 0
@@ -419,7 +415,7 @@ def buildMDF(mdfCollectionName,mdfVersion = None):
 	if mdfVersion == None:
 		
 		mdfVersion = getMDFVersionToGameName(bpy.context.scene.re_mdf_toolpanel.activeGame)
-	reindexMaterials(mdfCollectionName)
+	reindexMaterials(mdfCollection)
 	if mdfCollection != None:
 		valid = MDFErrorCheck(mdfCollectionName)
 	else:

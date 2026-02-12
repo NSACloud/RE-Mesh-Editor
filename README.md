@@ -1,7 +1,8 @@
+
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.60 (12/15/2025) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.61 (2/11/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -9,39 +10,45 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-<img width="1544" height="920" alt="meshEditorPreview" src="https://github.com/user-attachments/assets/bc0ac317-922e-4ad5-8a96-850faff2eeed" />
+<img width="1718" height="968" alt="meshEditorPreview" src="https://github.com/user-attachments/assets/df5c3f7f-a4a2-4f97-98d5-c747b5124a55" />
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
  - Allows for importing and exporting of RE Engine mdf2 (material) files.
- - MDF material editing from within Blender.<details>
+ - MDF material editing from within Blender.
+   
+   <details>
  
     <summary>Video Preview</summary>
   
     https://github.com/user-attachments/assets/48be61bc-7c40-440f-881b-534809d3232f
    
-    </details>
+   </details>
    
  - Preset system that allows for presets of materials to be saved and shared.
  - Supports LOD (level of detail) import and export.
  - Texture conversion tools.
  - Collection based system that allows for export with multiple mesh files in a scene.
- - Drag and drop dds/tex conversion. (Blender 4.1 and higher)<details>
+ - Drag and drop texture conversion. (Blender 4.1 and higher)
+    <details>
     <summary>Video Preview</summary>
   
-    https://github.com/user-attachments/assets/cf99e5f2-2aa6-4a6f-b170-1e5beb3bcec4
+    https://github.com/user-attachments/assets/da7fe4a6-b408-4269-ab33-3a52b1a71c54
    
     </details>
- - Drag and drop mesh importing. (Blender 4.1 and higher)<details>
+ - Drag and drop mesh importing. (Blender 4.1 and higher)
+    <details>
     <summary>Video Preview</summary>
   
     https://github.com/user-attachments/assets/fa1ba74e-8a57-4115-b6cd-9585a2a92a21
    
-    </details>
+   </details>
+   
  - **(New in 0.58)** Batch exporting for all supported RE Engine file types.
  - **(New in 0.58)** Unpacking and repacking of mod pak files. (RE Asset Library Required)
  - Additional supported file types:
   - **.fbxskel** - (Skeleton)
+  - **.sfur** - (Shell Fur)
  ## Supported Games
  - **Devil May Cry 5**
  - **Resident Evil 2/3 Remake (Supports both RT and Non RT Versions)**
@@ -51,12 +58,14 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - **Resident Evil Re:Verse** 
  - **Monster Hunter Rise**
  - **Monster Hunter Wilds**
+ - **Monster Hunter Stories 3**
  - **Street Fighter 6**
  - **Dragon's Dogma 2**
  - **Kunitsu-Gami: Path of the Goddess**
  - **Dead Rising Deluxe Remaster**
  - **Onimusha 2: Samurai's Destiny**
  - **Pragmata**
+
  
 Support for more games may be added in the future.
 
@@ -72,6 +81,8 @@ Download the addon from the "Download RE Mesh Editor" link at the top or click C
 
 In Blender, go to Edit > Preferences > Addons, then click "Install" in the top right.
 
+Be sure to check the box next to RE Mesh Editor in the addons menu.
+
 NOTE: If you are on Blender 4.2 or above, the install button is found by clicking the arrow in the top right of the addon menu.
 
 ![image](https://github.com/user-attachments/assets/49dd95c1-9a20-49d8-af55-7160d54836df)
@@ -81,6 +92,21 @@ Navigate to the downloaded zip file for this addon and click "Install Addon". Th
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.61 - 2/11/2026
+* Added support for Monster Hunter Stories 3.
+* PNG, TGA and TIF files can now be directly converted to Tex by dragging and dropping them onto the 3D view.
+* Added Convert Tex to PNG option in the addon preferences. When enabled, tex files that are dragged onto the 3D view will be converted to .png instead of .dds. Disabled by default.
+* When Use DDS is disabled in the addon preferences, the default file type is now .png instead of .tif.
+* Added shell fur (.sfur) import and export support.
+This is for editing sfur files only, shell fur effects are not viewable inside Blender yet.
+* Fixed issue preventing mesh exports from working correctly in Pragmata.
+* Fixed issue with extra weight buffers. 12 weights are now supported in MH Wilds and newer.
+* Fixed issue where under certain circumstances, Blender could crash when importing a mesh.
+* Split Sharp Edges is now enabled by default on mesh export. Note that this option only affects edges marked as sharp (blue edges). This helps preserve normals.
+* Readded Solve Repeated UVs to the RE Mesh tab.
+* Updated Texconv version.
+* Minor bug fixes.
 
 ### V0.60 - 12/15/2025
 * Added import support for the Pragmata demo. NOTE: Mesh exporting for Pragmata is not working correctly yet.

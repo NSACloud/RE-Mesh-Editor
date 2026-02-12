@@ -4,6 +4,7 @@ import os
 from..gen_functions import raiseWarning,wildCardFileSearchList
 from .file_re_tex import getTexVersionFromGameName
 from .re_tex_utils import DDSToTex,convertTexFileToDDS
+from ..ddsconv.directx.texconv import Texconv, unload_texconv
 DELETE_DDS = True
 BLENDER_MAX_IMAGE_ARRAY_SIZE = 16#Blender can't handle much more mix nodes than this
 def loadTex(texPath,outputPath,texConv,reloadCachedTextures,useDDS):
@@ -24,7 +25,7 @@ def loadTex(texPath,outputPath,texConv,reloadCachedTextures,useDDS):
 			#print("test")
 			#print(resultList)
 			for result in sorted(resultList):
-				if result.endswith(".dds" if useDDS else ".tif"):
+				if result.endswith(".dds" if useDDS else ".png"):
 					foundArrayTexture = True
 					#print(f"Found existing array texture {result}")
 					blenderImageList.append(bpy.data.images.load(result,check_existing = True)) 
@@ -48,10 +49,10 @@ def loadTex(texPath,outputPath,texConv,reloadCachedTextures,useDDS):
 				print(f"Converting array texture: {texPath}")
 				for i in range(texInfo["arrayNum"]):
 					newDDSPath = f"{newDDSPathRoot}{str(i).zfill(digitCount)}.dds"
-					newOutputPath = f"{newDDSPathRoot}{str(i).zfill(digitCount)}.tif"
+					newOutputPath = f"{newDDSPathRoot}{str(i).zfill(digitCount)}.png"
 					
 					if not useDDS:
-						texConv.convert_to_tif(newDDSPath,out = os.path.dirname(newOutputPath),verbose=False)
+						texConv.convert_to_png(newDDSPath,out = os.path.dirname(newOutputPath),verbose=False)
 					else:
 						newOutputPath = newDDSPath
 					
@@ -73,7 +74,7 @@ def loadTex(texPath,outputPath,texConv,reloadCachedTextures,useDDS):
 					#print("TEX ARRAY FOUND")
 					ddsPath = f"{os.path.splitext(ddsPath)[0]} #ARRAY_{str(0)*digitCount}.dds"
 				if not useDDS:
-					texConv.convert_to_tif(ddsPath,out = os.path.dirname(outputPath),verbose=False)
+					texConv.convert_to_png(ddsPath,out = os.path.dirname(outputPath),verbose=False)
 				if os.path.isfile(outputPath):
 					blenderImageList = [bpy.data.images.load(outputPath,check_existing = not reloadCachedTextures)]
 					#print(blenderImageList)
@@ -86,7 +87,7 @@ def loadTex(texPath,outputPath,texConv,reloadCachedTextures,useDDS):
 
 supportedImageExtensionsSet = set([".png",".tga",".tif"])#Not implemented yet
 
-def convertTexDDSList (fileNameList,inDir,outDir,gameName,createStreamingTex = False):
+def convertTexDDSList (fileNameList,inDir,outDir,gameName,createStreamingTex = False,texToPNG = False):
 	ddsConversionList = []
 	ddsArrayConversionDict = {}
 	texConversionList = []
@@ -138,13 +139,30 @@ def convertTexDDSList (fileNameList,inDir,outDir,gameName,createStreamingTex = F
 			DDSToTex(ddsPathList,texVersion,texPath,streamingFlag = False)#TODO Streaming
 			conversionCount += 1
 	
+	ddsToPNGConversionList = []
 	if texConversionList != []:
 		os.makedirs(outDir,exist_ok = True)
 		for texPath in texConversionList:
 			try:
-				convertTexFileToDDS(texPath,texPath.split(".tex.")[0]+".dds")
+				texInfo = convertTexFileToDDS(texPath,texPath.split(".tex.")[0]+".dds")
+				if texToPNG:
+					ddsToPNGConversionList.extend(texInfo["outDDSList"])
 				conversionCount += 1
 			except Exception as err:
 				print(f"Failed to convert {texPath} - {str(err)}")
 				failCount += 1
+	if len(ddsToPNGConversionList) != 0:
+		texConv = Texconv()
+		
+		for ddsPath in ddsToPNGConversionList:
+			try:
+				texConv.convert_to_png(ddsPath,out = outDir,verbose=False)
+			except Exception as err:
+				print(f"Failed to convert {ddsPath} - {err}")
+			try:
+				if os.path.isfile(ddsPath):
+					os.remove(ddsPath)
+			except:
+				pass
+		unload_texconv()
 	return (conversionCount,failCount)

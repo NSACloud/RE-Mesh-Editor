@@ -38,8 +38,12 @@ class WM_OT_ReindexMaterials(Operator):
 	bl_description = "Reorders the materials and sets their names to the name set in the custom properties. This is done automatically upon exporting"
 	bl_idname = "re_mdf.reindex_materials"
 
+	@classmethod
+	def poll(self,context):
+		return context.scene.re_mdf_toolpanel.mdfCollection is not None
+
 	def execute(self, context):
-		reindexMaterials(bpy.context.scene.re_mdf_toolpanel.mdfCollection.name)
+		reindexMaterials(bpy.context.scene.re_mdf_toolpanel.mdfCollection)
 		self.report({"INFO"},"Reindexed materials.")
 		return {'FINISHED'}
 
@@ -48,6 +52,11 @@ class WM_OT_AddPresetMaterial(Operator):
 	bl_description = "Add a new material to the file and configure it to the selected preset"
 	bl_idname = "re_mdf.add_preset_material"
 	bl_options = {'UNDO'}
+	
+	@classmethod
+	def poll(self,context):
+		return context.scene.re_mdf_toolpanel.mdfCollection is not None
+	
 	def execute(self, context): 
 		enumValue = bpy.context.scene.re_mdf_toolpanel.materialPresets
 
@@ -65,6 +74,10 @@ class WM_OT_ApplyMDFToMeshCollection(Operator):
 	bl_label = "Apply Active MDF"
 	bl_description = "Applies the Active MDF Collection to the specified Mesh Collection.\nThis will remove all materials on the mesh and rebuild them using the active MDF.\nTextures will be fetched from the chunk path set in the addon preferences"
 	bl_idname = "re_mdf.apply_mdf"
+
+	@classmethod
+	def poll(self,context):
+		return context.scene.re_mdf_toolpanel.mdfCollection is not None and context.scene.re_mdf_toolpanel.meshCollection is not None
 
 	def execute(self, context):
 		#reindexMaterials()

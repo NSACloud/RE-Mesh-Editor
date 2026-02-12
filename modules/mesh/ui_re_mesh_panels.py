@@ -35,8 +35,7 @@ class OBJECT_PT_MeshObjectModePanel(Panel):
 		layout.operator("re_mesh.create_mesh_collection")
 		layout.operator("re_mesh.rename_meshes")
 		layout.operator("re_mesh.delete_loose")
-		#TODO add solve repeated uvs again
-		#layout.operator("re_mesh.solve_repeated_uvs")
+		layout.operator("re_mesh.solve_repeated_uvs")
 		layout.operator("re_mesh.remove_zero_weight_vertex_groups")
 		layout.operator("re_mesh.limit_total_normalize")
 		layout.operator("re_mesh.batch_exporter")

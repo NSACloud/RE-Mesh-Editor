@@ -146,7 +146,7 @@ class Texconv:
                     args += ['-reconstructz']
                 if invert_normals:
                     args += ['-inverty']
-            print(args)
+            #print(args)
             out = self.__texconv(file, args, out=out, verbose=verbose)
 
         name = os.path.join(out, os.path.basename(file))
@@ -182,8 +182,6 @@ class Texconv:
 
 
     def convert_to_png(self, file, out=None, cubemap_layout="h-cross", invert_normals=False, verbose=True):
-        #NOTE:Texconv is very tempermental about saving pngs for some reason, it gives access denied errors in appdata where other texture formats don't
-		#tif is used instead because of this
         """Convert dds to png."""
         if self.dll is None:
             raise RuntimeError("texconv is unloaded.")
@@ -257,6 +255,7 @@ class Texconv:
             self.__cube_to_image(file, name, args, cubemap_layout=cubemap_layout, verbose=verbose)
 
         return name
+    
     def convert_to_dds(self, file, dds_fmt, out=None,
                        invert_normals=False, no_mip=False,
                        image_filter="LINEAR",

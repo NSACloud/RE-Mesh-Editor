@@ -110,7 +110,8 @@ normalTypeSet = set([
 	"NormalRoughnessHeightMap",
 	"NRRTMap",
 	"Tex_Normal",
-	"IrisNormalMap"
+	"IrisNormalMap",
+	"NormalOcclusionFilmMap",
 	])
 
 alphaTypeSet = set([
@@ -160,6 +161,7 @@ NRRTTypes = set([
 	"NormalRoughnessAlphaMap",
 	"NormalRoughnessHeightMap",
 	"NormalOcclusionCavityMap",
+	"NormalOcclusionFilmMap",
 	"NRRTMap",
 	])
 ATOSTypes = set([
@@ -272,7 +274,9 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 		".240820143":".45",#MHWILDS
 		".241111606":".45",#MHWILDS
 		".240827123":".46",#ONI2
+		".250604100":".49",#MHS3
 		".250925211":".51",#PRAG
+		#".250925212":".52",#RE9 Placeholder
 		
 		
 		}
@@ -443,7 +447,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						detectedAlbedo = True
 				if loadUnusedTextures or textureType in usedTextureSet or autoDetectedAlbedo:
 					baseTexturePath = texture.replace("@","").replace(".tex","").replace('/',os.sep)
-					outputPath = os.path.join(TEXTURE_CACHE_DIR,baseTexturePath+".tif")
+					outputPath = os.path.join(TEXTURE_CACHE_DIR,baseTexturePath+".png")
 					
 					texPath = getTexPath(baseTexturePath,chunkPathList,mdfVersion)
 					

@@ -24,6 +24,7 @@ from .re_mesh_parse import ParsedREMesh,VisconGroup,LODLevel,SubMesh,ParsedBone,
 from ..mdf.file_re_mdf import readMDF
 from ..mdf.blender_re_mesh_mdf import findMDFPathFromMeshPath,importMDF
 from ..mdf.blender_re_mdf import importMDFFile
+from ..sfur.blender_re_sfur import importSFurFile,findSFurPathFromMeshPath
 from .re_mesh_export_errors import addErrorToDict,printErrorDict,showREMeshErrorWindow
 from ..gen_functions import splitNativesPath,raiseWarning
 from ..blender_utils import showErrorMessageBox
@@ -285,17 +286,24 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 	if faceList == []:
 		raise Exception("Invalid mesh, submesh has no faces")
 	meshData.from_pydata(vertexList, [], faceList)
-	
+	#print(f"DEBUG:\t Loaded {len(vertexList)} verts and {len(faceList)} faces")
 	#Import vertex normals
 	if vertexNormalList != []:
 		
 		
 		meshData.update(calc_edges=True)
+		#print(f"DEBUG:\tUpdated mesh data")
 		meshData.polygons.foreach_set("use_smooth", [True] * len(meshData.polygons))
+		#print(f"DEBUG:\tSet use smooth")
+		#print(f"DEBUG:\tVertex normal count {len(vertexNormalList)}")
+		meshData.validate()#Must call validate before setting custom normals or it can cause rare crashes when importing
 		meshData.normals_split_custom_set_from_vertices([normalizeVec(v) for v in vertexNormalList])
+		
+		#print(f"DEBUG:\tSet custom normals")
 		if bpy.app.version < (4,0,0):
 			meshData.use_auto_smooth = True
 			meshData.calc_normals_split()
+		#print(f"DEBUG:\t Loaded vertex normals")
 		"""
 		meshData.use_auto_smooth = True
 		meshData.polygons.foreach_set("use_smooth", [True] * len(meshData.polygons))
@@ -309,6 +317,7 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 			for face in meshData.polygons:
 				for vertexIndex, loopIndex in zip(face.vertices, face.loop_indices):
 					newUVLayer.data[loopIndex].uv = layer[vertexIndex]
+			#print(f"DEBUG:\t Loaded UV {layerIndex}")
 	
 	
 	#Import vertex color layer 0
@@ -316,6 +325,7 @@ def importMesh(meshName = "newMesh",vertexList = [],faceList = [],vertexNormalLi
 		vcol_layer = meshData.vertex_colors.new()
 		for l,color in zip(meshData.loops, vcol_layer.data):
 			color.color = vertexColor0List[l.vertex_index]
+		#print(f"DEBUG:\t Loaded Vertex Color")
 	
 	meshObj = bpy.data.objects.new(meshName, meshData)
 	
@@ -473,6 +483,7 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 			#lodCollection.hide_viewport = True
 			hiddenCollectionSet.add(lodCollection.name)
 		for visconGroup in lod.visconGroupList:
+			#print(f"DEBUG: Group {visconGroup.visconGroupNum}")
 			objMergeList = []
 			for subMesh in visconGroup.subMeshList:
 				if subMesh.isReusedMesh:	
@@ -480,7 +491,7 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 				else:
 					materialName = parsedMesh.materialNameList[subMesh.materialIndex]
 					#print(subMesh.vertexPosList)
-					
+					#print(f"DEBUG:\t Sub {subMesh.subMeshIndex}")
 					if importAllLODs:
 						LODNum = f"LOD_{str(lodIndex)}_"
 					else:
@@ -523,13 +534,16 @@ def importLODGroup(parsedMesh,meshType,meshCollection,materialDict,armatureObj,h
 							
 						if importBoundingBoxes:
 							importBoundingBox(subMesh.boundingBox, f"BBOX: {LODNum}Group_{str(visconGroup.visconGroupNum)}_Sub_{str(subMesh.subMeshIndex)}__{materialName}", meshCollection,rotate90 = rotate90)
+					#print(f"DEBUG:\t Finished Importing Sub {subMesh.subMeshIndex}")
 					if mergeGroups:
 						objMergeList.append(meshObj)
 					meshOffsetDict[subMesh.meshVertexOffset] = meshObj
+					
 			if mergeGroups and len(objMergeList) > 1:
 				joinObjects(objMergeList)
+			#print(f"DEBUG: End Group {visconGroup.visconGroupNum}")
 		firstLOD = False
-
+		
 
 def importBoundingBox(bbox,bboxName,meshCollection,armatureObj = None,boneParent = None,rotate90 = True):
 	bboxVertList = [
@@ -672,6 +686,7 @@ def importREMeshFile(filePath,options):
 	armatureObj = None
 	parentCollection = None#Collection for grouping mesh and mdf
 	if options["createCollections"]:
+		#print("DEBUG: Making collections")
 		if options["loadMDFData"]:
 			parentCollection = getCollection(meshFileName.split(".mesh")[0],makeNew = True)
 		meshCollection = getCollection(meshFileName,parentCollection,makeNew = True)
@@ -688,20 +703,25 @@ def importREMeshFile(filePath,options):
 	else:
 		meshCollection = bpy.context.scene.collection
 	hiddenCollectionSet = set()
+	#print("DEBUG: Finished colllections")
 	if parsedMesh.skeleton != None:
+		
 		armatureObj = importSkeleton(parsedMesh.skeleton,meshFileName.split(".mesh")[0]+" Armature",meshCollection,options["rotate90"],options["mergeArmature"])
 	#Create dictionary of material names mapping to material data to avoid assigning the wrong material in case of name duplication
 	materialDict = createMaterialDict(parsedMesh.materialNameList)
 	meshOffsetDict = dict()
 	
 	if not options["importArmatureOnly"]:
+		#print("DEBUG: Importing main mesh")
 		importLODGroup(parsedMesh,"Main Mesh",meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict,options["importAllLODs"],options["createCollections"],options["importShadowMeshes"],options["rotate90"],options["mergeGroups"],options["importBoundingBoxes"])
+		#print("DEBUG: Finished importing main mesh")
 	"""
 	if options["importShadowMeshes"] and parsedMesh.shadowMeshLODList != []:
 		importLODGroup(parsedMesh,"Shadow Mesh",meshCollection,materialDict,armatureObj,hiddenCollectionSet,meshOffsetDict)
 	"""
 	#Hide other lods in viewport
 	#print(hiddenCollectionSet)
+	
 	collections = bpy.context.view_layer.layer_collection.children
 	for collection in collections:
 		if collection.name == meshCollection.name:	
@@ -749,6 +769,17 @@ def importREMeshFile(filePath,options):
 		except Exception as err:
 			#print(str(err))
 			warningList.append("Could not import mesh materials from " + mdfPath +":" + str(err))
+	
+	if options["loadShellFur"]:
+		sFurPath = findSFurPathFromMeshPath(filePath,gameName)
+		if sFurPath != None:
+			print("Loading SFur Data...")
+			try:
+				importSFurFile(sFurPath,parentCollection = parentCollection)
+			except Exception as err:
+				raiseWarning("Could not import SFur data from " + sFurPath +":" + str(err))
+				warningList.append("Could not import SFur data from " + sFurPath +":" + str(err))
+		
 	if options["createCollections"]:
 		bpy.context.scene["REMeshLastImportedCollection"] = meshCollection.name
 	bpy.context.scene["REMeshLastImportedMeshVersion"] = meshVersion	
@@ -847,12 +878,8 @@ def deleteClone(clone):
     objs = bpy.data.objects
     objs.remove(objs[clone.name], do_unlink=True)	
 
-def solveRepeatedUVs():
+def solveRepeatedUVs(selection):
 	context = bpy.context
-	if context.selected_objects != []:
-		selection = context.selected_objects	
-	else:
-		selection = bpy.context.scene.objects
 	for selectedObj in selection:
 		if selectedObj.type == "MESH":
 			context.view_layer.objects.active  = selectedObj
@@ -984,13 +1011,18 @@ def exportREMeshFile(filePath,options):
 	maxWeightsPerVertex = 8
 	maxWeightsPerVertexExtended = 16
 	maxWeightedBones = 256
-	if gameName == "SF6" or gameName == "MHWILDS" or gameName == "PRAG":
+	SIX_WEIGHT_GAMES = set(["SF6","MHWILDS","PRAG","RE9"])
+	EXTENDED_WEIGHT_GAMES = set(["MHWILDS","PRAG","MHS3","RE9"])#Games with support for extended weight buffers
+	if gameName in SIX_WEIGHT_GAMES:
 		maxWeightsPerVertex = 6
 		maxWeightsPerVertexExtended = 12
 		maxWeightedBones = 1024
+	padWithLastWeightIndex = True if gameName == "PRAG" or gameName == "MHS3" or gameName == "RE9" else False
 	MAX_VERTICES = 65536
 	MAX_VERTICES_EXTENDED = 4294967295
 	MAX_FACES = 4294967295
+	
+	
 	
 	subMeshCount = 0
 	
@@ -1258,7 +1290,7 @@ def exportREMeshFile(filePath,options):
 					except:
 						pass
 				else:
-					print("Could not parse group ID in {obj.name}, setting to 0")
+					print(f"Could not parse group ID in {obj.name}, setting to 0")
 					groupID = 0
 				
 				#Build bone remap table from first LOD by first finding all bones that have vertex groups weighted to them
@@ -1300,7 +1332,7 @@ def exportREMeshFile(filePath,options):
 				obj.select_set(True)
 				
 			try:
-				solveRepeatedUVs()
+				solveRepeatedUVs(selection = bpy.context.selected_objects)
 			except Exception as err:
 				raiseWarning(f"Failed to solve repeated UVs. {str(err)}")
 			
@@ -1548,6 +1580,7 @@ def exportREMeshFile(filePath,options):
 					secondaryWeightIndicesList = []
 					
 					if parsedMesh.bufferHasWeight:
+						paddingValue = 0#Pad bone indices with last value
 						for g in vertex.groups:
 							if (g.weight >= MIN_WEIGHT or g.group in shapeKeyGroupIndices) and g.group < vertexGroupCount:
 								if g.group in shapeKeyGroupIndices:#DD2 shapekey weights
@@ -1560,6 +1593,9 @@ def exportREMeshFile(filePath,options):
 								else:
 									weightList.append(g.weight)
 									weightIndicesList.append(vertexGroupIndexToRemapDict[g.group])
+									if padWithLastWeightIndex:
+										paddingValue = vertexGroupIndexToRemapDict[g.group]
+									lastWeightedIndex = vertexGroupIndexToRemapDict[g.group]#For pragmata
 									#Gather vertex positions of bone weights to generate bone bounding box
 									boneVertDict[parsedMesh.skeleton.weightedBones[weightIndicesList[-1]]].append(vertex.co)
 						"""
@@ -1573,12 +1609,11 @@ def exportREMeshFile(filePath,options):
 						#print(weightIndicesList)
 						if len(weightList) > maxWeightsPerVertex:
 							parsedMesh.bufferHasExtraWeight = True
-							#Disabled extra weights temporarily due to issues with export
-							#if gameName != "MHWILDS":#Limit extra vertex weights to MH Wilds for now since I haven't tested which games extra weights can work on.
-							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
+							if gameName not in EXTENDED_WEIGHT_GAMES:#Limit extra vertex weights to MH Wilds for now since I haven't tested which games extra weights can work on.
+								addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
 							
 							parsedSubMesh.extraWeightList[currentVertIndex] = list(pad(weightList[maxWeightsPerVertex:],size=8,padding=0.0))
-							parsedSubMesh.extraWeightIndicesList[currentVertIndex] = list(pad(weightIndicesList[maxWeightsPerVertex:],size=8,padding=0))
+							parsedSubMesh.extraWeightIndicesList[currentVertIndex] = list(pad(weightIndicesList[maxWeightsPerVertex:],size=8,padding=paddingValue))
 							#print(rawsubmesh.name)
 							#print(currentVertIndex)
 							#print(parsedSubMesh.extraWeightList[currentVertIndex])
@@ -1593,7 +1628,7 @@ def exportREMeshFile(filePath,options):
 							addErrorToDict(errorDict, "MaxWeightsPerVertexExceeded", rawsubmesh.name)
 						
 						parsedSubMesh.weightList[currentVertIndex] = list(pad(weightList[:maxWeightsPerVertex],size=8,padding=0.0))
-						parsedSubMesh.weightIndicesList[currentVertIndex] = list(pad(weightIndicesList[:maxWeightsPerVertex],size=8,padding=0))
+						parsedSubMesh.weightIndicesList[currentVertIndex] = list(pad(weightIndicesList[:maxWeightsPerVertex],size=8,padding=paddingValue))
 						if parsedMesh.bufferHasSecondaryWeight:
 							parsedSubMesh.secondaryWeightList[currentVertIndex] = list(pad(secondaryWeightList,size=8,padding=0.0))
 							parsedSubMesh.secondaryWeightIndicesList[currentVertIndex] = list(pad(secondaryWeightIndicesList,size=8,padding=0))

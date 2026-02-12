@@ -54,14 +54,17 @@ VERSION_DD2NEW = 124#file:240423143,internal:230517984
 VERSION_DR = 125#file:240424828,internal:240423829
 #VERSION_MHWILDS = 130#file:240820143,internal:240704828# beta
 VERSION_ONI2 = 127#file:240827123,internal:240827123
-
 VERSION_MHWILDS = 130#file:241111606,internal:240704828
 VERSION_PRAGDEMO = 135#file:250925211,internal:250707828
+VERSION_MHS3 = 136#file:250604100,internal:250203152
+VERSION_RE9 = 140#file:250925211,internal:250707828#RE9 Placeholder
 
 SIX_WEIGHT_GAMES = frozenset([
 	VERSION_SF6,
 	VERSION_MHWILDS,
+	VERSION_MHS3,
 	VERSION_PRAGDEMO,
+	VERSION_RE9,
 	])
 
 meshFileVersionToNewVersionDict = {
@@ -82,7 +85,9 @@ meshFileVersionToNewVersionDict = {
 	240820143:VERSION_MHWILDS,
 	240827123:VERSION_ONI2,
 	241111606:VERSION_MHWILDS,
+	250604100:VERSION_MHS3,
 	250925211:VERSION_PRAGDEMO,
+	#250925211:VERSION_RE9,#RE9 Placeholder
 	}
 newVersionToMeshFileVersion = {
 	VERSION_DMC5:1808282334,
@@ -100,7 +105,9 @@ newVersionToMeshFileVersion = {
 	VERSION_DR:240424828,
 	VERSION_ONI2:240820143,
 	VERSION_MHWILDS:241111606,
+	VERSION_MHS3:250604100,
 	VERSION_PRAGDEMO:250925211,
+	#VERSION_RE9:250925211,#RE9 Placeholder
 	}
 meshFileVersionToInternalVersionDict = {
 	1808282334:386270720,#VERSION_DMC5
@@ -118,7 +125,9 @@ meshFileVersionToInternalVersionDict = {
 	240820143:240704828,#VERSION_MHWILDS
 	240827123:240704828,#VERSION_ONI2
 	241111606:240704828,#VERSION_MHWILDS
+	250604100:250203152,#VERSION_MHS3
 	250925211:250707828,#VERSION_PRAGDEMO
+	#250925211:250707828,#VERSION_RE9#RE9 Placeholder
 	}
 internalVersionToMeshFileVersionDict = {
 	386270720:1808282334,#VERSION_DMC5
@@ -136,7 +145,9 @@ internalVersionToMeshFileVersionDict = {
 	#240704828:240820143,#VERSION_MHWILDSBETA
 	240704828:240820143,#VERSION_ONI2
 	240704828:241111606,#VERSION_MHWILDS
+	250203152:250604100,#VERSION_MHS3
 	250707828:250925211,#VERSION_PRAGDEMO
+	#250707828:250925211,#VERSION_RE9#RE9 Placeholder
 	}
 meshFileVersionToGameNameDict = {
 	1808282334:"DMC5",#VERSION_DMC5
@@ -156,7 +167,9 @@ meshFileVersionToGameNameDict = {
 	240820143:"MHWILDS",#VERSION_MHWILDSBETA
 	240827123:"ONI2",#VERSION_ONI2
 	241111606:"MHWILDS",#VERSION_MHWILDS
+	250604100:"MHS3",#VERSION_MHS3
 	250925211:"PRAG",#VERSION_PRAGDEMO
+	250925212:"RE9",#VERSION_RE9#RE9 Placeholder
 	}
 
 #Used for unmapped mesh versions, potentially allows for importing
@@ -1545,8 +1558,8 @@ class REMesh():
 				self.streamingInfoHeader = StreamingInfo()
 				self.streamingInfoHeader.read(file)
 				if self.streamingInfoHeader.entryCount != 0 and streamingBuffer == None:
-					raiseError("The corresponding streaming mesh file is missing. Cannot import mesh.\nCheck that you're using the most up to date list file when extracting files.")
-					raise Exception("Streaming mesh file is missing. Check that you're using the most up to date list file when extracting game files.")
+					raiseError("Streaming mesh file is missing. Both mesh files are required. Extract the corresponding mesh file from inside the streaming directory.\n\nExample Mesh Path: natives\\STM\\Art\\Model\\Character\\ch02\\007\\000\\1\\ch02_007_0001.mesh.241111606\nExample Streaming Mesh Path: natives\\STM\\streaming\\Art\\Model\\Character\\ch02\\007\\000\\1\\ch02_007_0001.mesh.241111606")
+					raise Exception("Streaming mesh file is missing. Both mesh files are required. Extract the corresponding mesh file from inside the streaming directory.")
 		if self.fileHeader.meshOffset:
 			file.seek(self.fileHeader.meshOffset)
 			self.meshBufferHeader = MeshBufferHeader()
@@ -1810,6 +1823,95 @@ def WriteToWeightBuffer(bufferStream,boneWeightsList,boneIndicesList,isSixWeight
 	weightArray[1::2] = boneWeightsArray
 	#print(weightArray)
 	bufferStream.write(weightArray.tobytes())
+
+def WriteToWeightBufferExtended(bufferStream,boneWeightsList,boneIndicesList,extraBufferStream,extraBoneWeightsList,extraBoneIndicesList,isSixWeight):
+	
+	if isSixWeight:
+		#TODO Do bitfield work in numpy
+		bf = CompressedSixWeightIndices()
+		uint64Array = np.empty((len(boneWeightsList),1), dtype=np.dtype("<Q"))
+		for index in range(len(boneIndicesList)):
+			#print(f"boneIndicesList: {boneIndicesList[index]}")
+			bf.weights.w0 = boneIndicesList[index][0]
+			bf.weights.w1 = boneIndicesList[index][1]
+			bf.weights.w2 = boneIndicesList[index][2]
+			bf.weights.pad0 = 0
+			bf.weights.w3 = boneIndicesList[index][3]
+			bf.weights.w4 = boneIndicesList[index][4]
+			bf.weights.w5 = boneIndicesList[index][5]
+			bf.weights.pad1 = 0
+			uint64Array[index] = bf.asUInt64
+			#print(f"bitfield: {[bf.weights.w0,bf.weights.w1,bf.weights.w2,bf.weights.w3,bf.weights.w4,bf.weights.w5]}")
+			#print(f"uint64: {uint64Array[index]}\n")
+		boneIndicesArray = uint64Array.view(dtype = "<B")#.byteswap(inplace=True)
+		
+		uint64Array2 = np.empty((len(extraBoneIndicesList),1), dtype=np.dtype("<Q"))#Extra weights
+		for index in range(len(extraBoneIndicesList)):
+			#print(f"boneIndicesList: {boneIndicesList[index]}")
+			bf.weights.w0 = extraBoneIndicesList[index][0]
+			bf.weights.w1 = extraBoneIndicesList[index][1]
+			bf.weights.w2 = extraBoneIndicesList[index][2]
+			bf.weights.pad0 = 0
+			bf.weights.w3 = extraBoneIndicesList[index][3]
+			bf.weights.w4 = extraBoneIndicesList[index][4]
+			bf.weights.w5 = extraBoneIndicesList[index][5]
+			bf.weights.pad1 = 0
+			uint64Array2[index] = bf.asUInt64
+			#print(f"bitfield: {[bf.weights.w0,bf.weights.w1,bf.weights.w2,bf.weights.w3,bf.weights.w4,bf.weights.w5]}")
+			#print(f"uint64: {uint64Array[index]}\n")
+		extraBoneIndicesArray = uint64Array2.view(dtype = "<B")#.byteswap(inplace=True)
+		#print(boneIndicesArray)
+	else:
+		boneIndicesArray = boneIndicesList.astype("<B")
+		extraBoneIndicesArray = extraBoneIndicesList.astype("<B")
+	
+	
+	
+	boneWeightsArray = np.array(boneWeightsList)
+	#Combine extra weights with first set so that they're normalized together
+	boneWeightsArray = np.hstack((boneWeightsArray,np.array(extraBoneWeightsList)))
+	#print(boneWeightsArray)
+	#Clean Weights
+	#boneWeightsArray = np.round(boneWeightsArray,decimals=4)
+	#MIN_FLOAT_VALUE = 0.01
+	#boneWeightsArray = np.where(((boneWeightsArray != 0) & (boneWeightsArray < MIN_FLOAT_VALUE)),0.0,boneWeightsArray)
+	
+	#boneWeightsArray = np.round(boneWeightsArray,decimals = 2)
+	weightSums = np.sum(boneWeightsArray,axis = 1,dtype = np.float32)
+	#print(weightSums)
+	#Normalize weights to 1.0
+	with np.errstate(divide='ignore', invalid='ignore'):
+	    boneWeightsArray = boneWeightsArray / weightSums[:,None]
+	    boneWeightsArray[weightSums == 0] = 0
+	boneWeightsArray = np.multiply(boneWeightsArray,255)
+	boneWeightsArray = np.round(boneWeightsArray)
+	diffSums = 255.0 - np.sum(boneWeightsArray,axis = 1,dtype = np.float32)
+	#print(diffSums)
+	#for i in range(len(boneWeightsArray)):
+		#print(f"{boneWeightsArray[i]}, difference: {diffSums[i]}")
+	
+	#Add difference of 255 to the largest value of each row in weight array
+	boneWeightsArray[np.arange(boneWeightsArray.shape[0]), np.argmax(boneWeightsArray, axis=1)] += diffSums
+	#boneWeightsArray[:, 0] += diffSums
+	boneWeightsArray = boneWeightsArray.astype("<B")
+	
+	if (255 - np.sum(boneWeightsArray,axis = 1,dtype = np.int32) != 0).any():
+		raiseWarning("Non normalized weights detected on sub mesh! Weights may not behave as expected in game!")
+	
+	#Set zero weight bone indices to 0
+	#boneIndicesArray = np.where(boneWeightsArray == 0,0,boneIndicesArray)
+	
+	weightArray = np.empty((len(boneWeightsList)*2,8), dtype=np.dtype("<B"))
+	weightArray[::2] = boneIndicesArray
+	weightArray[1::2] = boneWeightsArray[:,:8]
+	#print(weightArray)
+	bufferStream.write(weightArray.tobytes())
+	
+	extraWeightArray = np.empty((len(extraBoneWeightsList)*2,8), dtype=np.dtype("<B"))
+	extraWeightArray[::2] = extraBoneIndicesArray
+	extraWeightArray[1::2] = boneWeightsArray[:,8:]
+	extraBufferStream.write(extraWeightArray.tobytes())
+	
 	
 def WriteToColorBuffer(bufferStream,colorList):
 	colorArray = np.array(colorList,dtype = np.float32)
@@ -1984,10 +2086,10 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 							WriteToUVBuffer(UV2Buffer,parsedSubMesh.uv2List)
 						
 						if len(parsedSubMesh.weightIndicesList) != 0 and len(parsedSubMesh.weightIndicesList) == len(parsedSubMesh.weightList):
-							WriteToWeightBuffer(weightBuffer,parsedSubMesh.weightList,parsedSubMesh.weightIndicesList,isSixWeight)
-						
-						if parsedMesh.bufferHasExtraWeight and len(parsedSubMesh.extraWeightIndicesList) != 0 and len(parsedSubMesh.extraWeightIndicesList) == len(parsedSubMesh.extraWeightList):
-							WriteToWeightBuffer(extraWeightBuffer,parsedSubMesh.extraWeightList,parsedSubMesh.extraWeightIndicesList,isSixWeight)
+							if parsedMesh.bufferHasExtraWeight and len(parsedSubMesh.extraWeightIndicesList) != 0 and len(parsedSubMesh.extraWeightIndicesList) == len(parsedSubMesh.extraWeightList):
+								WriteToWeightBufferExtended(weightBuffer,parsedSubMesh.weightList,parsedSubMesh.weightIndicesList,extraWeightBuffer,parsedSubMesh.extraWeightList,parsedSubMesh.extraWeightIndicesList,isSixWeight)
+							else:
+								WriteToWeightBuffer(weightBuffer,parsedSubMesh.weightList,parsedSubMesh.weightIndicesList,isSixWeight)
 						
 						#DD2 shapekeys
 						if len(parsedSubMesh.secondaryWeightIndicesList) != 0 and len(parsedSubMesh.secondaryWeightIndicesList) == len(parsedSubMesh.secondaryWeightList):

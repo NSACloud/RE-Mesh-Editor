@@ -2,7 +2,7 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 60),
+	"version": (0, 61),
 	"blender": (3, 3, 0),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
@@ -35,6 +35,7 @@ from .modules.mesh.re_mesh_operators import (
 	WM_OT_LimitTotalNormalizeAll,
 	WM_OT_CreateMeshCollection,
 	WM_OT_REBatchExporter,
+	WM_OT_SolveRepeatedUVs,
 
 )
 from .modules.mesh.ui_re_mesh_panels import (
@@ -95,9 +96,14 @@ from .modules.tex.re_tex_operators import (
 	WM_OT_ConvertFolderToTex,
 	WM_OT_CopyConvertedTextures,
 	WM_OT_ConvertDDSTexFile,
+	WM_OT_PNGToTexConversionWindow,
+	
 
 )
-
+from .modules.tex.re_tex_propertyGroups import (
+	PNGConversionEntryPropertyGroup,
+	TEX_UL_PNGConversionList,
+	)
 from .modules.mesh.re_mesh_export_errors import  (
 	REMeshErrorEntry,
 	MESH_UL_REMeshErrorList,
@@ -113,6 +119,23 @@ from .modules.fbxskel.re_fbxskel_propertyGroups import (
 	ToggleStringPropertyGroup,
 	FBXSKEL_UL_ObjectCheckList
 	)
+
+#sfur
+from .modules.sfur.blender_re_sfur import importSFurFile,exportSFurFile
+from .modules.sfur.re_sfur_operators import (
+	WM_OT_NewSFurHeader,
+	WM_OT_ReindexEntries,
+	WM_OT_AddFurEntry,
+	WM_OT_ApplySFurToMeshCollection,
+	)
+from .modules.sfur.ui_re_sfur_panels import (
+	OBJECT_PT_SFurObjectModePanel,
+	OBJECT_PT_SFurEntryPanel,
+	)
+from .modules.sfur.re_sfur_propertyGroups import (
+	SFurEntryPropertyGroup,
+	)
+
 os.system("color")#Enable console colors
 
 
@@ -121,6 +144,7 @@ def setMeshImportDefaults(self):
 	self.clearScene = bpy.context.preferences.addons[__name__].preferences.default_clearScene
 	self.loadMaterials = bpy.context.preferences.addons[__name__].preferences.default_loadMaterials
 	self.loadMDFData = bpy.context.preferences.addons[__name__].preferences.default_loadMDFData
+	self.loadShellFur = bpy.context.preferences.addons[__name__].preferences.default_loadShellFur
 	self.loadUnusedTextures = bpy.context.preferences.addons[__name__].preferences.default_loadUnusedTextures
 	self.loadUnusedProps = bpy.context.preferences.addons[__name__].preferences.default_loadUnusedProps
 	self.useBackfaceCulling = bpy.context.preferences.addons[__name__].preferences.default_useBackfaceCulling
@@ -238,6 +262,8 @@ class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
 		("ONI2", "Onimusha 2", ""),
 		("MHWILDS", "Monster Hunter Wilds", ""),
 		("PRAG", "Pragmata", ""),
+		("MHS3", "Monster Hunter Stories 3", ""),
+		#("RE9", "Resident Evil 9", ""),#RE9 Placeholder
 		]
     )
     path: StringProperty(
@@ -332,8 +358,14 @@ class REMeshPreferences(AddonPreferences):
 	)
 	useDDS: BoolProperty(
 		name="Use DDS Textures (Blender 4.2 or higher)",
-		description = "Use DDS textures instead of converting to TIF.\nThis greatly improves mesh import speed but is only usable on Blender 4.2 or higher.\nIf the Blender version is less than 4.2, this option will do nothing",
+		description = "Use DDS textures when loading textures instead of converting to PNG.\nThis greatly improves mesh import speed but is only usable on Blender 4.2 or higher.\nIf the Blender version is less than 4.2, this option will do nothing",
 		default = False if bpy.app.version < (4,2,0) else True
+	)
+	
+	convertTexToPNG: BoolProperty(
+		name="Convert Tex to PNG",
+		description = "When converting a tex file, convert it to a .png file instead of .dds",
+		default = False
 	)
 	
 	saveChunkPaths: BoolProperty(
@@ -408,6 +440,11 @@ class REMeshPreferences(AddonPreferences):
 	default_loadMDFData : BoolProperty(
 	   name = "Load MDF Material Data",
 	   description = "Imports the MDF materials as objects inside a collection in the outliner.\nYou can make changes to MDF materials by selecting the Material objects in the outliner.\nUnder the Object Properties tab (orange square), there's a panel called \"RE MDF Material Settings\".\nMake any changes to MDF materials there.\nIf you're not modding an RE Engine game, you can uncheck this option since it won't be needed",
+	   default = True)
+	
+	default_loadShellFur : BoolProperty(
+	   name = "Load Shell Fur",
+	   description = "Load shell fur data from sfur file if present",
 	   default = True)
 	
 	default_loadUnusedTextures : BoolProperty(
@@ -491,7 +528,7 @@ class REMeshPreferences(AddonPreferences):
 	default_preserveSharpEdges : BoolProperty(
 	   name = "Split Sharp Edges",
 	   description = "Edge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the exported mesh",
-	   default = False)
+	   default = True)
 	default_useBlenderMaterialName : BoolProperty(
 	   name = "Use Blender Material Names",
 	   description = "If left unchecked, the exporter will get the material names to be used from the end of each object name. For example, if a mesh is named LOD_0_Group_0_Sub_0__Shirts_Mat, the material name is Shirts_Mat. If this option is enabled, the material name will instead be taken from the first material assigned to the object",
@@ -520,6 +557,7 @@ class REMeshPreferences(AddonPreferences):
 		layout.prop(self, "dragDropImportOptions")
 		layout.prop(self, "showConsole")
 		layout.prop(self, "useDDS")
+		layout.prop(self, "convertTexToPNG")
 		box = layout.box()
 		row = box.row()
 		
@@ -626,6 +664,10 @@ class ImportREMesh(Operator, ImportHelper):
 	   description = "Imports the MDF materials as objects inside a collection in the outliner.\nYou can make changes to MDF materials by selecting the Material objects in the outliner.\nUnder the Object Properties tab (orange square), there's a panel called \"RE MDF Material Settings\".\nMake any changes to MDF materials there.\nIf you're not modding an RE Engine game, you can uncheck this option since it won't be needed",
 	   default = True)
 	
+	loadShellFur : BoolProperty(
+	   name = "Load Shell Fur",
+	   description = "Load shell fur data from sfur file if present",
+	   default = True)
 	loadUnusedTextures : BoolProperty(
 	   name = "Load Unused Textures",
 	   description = "Loads textures that have no function assigned to them in the material shader graph.\nLeaving this disabled will make materials load faster.\nOnly enable this if you plan on editing the material shader graph",
@@ -730,6 +772,7 @@ class ImportREMesh(Operator, ImportHelper):
 		if self.showMaterialOptions:
 			column2.prop(self, "loadMaterials")
 			column2.prop(self, "loadMDFData")
+			column2.prop(self, "loadShellFur")
 			column2.prop(self, "reloadCachedTextures")
 			column2.prop(self, "loadUnusedTextures")
 			column2.prop(self, "loadUnusedProps")
@@ -761,7 +804,7 @@ class ImportREMesh(Operator, ImportHelper):
 			raiseWarning("Could not create texture cache directory at " + bpy.context.preferences.addons[__name__].preferences.textureCachePath)
 		if self.mergeArmature:
 			self.clearScene = False
-		options = {"clearScene":self.clearScene,"createCollections":self.createCollections,"loadMaterials":self.loadMaterials,"loadMDFData":self.loadMDFData,"loadUnusedTextures":self.loadUnusedTextures,"loadUnusedProps":self.loadUnusedProps,"useBackfaceCulling":self.useBackfaceCulling,"reloadCachedTextures":self.reloadCachedTextures,"mdfPath":self.mdfPath.replace("\"",""),"importAllLODs":self.importAllLODs,"importBlendShapes":self.importBlendShapes,"rotate90":self.rotate90,"mergeArmature":self.mergeArmature,"importArmatureOnly":self.importArmatureOnly,"mergeGroups":self.mergeGroups,"importShadowMeshes":self.importShadowMeshes,"importOcclusionMeshes":self.importOcclusionMeshes,"importBoundingBoxes":self.importBoundingBoxes}
+		options = {"clearScene":self.clearScene,"createCollections":self.createCollections,"loadMaterials":self.loadMaterials,"loadMDFData":self.loadMDFData,"loadShellFur":self.loadShellFur,"loadUnusedTextures":self.loadUnusedTextures,"loadUnusedProps":self.loadUnusedProps,"useBackfaceCulling":self.useBackfaceCulling,"reloadCachedTextures":self.reloadCachedTextures,"mdfPath":self.mdfPath.replace("\"",""),"importAllLODs":self.importAllLODs,"importBlendShapes":self.importBlendShapes,"rotate90":self.rotate90,"mergeArmature":self.mergeArmature,"importArmatureOnly":self.importArmatureOnly,"mergeGroups":self.mergeGroups,"importShadowMeshes":self.importShadowMeshes,"importOcclusionMeshes":self.importOcclusionMeshes,"importBoundingBoxes":self.importBoundingBoxes}
 		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
 		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
 		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
@@ -875,6 +918,8 @@ class ExportREMesh(Operator, ExportHelper):
 				(".240827123", "Onimusha 2", "Onimusha 2"),
 				(".241111606", "Monster Hunter Wilds", "Monster Hunter Wilds"),
 				(".250925211", "Pragmata", "Pragmata"),
+				(".250604100", "Monster Hunter Stories 3", "Monster Hunter Stories 3"),
+				#(".250925212", "Resident Evil 9", "Resident Evil 9"),#RE9 Placeholder
 			   ]
 		)
 	targetCollection: bpy.props.StringProperty(
@@ -907,7 +952,7 @@ class ExportREMesh(Operator, ExportHelper):
 	preserveSharpEdges : BoolProperty(
 	   name = "Split Sharp Edges",
 	   description = "Edge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the exported mesh",
-	   default = False)
+	   default = True)
 	useBlenderMaterialName : BoolProperty(
 	   name = "Use Blender Material Names",
 	   description = "If left unchecked, the exporter will get the material names to be used from the end of each object name. For example, if a mesh is named LOD_0_Group_0_Sub_0__Shirts_Mat, the material name is Shirts_Mat. If this option is enabled, the material name will instead be taken from the first material assigned to the object",
@@ -973,10 +1018,6 @@ class ExportREMesh(Operator, ExportHelper):
 		layout = self.layout
 		layout.label(text = "Mesh Version:")
 		layout.prop(self, "filename_ext")
-		if self.filename_ext == ".250925211":
-			row = layout.row()
-			row.alert=True
-			row.label(icon = "ERROR",text="Mesh export isn't working yet!")
 		layout.label(text = "Mesh Collection:")
 		layout.prop_search(self, "targetCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_01")
 		
@@ -1108,7 +1149,7 @@ class ImportREMDF(bpy.types.Operator, ImportHelper):
 			return self.execute(context)
 		context.window_manager.fileselect_add(self)
 		return {'RUNNING_MODAL'}
-supportedMDFVersions = set([23,19,21,32,31,40,45,51])	
+supportedMDFVersions = set([23,19,21,32,31,40,45,49,51])	
 
 def update_targetMDFCollection(self,context):
 	temp = bpy.data.screens.get("temp")
@@ -1144,6 +1185,8 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				(".46", "Onimusha 2", "Onimusha 2"),
 				(".45", "Monster Hunter Wilds", "Monster Hunter Wilds"),
 				(".51", "Pragmata", "Pragmata"),
+				(".49", "Monster Hunter Stories 3", "Monster Hunter Stories 3"),
+				#(".52", "Resident Evil 9", "Resident Evil 9"),#RE9 Placeholder
 			  ]
 		)
 	targetCollection : StringProperty(
@@ -1185,7 +1228,7 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 			row.alert=True
 	def execute(self, context):
 		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
-		print(f"\n{textColors.BOLD}RE MDF Editor V{editorVersion}{textColors.ENDC}")
+		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
 		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
 		print("https://github.com/NSACloud/RE-Mesh-Editor")
 		success = exportMDFFile(self.filepath,self.targetCollection)
@@ -1257,8 +1300,9 @@ class ExportREFBXSkel(bpy.types.Operator, ExportHelper):
 				(".4", "RERT (.4)", ""),
 				(".5", "RE4R (.5)", ""),
 				(".6", "DD2 (.6)", ""),
-				(".7", "MH Wilds (.7)", ""),
+				(".7", "MH Wilds / MHS3 (.7)", ""),
 				(".8", "Pragmata (.8)", ""),
+				#(".9", "Resident Evil 9 (.9)", ""),#RE9 Placeholder
 
 			   ],
 		default = ".7"
@@ -1324,6 +1368,142 @@ class ExportREFBXSkel(bpy.types.Operator, ExportHelper):
 			self.report({"INFO"},"Failed to export RE FBXSkel. Check Window > Toggle System Console for details.")
 			return {"CANCELLED"}
 
+class ImportRESFur(bpy.types.Operator, ImportHelper):
+	'''Import RE Engine SFur File'''
+	bl_idname = "re_sfur.importfile"
+	bl_label = "Import RE SFur"
+	bl_options = {'PRESET', "REGISTER", "UNDO"}
+	
+	files : CollectionProperty(
+			name="File Path",
+			type=OperatorFileListElement,
+			)
+	directory : StringProperty(
+			subtype='DIR_PATH',
+			options={'SKIP_SAVE'}
+			)
+	filename_ext = ".sfur.*"
+	filter_glob: StringProperty(default="*.sfur.*", options={'HIDDEN'})
+
+	def execute(self, context):
+		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
+		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
+		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
+		print("https://github.com/NSACloud/RE-Mesh-Editor")
+		multiFileImport = len(self.files) > 1
+		hasImportErrors = False
+		
+		for index, file in enumerate(self.files):
+			filepath = os.path.join(self.directory,file.name)
+			if os.path.isfile(filepath):
+				success = importSFurFile(filepath)
+				if not success: hasImportErrors = True
+			else:
+				hasImportErrors = True
+				raiseWarning(f"Path does not exist, cannot import file. If you are importing multiple files at once, they must all be in the same directory.\nInvalid Path:{filepath}")
+			
+			
+		if not hasImportErrors:
+			if not multiFileImport:
+				self.report({"INFO"},"Imported RE SFur file.")
+			else:
+				self.report({"INFO"},f"Imported {str(len(self.files))} RE SFur files.")
+			return {"FINISHED"}
+		else:
+			self.report({"INFO"},"Failed to import RE SFur. Check the console for errors.")
+			return {"CANCELLED"}
+	def invoke(self, context, event):
+		if self.directory:
+			return self.execute(context)
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}
+supportedMDFVersions = set([4,5])	
+
+def update_targetSFurCollection(self,context):
+	temp = bpy.data.screens.get("temp")
+	browserSpace = None
+	if temp != None:
+	    for area in temp.areas:
+	        for space in area.spaces:
+	            if type(space.params).__name__ == "FileSelectParams":
+	                browserSpace = space
+	                break
+	                break
+	if browserSpace != None:
+		#print(browserSpace.params.filename)
+		if ".sfur" in self.targetCollection:
+			browserSpace.params.filename = self.targetCollection.split(".sfur")[0]+".sfur" + self.filename_ext	
+class ExportRESFur(bpy.types.Operator, ExportHelper):
+	'''Export RE Engine SFur File'''
+	bl_idname = "re_sfur.exportfile"
+	bl_label = "Export RE SFur"
+	bl_options = {'PRESET'}
+	filename_ext: EnumProperty(
+		name="",
+		description="Set which game to export the MDF for",
+		items=[ 
+				(".4", "Resident Evil 4", ""),
+				(".5", "Dragon's Dogma 2 / Monster Hunter Wilds", ""),
+			  ]
+		)
+	targetCollection : StringProperty(
+	   name = "",
+	   description = "Set the SFur collection to be exported\nNote: SFur collections are brown and end with .sfur",
+	   default = "",
+	   update = update_targetSFurCollection)
+	filter_glob: StringProperty(default="*.sfur*", options={'HIDDEN'})
+	def invoke(self, context, event):
+		if context.scene.get("REMeshLastImportedSFurVersion",0) != 0:
+			self.filename_ext = "."+str(context.scene.get("REMeshLastImportedSFurVersion"))
+	
+		if bpy.data.collections.get(self.targetCollection,None) == None:
+			if bpy.context.scene.re_mdf_toolpanel.sFurCollection:
+				self.targetCollection = bpy.context.scene.re_mdf_toolpanel.sFurCollection.name
+				if self.targetCollection.endswith(".sfur"):
+					self.filepath = self.targetCollection + self.filename_ext
+		context.window_manager.fileselect_add(self)
+		return {'RUNNING_MODAL'}
+	
+	def draw(self, context):
+		layout = self.layout
+		layout.label(text = "SFur Version:")
+		layout.prop(self,"filename_ext")
+		layout.label(text = "SFur Collection:")
+		layout.prop_search(self, "targetCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_08")
+		if self.targetCollection in bpy.data.collections:
+			collection = bpy.data.collections[self.targetCollection]
+			if not collection.get("~TYPE") == "RE_SFUR_COLLECTION" and not collection.name.endswith(".sfur"):
+				row = layout.row()
+				row.alert=True
+				row.label(icon = "ERROR",text="Collection is not a SFUR collection.")
+		elif self.targetCollection == "":
+			row = layout.row()
+			row.alert=True
+			row.label(icon = "ERROR",text="Collection is not a SFUR collection.")
+			
+		else:
+			row = layout.row()
+			row.label(icon="ERROR",text="Chosen collection doesn't exist.")
+			row.alert=True
+	def execute(self, context):
+		editorVersion = str(bl_info["version"][0])+"."+str(bl_info["version"][1])
+		print(f"\n{textColors.BOLD}RE Mesh Editor V{editorVersion}{textColors.ENDC}")
+		print(f"Blender Version {bpy.app.version[0]}.{bpy.app.version[1]}.{bpy.app.version[2]}")
+		print("https://github.com/NSACloud/RE-Mesh-Editor")
+		success = exportSFurFile(self.filepath,self.targetCollection)
+		if success:
+			self.report({"INFO"},"Exported RE SFur successfully.")
+			
+			if bpy.context.scene.re_mdf_toolpanel.modDirectory == "":
+				setModDirectoryFromFilePath(self.filepath)
+			
+			bpy.data.collections[self.targetCollection]["BatchExport_path"] = self.filepath
+			return {"FINISHED"}
+		else:
+			self.report({"INFO"},"Failed to export RE SFur. Check Window > Toggle System Console for details.")
+			return {"CANCELLED"}
+
+
 # Registration
 classes = [
 	#preferences
@@ -1348,7 +1528,7 @@ classes = [
 	ExporterNodePropertyGroup,
 	MESH_UL_REExporterList,
 	WM_OT_REBatchExporter,
-	
+	WM_OT_SolveRepeatedUVs,
 	
 	#mdf
 	ImportREMDF,
@@ -1394,13 +1574,34 @@ classes = [
 	WM_OT_ApplyMDFToMeshCollection,
 	WM_OT_ShowREMeshErrorWindow,
 	WM_OT_FindReplaceTextureBindings,
+	
+	#sfur
+	ImportRESFur,
+	ExportRESFur,
+	#operators
+	WM_OT_NewSFurHeader,
+	WM_OT_ReindexEntries,
+	WM_OT_AddFurEntry,
+	#WM_OT_ApplySFurToMeshCollection,
+	#ui panels
+	OBJECT_PT_SFurObjectModePanel,
+	OBJECT_PT_SFurEntryPanel,
+	#property groups
+	SFurEntryPropertyGroup,
+	
 	#tex
+	#property groups
+	PNGConversionEntryPropertyGroup,
+	TEX_UL_PNGConversionList,
+	
 	#operators
 	WM_OT_ConvertFolderToTex,
 	WM_OT_CopyConvertedTextures,
 	WM_OT_ConvertDDSTexFile,
+	WM_OT_PNGToTexConversionWindow,
 	#ui panels
 	OBJECT_PT_TexConversionPanel,
+	
 	
 	#fbxskel
 	ImportREFBXSkel,
@@ -1411,6 +1612,7 @@ classes = [
 	#operators
 	WM_OT_LinkArmatureBones,
 	WM_OT_ClearBoneLinkages,
+	
 	
 	
 	#RE asset extra tools
@@ -1447,7 +1649,7 @@ if bpy.app.version >= (4, 1, 0):
 		@classmethod
 		def poll_drop(cls, context):
 			return (context.area and context.area.type == 'VIEW_3D')
-	texExtensionsString = ".dds;"
+	texExtensionsString = ".tif;.tiff;.tga;.png;.dds;"
 	for texVersion in gameNameToTexVersionDict.values():
 		texExtensionsString += f".{str(texVersion)};"
 	texExtensionsString += ".31;"#RE Verse tex drag and drop support
@@ -1462,13 +1664,25 @@ if bpy.app.version >= (4, 1, 0):
 		def poll_drop(cls, context):
 			return (context.area and context.area.type == 'VIEW_3D')
 		
-	fbxSkelExtensionsString = ".4;.5;.6;.7;.8;"#RE Verse tex drag and drop support
+		
+	fbxSkelExtensionsString = ".4;.5;.6;.7;.8;"
 	
 	class FBXSKEL_FH_drag_import(bpy.types.FileHandler):
 		bl_idname = "FBXSKEL_FH_drag_import"
 		bl_label = "File handler for RE FBXSkel importing"
 		bl_import_operator = "re_fbxskel.importfile"
 		bl_file_extensions = fbxSkelExtensionsString
+	
+		@classmethod
+		def poll_drop(cls, context):
+			return (context.area and context.area.type == 'VIEW_3D')
+	sfurExtensionsString = ".4;.5;"
+	
+	class SFUR_FH_drag_import(bpy.types.FileHandler):
+		bl_idname = "SFUR_FH_drag_import"
+		bl_label = "File handler for RE SFur importing"
+		bl_import_operator = "re_sfur.importfile"
+		bl_file_extensions = sfurExtensionsString
 	
 		@classmethod
 		def poll_drop(cls, context):
@@ -1506,6 +1720,7 @@ class IMPORT_MT_re_mesh_editor(bpy.types.Menu):
         layout.operator(ImportREMesh.bl_idname, text="RE Mesh (.mesh.x) (Model)",icon = "MESH_DATA")
         layout.operator(ImportREMDF.bl_idname, text="RE MDF (.mdf2.x) (Materials)",icon = "MATERIAL")
         layout.operator(ImportREFBXSkel.bl_idname, text="RE FBXSkel (.fbxskel.x) (Skeleton)",icon = "ARMATURE_DATA")
+        layout.operator(ImportRESFur.bl_idname, text="RE SFur (.sfur.x) (Shell Fur)",icon = "CURVES_DATA")
 
 def re_mesh_editor_import(self, context):
 	self.layout.menu("IMPORT_MT_re_mesh_editor",icon = "MOD_LINEART")
@@ -1520,6 +1735,7 @@ class EXPORT_MT_re_mesh_editor(bpy.types.Menu):
         layout.operator(ExportREMesh.bl_idname, text="RE Mesh (.mesh.x) (Model)",icon = "MESH_DATA")
         layout.operator(ExportREMDF.bl_idname, text="RE MDF (.mdf2.x) (Materials)",icon = "MATERIAL")
         layout.operator(ExportREFBXSkel.bl_idname, text="RE FBXSkel (.fbxskel.x) (Skeleton)",icon = "ARMATURE_DATA")
+        layout.operator(ExportRESFur.bl_idname, text="RE SFur (.sfur.x) (Shell Fur)",icon = "CURVES_DATA")
 
 def re_mesh_editor_export(self, context):
 	self.layout.menu("EXPORT_MT_re_mesh_editor",icon = "MOD_LINEART")
@@ -1540,6 +1756,8 @@ def register():
 	bpy.types.Scene.re_mdf_toolpanel = PointerProperty(type=MDFToolPanelPropertyGroup)
 	bpy.types.Object.re_mdf_material = PointerProperty(type=MDFMaterialPropertyGroup)
 	
+	bpy.types.Object.re_sfur_data = PointerProperty(type=SFurEntryPropertyGroup)
+	
 	
 	
 	#bpy.types.TOPBAR_MT_file_import.append(re_mesh_import)
@@ -1556,6 +1774,7 @@ def register():
 		bpy.utils.register_class(MDF_FH_drag_import)
 		bpy.utils.register_class(TEX_FH_drag_import)
 		bpy.utils.register_class(FBXSKEL_FH_drag_import)
+		bpy.utils.register_class(SFUR_FH_drag_import)
 		
 	
 def unregister():
@@ -1583,6 +1802,7 @@ def unregister():
 		bpy.utils.unregister_class(MDF_FH_drag_import)
 		bpy.utils.unregister_class(TEX_FH_drag_import)
 		bpy.utils.unregister_class(FBXSKEL_FH_drag_import)
+		bpy.utils.unregister_class(SFUR_FH_drag_import)
 if __name__ == '__main__':
 	register()
 	

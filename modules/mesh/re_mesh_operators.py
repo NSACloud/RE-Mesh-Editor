@@ -10,7 +10,7 @@ from bpy.props import (StringProperty,
                        FloatVectorProperty,
                        EnumProperty,
                        )
-
+from .blender_re_mesh import solveRepeatedUVs
 from .re_mesh_propertyGroups import ExporterNodePropertyGroup,MESH_UL_REExporterList
 from ..gen_functions import splitNativesPath
 from ..blender_utils import showErrorMessageBox
@@ -107,7 +107,7 @@ class WM_OT_LimitTotalNormalizeAll(Operator):
 		items=[ ("4", "4 Weights", "Safest option but potentially lower weight quality"),
 				("6", "6 Weights (SF6)", "Maximum amount of weights for SF6"),
 				("8", "8 Weights", "Note that certain materials may not support 8 weights"),
-				("12", "12 Weights (MH Wilds Only)", "This is only supported in MH Wilds (and newer potentially)"),
+				("12", "12 Weights (MH Wilds or Newer)", "This is only supported in MH Wilds (and newer potentially)\nNote that some materials may not support 12 weights"),
 			   ],
 		default = "4"
 		
@@ -561,3 +561,23 @@ class WM_OT_REBatchExporter(Operator):
 					box.prop(item, "exportBoundingBoxes")
 			else:
 				box.label(text=f"Select a file from the list to configure export settings.")
+				
+
+class WM_OT_SolveRepeatedUVs(Operator):
+	bl_label = "Solve Repeated UVs"
+	bl_idname = "re_mesh.solve_repeated_uvs"
+	bl_description = "Splits connected UV islands"
+	def execute(self, context):
+
+		if context.selected_objects != []:
+			selection = context.selected_objects	
+		else:
+			selection = bpy.context.scene.objects
+		
+		solveRepeatedUVs(selection)
+		
+		if context.selected_objects == []: 
+			self.report({"INFO"},"Solved repeated UVs on all objects.")
+		else:
+			self.report({"INFO"},"Solved repeated UVs on selected objects.")
+		return {'FINISHED'}

@@ -48,6 +48,9 @@ def filterMDFCollection(self, collection):
 def filterMeshCollection(self, collection):
     return True if ((collection.get("~TYPE") == "RE_MESH_COLLECTION") or (".mesh" in collection.name)) else False
 
+def filterSFurCollection(self, collection):
+    return True if ((collection.get("~TYPE") == "RE_SFUR_COLLECTION") or (".sfur" in collection.name)) else False
+
 
 flags = MDFFlags()#Bitflag struct
 flagsB = MDFFlagsB()#Bitflag struct
@@ -232,6 +235,8 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 				("ONI2", "Onimusha 2", ""),
 				("MHWILDS", "Monster Hunter Wilds", ""),
 				("PRAG", "Pragmata", ""),
+				("MHS3", "Monster Hunter Stories 3", ""),
+				#("RE9", "Resident Evil 9", ""),#RE9 Placeholder
 			  ]
 		)
 	materialPresets: EnumProperty(
@@ -244,6 +249,12 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 		description = "Set the mesh collection to apply the active MDF collection to.\nHint: Mesh collections are red",
 		type=bpy.types.Collection,
 		poll = filterMeshCollection
+		)
+	sFurCollection: bpy.props.PointerProperty(
+		name="",
+		description = "Set the sfur collection to be edited.",
+		type=bpy.types.Collection,
+		poll = filterSFurCollection
 		)
 	modDirectory: bpy.props.StringProperty(
 		name="",
