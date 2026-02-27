@@ -6,6 +6,7 @@ import traceback
 import glob
 
 from mathutils import Vector
+from ..gen_functions import isLinux,resolveLinuxPath
 from ..blender_utils import arrangeNodeTree,showErrorMessageBox
 IMPORT_TRANSLUCENT = False#Disabled since it's not quite right yet
 
@@ -376,17 +377,17 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 			
 	return mdfPath
 texVersionDict = {
-	".6":".8",
-	".10":".10",
-	".13":".190820018",
-	".19":".30",
-	".20":".31",
-	#".21":".34",#Commented out so RE7RT streaming textures will be found
-	".23":".28",
-	".32":".143221013",
-	".40":".760230703",
-	".45":".241106027",
-	".51":".250813143",
+	6:".8",
+	10:".10",
+	13:".190820018",
+	19:".30",
+	20:".31",
+	#21":".34",#Commented out so RE7RT streaming textures will be found
+	23:".28",
+	32:".143221013",
+	#40:".760230703",
+	45:".241106027",
+	51:".250813143",
   }	
 def getTexPath(baseTexturePath,chunkPathList,mdfVersion):
 	
@@ -399,8 +400,18 @@ def getTexPath(baseTexturePath,chunkPathList,mdfVersion):
 		if inputPath == None:
 			inputPath = wildCardFileSearch(glob.escape(os.path.join(chunkPath,baseTexturePath+f".tex{texVersion}"))+"*")
 		
+		
+		
 		if inputPath != None:
 			break
+		
+		if isLinux():
+			inputPath = resolveLinuxPath(os.path.join(chunkPath,"streaming",baseTexturePath+f".tex{texVersion}"))
+			if inputPath == None:
+				inputPath = resolveLinuxPath(os.path.join(chunkPath,baseTexturePath+f".tex{texVersion}"))
+			if inputPath != None:
+				break
+				
 	return inputPath	
 	
 

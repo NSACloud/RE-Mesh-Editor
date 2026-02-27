@@ -2,7 +2,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.62 (2/28/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.63 (2/27/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -94,6 +94,9 @@ Be sure to check the box next to RE Mesh Editor in the addons menu. The addon sh
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.63 - 2/27/2026
+* Fixed issue with finding textures on Linux.
 
 ### V0.62 - 2/27/2026
 * Minimum required Blender version is now 4.3.2. This is due to the increased reliance on RE Asset Library.

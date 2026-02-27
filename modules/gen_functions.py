@@ -1,5 +1,5 @@
 #Author: NSA Cloud
-#V7
+#V8
 import os
 import struct
 import glob
@@ -262,7 +262,7 @@ def resolvePath(pathString):
 		if not os.path.isfile(newPath):#Lower case the path in case the pak list is lowercased
 			newPath = newPath.lower()
 			return newPath
-	
+		
 def splitInt64(value):#Takes int64 and converts to 2 int32's
 	return struct.unpack("ii", value.to_bytes(8, "little", signed=False))
 
@@ -295,3 +295,51 @@ def openFolder(path):
         subprocess.Popen(["open", path])
     else:
         subprocess.Popen(["xdg-open", path])
+
+def isLinux():
+	return not IS_WINDOWS
+	
+def _case_insensitive_pattern(name):
+    escaped = glob.escape(name)
+    pattern = ""
+
+    i = 0
+    while i < len(escaped):
+        c = escaped[i]
+
+        # Handle escaped characters like \*
+        if c == "\\" and i + 1 < len(escaped):
+            pattern += escaped[i:i+2]
+            i += 2
+            continue
+
+        if c.isalpha():
+            pattern += f"[{c.lower()}{c.upper()}]"
+        else:
+            pattern += c
+        i += 1
+
+    return pattern
+
+
+def resolveLinuxPath(path):
+    path = os.path.abspath(path)
+
+    if os.path.exists(path):
+        return path
+
+    parts = path.strip(os.sep).split(os.sep)
+    current = os.sep if path.startswith(os.sep) else os.getcwd()
+
+    for part in parts:
+        pattern = _case_insensitive_pattern(part)
+        search_pattern = os.path.join(current, pattern)
+
+        matches = glob.glob(search_pattern)
+        if not matches:
+            return None
+
+        current = matches[0]
+
+    return current
+	
