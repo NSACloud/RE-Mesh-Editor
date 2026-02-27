@@ -1,0 +1,218 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "MHWILDS",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "StageSimpleMat",
+        "Master Material Path": "MaterialShader/Variation/Base_simple.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 134217872,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "ColorParam",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "RayTrace_BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Roughness",
+            "Data Type": "FLOAT",
+            "Value": 0.25,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Basecolor_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RoughnessParam",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "MetalParam",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "TranslucentParam",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_RimTranslucent",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTrasnlucent_Power",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTranslucent_NormalBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OcclusionParam",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSParam",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSProfile",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaAdjust",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTest_Ref",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseTempDither",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseAOSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AO_to_Cavity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BackFaceFlipNormal",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DitherShadow",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ChangeUV",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HorizonFade",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_AntiTranslucent_Diffuse",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WetBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PassThrough",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dissolve",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SandBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Allover_Emissive_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 8
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessOcclusionMap",
+            "Texture Path": "systems/rendering/NullNormalRoughnessOcclusion.tex"
+        },
+        {
+            "Texture Type": "noisemap",
+            "Texture Path": "MasterMaterial/Textures/bluenoise_msk1.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": [
+        "FoliageBAB_StaticParam,MasterMaterial/ByteAddressBuffer/FoliageBAB_StaticParam.gpbf,0,1",
+        "FoliageBAB_DynamicParam,MasterMaterial/ByteAddressBuffer/FoliageBAB_DynamicParam.gpbf,0,1"
+    ]
+}

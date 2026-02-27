@@ -32,13 +32,14 @@ class OBJECT_PT_MeshObjectModePanel(Panel):
 		layout = self.layout
 		scene = context.scene
 		re_mdf_toolpanel = scene.re_mdf_toolpanel
-		layout.operator("re_mesh.create_mesh_collection")
-		layout.operator("re_mesh.rename_meshes")
-		layout.operator("re_mesh.delete_loose")
-		layout.operator("re_mesh.solve_repeated_uvs")
-		layout.operator("re_mesh.remove_zero_weight_vertex_groups")
-		layout.operator("re_mesh.limit_total_normalize")
-		layout.operator("re_mesh.batch_exporter")
+		layout.operator("re_mesh.create_mesh_collection",icon = "COLLECTION_NEW")
+		layout.operator("re_mesh.rename_meshes",icon = "MOD_LINEART")
+		layout.operator("re_mesh.delete_loose",icon = "SNAP_VERTEX")
+		layout.operator("re_mesh.solve_repeated_uvs",icon = "UV")
+		layout.operator("re_mesh.remove_zero_weight_vertex_groups",icon = "MESH_DATA")
+		layout.operator("re_mesh.limit_total_normalize",icon = "MOD_VERTEX_WEIGHT")
+		layout.operator("re_mesh.batch_exporter",icon = "OUTLINER_OB_GROUP_INSTANCE")
+		layout.operator("re_mesh.quick_batch_export",icon = "OUTLINER_OB_GROUP_INSTANCE")
 		
 class OBJECT_PT_MeshArmatureToolsPanel(Panel):
 	bl_label = "Armature Tools"

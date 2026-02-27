@@ -32,12 +32,13 @@ class OBJECT_PT_MDFObjectModePanel(Panel):
 		layout = self.layout
 		scene = context.scene
 		re_mdf_toolpanel = scene.re_mdf_toolpanel
-		layout.operator("re_mdf.create_mdf_collection")
-		layout.label(text = "Active MDF Collection")
+		layout.operator("re_mdf.create_mdf_collection",icon = "COLLECTION_NEW")
+		layout.label(text = "Active MDF Material Collection")
 		layout.prop_search(re_mdf_toolpanel, "mdfCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_05")
 		layout.label(text = "Active Game")
 		layout.prop(re_mdf_toolpanel, "activeGame")
 		layout.operator("re_mdf.reindex_materials")
+		layout.operator("re_mdf.nullify_texture_bindings")
 		
 		
 		

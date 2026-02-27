@@ -79,7 +79,7 @@ def convertTexFileToDDS(texPath, outputPath):
         ddsFile.write(outputPath)
         texInfo["outDDSList"].append(outputPath)
     else:
-        digitCount = len(str(texFile.tex.header.imageCount))
+        digitCount = max((2,len(str(texFile.tex.header.imageCount))))
         #print("TEX ARRAY FOUND")
         newOutPathRoot = os.path.splitext(outputPath)[0] + " #ARRAY_"
         for i in range(texFile.tex.header.imageCount):

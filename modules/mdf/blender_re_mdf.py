@@ -375,7 +375,7 @@ def MDFErrorCheck(collectionName):
 		print("No errors found.")
 		#print(noesisMeshMaterialSet)
 		if warningList != []:
-			showMessageBox("Warnings occured during export. Check Window > Toggle System Console for details.",title = "Export Warning", icon = "ERROR")
+			showMessageBox("Warnings occured during export. Check Window > Toggle System Console for details.",title = "MDF Conversion Warning", icon = "ERROR")
 		return True
 	else:
 		errorString = ""

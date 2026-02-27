@@ -33,7 +33,7 @@ class OBJECT_PT_SFurObjectModePanel(Panel):
 		layout = self.layout
 		scene = context.scene
 		re_mdf_toolpanel = scene.re_mdf_toolpanel
-		layout.operator("re_sfur.create_sfur_collection")
+		layout.operator("re_sfur.create_sfur_collection",icon = "COLLECTION_NEW")
 		layout.label(text = "Active SFur Collection")
 		layout.prop_search(re_mdf_toolpanel, "sFurCollection",bpy.data,"collections",icon = "COLLECTION_COLOR_08")
 		layout.operator("re_sfur.add_sfur_entry")

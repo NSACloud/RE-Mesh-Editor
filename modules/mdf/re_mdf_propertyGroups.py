@@ -236,7 +236,7 @@ class MDFToolPanelPropertyGroup(bpy.types.PropertyGroup):
 				("MHWILDS", "Monster Hunter Wilds", ""),
 				("PRAG", "Pragmata", ""),
 				("MHS3", "Monster Hunter Stories 3", ""),
-				#("RE9", "Resident Evil 9", ""),#RE9 Placeholder
+				("RE9", "Resident Evil 9", ""),
 			  ]
 		)
 	materialPresets: EnumProperty(
@@ -545,7 +545,7 @@ class MDFPropPropertyGroup(bpy.types.PropertyGroup):
     )
     color_value: bpy.props.FloatVectorProperty(
         name="",
-        subtype='COLOR',
+        subtype="COLOR" if bpy.app.version < (5,0,0) else "COLOR_GAMMA",
         size=4,
         min=0.0,
         soft_max=1.0,

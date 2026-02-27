@@ -17,9 +17,8 @@ from . import tex_math as tmath
 GDEFLATE_VERSIONS = set([
 	#240701001,#VERSION_MHWILDS_BETA#Disabled for MH Wilds beta since Onimusha 2 uses the same texture version but doesn't use gdeflate
 	241106027,#VERSION_MHWILDS
-	250813143,#VERSION_PRAGDEMO
+	250813143,#VERSION_PRAGDEMO, VERSION_RE9
 	251111100,#VERSION_MHS3
-	250813144,#VERSION_RE9#RE9 Placeholder
 	])
 
 VERSION_MHWILDS_BETA = 240701001

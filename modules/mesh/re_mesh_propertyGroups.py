@@ -102,7 +102,7 @@ class ExporterNodePropertyGroup(bpy.types.PropertyGroup):
 	preserveSharpEdges : BoolProperty(
 	   name = "Split Sharp Edges",
 	   description = "Edge splits all edges marked as sharp to preserve them on the exported mesh.\nNOTE: This will modify the exported mesh",
-	   default = False)
+	   default = True)
 	useBlenderMaterialName : BoolProperty(
 	   name = "Use Blender Material Names",
 	   description = "If left unchecked, the exporter will get the material names to be used from the end of each object name. For example, if a mesh is named LOD_0_Group_0_Sub_0__Shirts_Mat, the material name is Shirts_Mat. If this option is enabled, the material name will instead be taken from the first material assigned to the object",

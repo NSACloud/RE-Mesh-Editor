@@ -257,7 +257,9 @@ class Texconv:
         return name
     
     def convert_to_dds(self, file, dds_fmt, out=None,
-                       invert_normals=False, no_mip=False,
+                       invert_normals=False,
+                       premultiplied_alpha=False,
+                       no_mip=False,
                        image_filter="LINEAR",
                        export_as_cubemap=False,
                        cubemap_layout="h-cross",
@@ -268,8 +270,8 @@ class Texconv:
 
         ext = util.get_ext(file)
 
-        if is_hdr(dds_fmt) and ext != 'hdr':
-            raise RuntimeError(f'Use .hdr for HDR textures. ({file})')
+        if is_hdr(dds_fmt) and ext not in ['hdr', 'dds']:
+            raise RuntimeError(f'Use .hdr or .dds for HDR textures. ({file})')
         if ('BC6' in dds_fmt or 'BC7' in dds_fmt) and (not util.is_windows()) and (not allow_slow_codec):
             raise RuntimeError(f'Can NOT export {dds_fmt} textures on this platform.'
                                ' Or enable the "Allow Slow Codec" option.')
@@ -284,16 +286,22 @@ class Texconv:
         base_name = '.'.join(base_name.split('.')[:-1] + ['dds'])
 
         args = ['-f', dds_fmt]
+		
+        args += ['-sepalpha']#This flag is important. Without it, the alpha channel gets mangled in the mip maps. Why this is an optional feature to not have the alpha channel get mangled is beyond me
+        
         if no_mip:
             args += ['-m', '1']
         if image_filter != "LINEAR":
             args += ["-if", image_filter]
 
         if is_signed(dds_fmt):
-            args += '-x2bias'
+            args += ['-x2bias']
 
         if "SRGB" in dds_fmt:
             args += ['-srgb']
+
+        if premultiplied_alpha:
+            args += ['-pmalpha']
 
         if ("BC5" in dds_fmt) and invert_normals:
             args += ['-inverty']

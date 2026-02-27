@@ -1,0 +1,308 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "MHWILDS",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "eyeMat",
+        "Master Material Path": "MaterialShader/Variation/Base_eye_Emit.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": -2013265768,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "ColorParam",
+            "Data Type": "COLOR",
+            "Value": [
+                0.5137255191802979,
+                0.8078431487083435,
+                0.8941176533699036,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Emissive_Color",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorParam_MetalMasked",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "RayTrace_BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "RoughnessParam",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "MetalParam",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "TranslucentParam",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_RimTranslucent",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTrasnlucent_Power",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTranslucent_NormalBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OcclusionParam",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSParam",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSProfile",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_Basecolor_to_Emissive",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fix_BaseColor_to_Emissive",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Emissive_Power",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Emissive_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseCounterExposureEmit",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CounterExposureEmit_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaAdjust",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTest_Ref",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseTempDither",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DitherShift",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseAOSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AO_to_Cavity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BackFaceFlipNormal",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ChangeUV",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HorizonFade",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_AntiTranslucent_Diffuse",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PassThrough",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dissolve",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SandBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RayTrace_Emissive_Booster",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseVectorEmit",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "VectorEmit_power",
+            "Data Type": "FLOAT",
+            "Value": 6.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseParallaxEmit",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ParallaxEmit_Height",
+            "Data Type": "FLOAT",
+            "Value": 0.009999999776482582,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ParallaxEmit_Blur",
+            "Data Type": "FLOAT",
+            "Value": 0.05000000074505806,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ParallaxEmit_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UV_Secondary_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.6000000238418579,
+            "Padding": 0
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "Art/Model/Character/ch00/CommonTextures/Eye/eye_01_ALBD.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessOcclusionMap",
+            "Texture Path": "Art/Model/Character/ch00/CommonTextures/Eye/eye_01_NRRO.tex"
+        },
+        {
+            "Texture Type": "EmissiveMap",
+            "Texture Path": "MasterMaterial/Textures/NullBlack_Alpha_MSK4.tex"
+        },
+        {
+            "Texture Type": "noisemap",
+            "Texture Path": "MasterMaterial/Textures/bluenoise_msk1.tex"
+        },
+        {
+            "Texture Type": "VectorEmitMap",
+            "Texture Path": "MasterMaterial/Textures/eye_VectorEmit_MSK3.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": [
+        "FoliageBAB_StaticParam,MasterMaterial/ByteAddressBuffer/FoliageBAB_StaticParam.gpbf,0,1",
+        "FoliageBAB_DynamicParam,MasterMaterial/ByteAddressBuffer/FoliageBAB_DynamicParam.gpbf,0,1"
+    ]
+}

@@ -1,0 +1,671 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE4",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "FaceMat",
+        "Master Material Path": "_Mercenaries/MasterMaterial/Master/MC_BlendTexture_RigLogic_Tier2.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 134217856,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_RTTChannelControl",
+            "Data Type": "VEC4",
+            "Value": [
+                1.0,
+                0.20000000298023224,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_RTTChannelControl_ADA",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.5
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ADA_Damage_HSV",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                -1.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.003921568859368563,
+                0.003921568859368563,
+                0.003921568859368563,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "StainColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.3333333134651184,
+                0.2039216011762619,
+                0.10196080058813095,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Cavity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSS_Channel",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WrinkleRoughnessBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight1",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight2",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight3",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight4",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight5",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight6",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight7",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight8",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight9",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight10",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight11",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight12",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight13",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight14",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight15",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight16",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight17",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight18",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight19",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight20",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight21",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight22",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight23",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight24",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight25",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight26",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight27",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight28",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight29",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight30",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight31",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight32",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight33",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight34",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight35",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight36",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight37",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight38",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight39",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight40",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Weight41",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseRecode",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_use_SecondaryUV",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Use_SecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_0",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_1",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_2",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_3",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blood_DarkMask_min",
+            "Data Type": "FLOAT",
+            "Value": 0.5099999904632568,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blood_DarkMask_max",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blood_unevenness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blood_NormalBlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodFlow_BlurRate",
+            "Data Type": "FLOAT",
+            "Value": 100.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodFlow_min",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodFlow_max",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Injury_uvScale",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Injury_NormalHaightRange",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Scar_BrackRate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Stain_uvScale",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SootNoise_UVScale",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ADA_Damage_BrightnessPlus",
+            "Data Type": "FLOAT",
+            "Value": 1.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ADA_BloodRoughness",
+            "Data Type": "FLOAT",
+            "Value": 0.8999999761581421,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodIntensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Index",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Channel",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodRoughness_Offset",
+            "Data Type": "FLOAT",
+            "Value": 0.20000000298023224,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodRoughness_Scaling",
+            "Data Type": "FLOAT",
+            "Value": 5.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "StainIntensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "StainMask_Index",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "StainMask_Channel",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "StainRoughness",
+            "Data Type": "FLOAT",
+            "Value": 0.800000011920929,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Cloth",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_WetRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_RainRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_Scale",
+            "Data Type": "FLOAT",
+            "Value": 4.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dissolve_Saturation",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 8
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "_Chainsaw/MasterMaterial/Textures/NullWhiteBlack.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionCavityMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "WrinkleDiffuseMap1",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "WrinkleDiffuseMap2",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "WrinkleNormalMap1",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "WrinkleNormalMap2",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "ArrayWrinkleMaskMap",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "RecordSys_rtt",
+            "Texture Path": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "RecordSys_Fix",
+            "Texture Path": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "RecordSys_Protect",
+            "Texture Path": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "RecordSys_FACEMASK",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "BloodMask",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "BloodFlow_rtt",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "BloodFlow_uv",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "Injury_Map_ALBA",
+            "Texture Path": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/Record_Injury_Map_ALBA.tex"
+        },
+        {
+            "Texture Type": "Injury_Map_NRM",
+            "Texture Path": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/Record_InjuryMap_NRM.tex"
+        },
+        {
+            "Texture Type": "Stain_Cloth_Map_MSK4",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "SootNoise_Map",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "DirtMask_Atex",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "Rec_Rain_WaterRiple",
+            "Texture Path": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Vector/tex_capcom_vector_water_0011_Array_NRMR.tex"
+        },
+        {
+            "Texture Type": "Rec_Rain_WetMask",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

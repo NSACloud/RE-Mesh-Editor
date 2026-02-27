@@ -726,7 +726,8 @@ missingTexTypeDict = {
 	}
 MAX_ARRAY_IMPORT_SIZE = 16#Blender can't handle much more than 16 mix nodes into a color node, so it gets treated as a single image node if it exceeds 16
 def addImageNode(nodeTree,textureType,imageList,texturePath,currentPos):
-	
+	#print(f"Loading {texturePath}")
+	#print(len(imageList))
 	colorSpace = "sRGB" if textureType in albedoTypeSet or "alb" in texturePath.rsplit("_",1)[-1].lower() else "Non-Color"
 	
 	if len(imageList) == 1 or len(imageList) > MAX_ARRAY_IMPORT_SIZE:
@@ -852,10 +853,17 @@ def newNAMNode (nodeTree,textureType,matInfo):
 	combineRGBNode.location = currentPos
 	nodeTree.links.new(separateRGBNode.outputs["Red"],combineRGBNode.inputs["Red"])
 	nodeTree.links.new(separateRGBNode.outputs["Green"],combineRGBNode.inputs["Green"])
+	
+	
+	
 	combineRGBNode.inputs["Blue"].default_value = 1.0
 	matInfo["normalNodeLayerGroup"].addMixLayer(combineRGBNode.outputs["Color"])
 	
-	matInfo["alphaSocket"] = imageNode.outputs["Alpha"]
+	if textureType == "StitchMap":
+		matInfo["alphaSocket"] = separateRGBNode.outputs["Blue"]
+		matInfo["isAlphaBlend"] = True
+	else:
+		matInfo["alphaSocket"] = imageNode.outputs["Alpha"]
 	if bpy.app.version < (4,2,0):
 		matInfo["blenderMaterial"].shadow_method = "NONE"
 	
@@ -1376,7 +1384,7 @@ def newATOSNode (nodeTree,textureType,matInfo):
 			if textureType == "AlphaTranslucentOcclusionCavityMap":
 				matInfo["cavityNodeLayerGroup"].addMixLayer(imageNode.outputs["Alpha"])
 	else:
-		if not isMTOS and not isMaskAlpha:
+		if not isMTOS and not isMaskAlpha and not "StitchMap" in matInfo["textureNodeDict"]:
 			matInfo["alphaSocket"] = separateNode.outputs["Red"]
 		matInfo["translucentSocket"] = separateNode.outputs["Green"]
 		if matInfo["gameName"] != "SF6" and not useLegacyHairUV2Occlusion:#SF6 uses occlusion channel for something else
@@ -1384,6 +1392,11 @@ def newATOSNode (nodeTree,textureType,matInfo):
 		
 		if textureType == "AlphaTranslucentOcclusionCavityMap":
 			matInfo["cavityNodeLayerGroup"].addMixLayer(imageNode.outputs["Alpha"])
+		
+		elif textureType == "AlphaCavityOcclusionTranslucentMap":
+			matInfo["cavityNodeLayerGroup"].addMixLayer(separateNode.outputs["Green"])
+			matInfo["translucentSocket"] = imageNode.outputs["Alpha"]
+		
 		else:
 			matInfo["subsurfaceSocket"] = imageNode.outputs["Alpha"]
 	
@@ -1412,6 +1425,24 @@ def newOCTDNode (nodeTree,textureType,matInfo):
 			matInfo["emissionStrengthNodeLayerGroup"].addMixLayer(separateNode.outputs["Blue"],mixType = "MULTIPLY",mixFactor = 1.0,factorOutSocket = maskStrengthNode.outputs["Value"])
 	matInfo["aoNodeLayerGroup"].addMixLayer(separateNode.outputs["Red"])
 	matInfo["cavityNodeLayerGroup"].addMixLayer(separateNode.outputs["Green"])
+	
+	return imageNode
+
+def newSCOTNode (nodeTree,textureType,matInfo):
+	imageNode = nodeTree.nodes[textureType]
+	currentPos = [imageNode.location[0]+300,imageNode.location[1]]
+	
+	
+	separateNode = nodeTree.nodes.new('ShaderNodeSeparateColor')
+	separateNode.location = currentPos
+	currentPos[0] += 300
+	nodeTree.links.new(imageNode.outputs["Color"],separateNode.inputs["Color"])
+	
+	
+	matInfo["subsurfaceSocket"] = separateNode.outputs["Red"]
+	matInfo["cavityNodeLayerGroup"].addMixLayer(separateNode.outputs["Green"])
+	matInfo["aoNodeLayerGroup"].addMixLayer(separateNode.outputs["Blue"])
+	matInfo["translucentSocket"] = imageNode.outputs["Alpha"]
 	
 	return imageNode
 
@@ -1455,6 +1486,7 @@ nodeDict = {
 	"EMI":newEMINode,
 	"ATOS":newATOSNode,
 	"OCTD":newOCTDNode,
+	"SCOT":newSCOTNode,
 	"NAM":newNAMNode,
 	"SRM":newSRMNode,
 	"NRM":newNRMNode,

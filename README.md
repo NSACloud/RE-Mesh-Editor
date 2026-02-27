@@ -2,7 +2,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.61 (2/11/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.62 (2/28/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -46,6 +46,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
    
  - **(New in 0.58)** Batch exporting for all supported RE Engine file types.
  - **(New in 0.58)** Unpacking and repacking of mod pak files. (RE Asset Library Required)
+ - **(New in 0.62)** Automatic conversion from Blender material shaders to RE Engine.
  - Additional supported file types:
   - **.fbxskel** - (Skeleton)
   - **.sfur** - (Shell Fur)
@@ -55,6 +56,7 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
  - **Resident Evil 4 Remake**
  - **Resident Evil 7 Ray Tracing Version**
  - **Resident Evil 8**
+ - **Resident Evil 9**
  - **Resident Evil Re:Verse** 
  - **Monster Hunter Rise**
  - **Monster Hunter Wilds**
@@ -70,28 +72,56 @@ This addon allows for importing and exporting of RE Engine mesh and mdf2 (materi
 Support for more games may be added in the future.
 
 ## Requirements
-* [Blender 3.3 or higher (4.3.2 or higher recommended)](https://www.blender.org/download/)
+* [Blender 4.3.2 or higher](https://www.blender.org/download/)
 
   
 **Not required but strongly recommended:**
 * [RE Chain Editor](https://github.com/NSACloud/RE-Chain-Editor) - Blender addon for creation of chain files. Used to add physics to models.
-* [RE Asset Library (Blender 4.3.2 or higher required)](https://github.com/NSACloud/RE-Asset-Library) - Blender addon that allows for extraction and importing of RE Engine files. Reduces the need to look up file IDs to find what you're looking for.
+* [RE Asset Library](https://github.com/NSACloud/RE-Asset-Library) - Blender addon that allows for extraction and importing of RE Engine files. Reduces the need to look up file IDs to find what you're looking for.
 ## Installation
 Download the addon from the "Download RE Mesh Editor" link at the top or click Code > Download Zip.
 
-In Blender, go to Edit > Preferences > Addons, then click "Install" in the top right.
+**Do not download from the Releases tab.**
 
-Be sure to check the box next to RE Mesh Editor in the addons menu.
-
-NOTE: If you are on Blender 4.2 or above, the install button is found by clicking the arrow in the top right of the addon menu.
+In Blender, go to Edit > Preferences > Addons, click the arrow in the top right of the addon menu and choose "Install From Disk".
 
 ![image](https://github.com/user-attachments/assets/49dd95c1-9a20-49d8-af55-7160d54836df)
 
-Navigate to the downloaded zip file for this addon and click "Install Addon". The addon should then be usable.
+Navigate to the downloaded zip file for this addon and click "Install Addon". 
+
+Be sure to check the box next to RE Mesh Editor in the addons menu. The addon should then be usable.
 
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.62 - 2/27/2026
+* Minimum required Blender version is now 4.3.2. This is due to the increased reliance on RE Asset Library.
+Older Blender versions may still work but no fixes will provided if issues occur.
+
+* Added Resident Evil 9 support.
+
+[RE Asset Library](https://github.com/NSACloud/RE-Asset-Library) is required to use the features below:
+* Added mod workspace system. This sets up a blend file for mod development and creates a folder for mod related files. The idea is to streamline the modding process to be as quick and easy as possible.
+* Mod workspace related options can be accessed in the RE Mod Dev Tools panel.
+* Added Convert Model To RE Engine button. This takes any model, converts it into RE Engine format and bakes it's materials for any RE Engine game. (As long as there's material presets for the game)
+
+Note that this isn't intended to do an entire mod for you, it still has to be rigged to the RE Engine armature and any specialized texture maps have to be set up manually.
+
+**I am working on a video tutorial for the new mesh importing workflow. I should be done with it soon hopefully.**
+* Added File Tracking feature. Enabling this will watch for changes made to files in the mod output folder and copy them into the game directory automatically.
+* Added Launch Game button.
+
+* Added material presets for MH Wilds and RE4. More will be added in the future. (If you would like to contribute presets, that would be appreciated)
+* Added Nullify Texture Bindings button. This sets all texture bindings on an MDF material to a corresponding null texture.
+* Fixed issue where the alpha channel of mipmaps would get corrupted when converting from TGA to Tex.
+* Fixed various errors that could occur when weights were set up incorrectly. A warning will be shown when weights are invalid upon mesh export.
+* Fixed issue where array textures wouldn't load under certain conditions.
+* Fixed issue where detail normal map layers would be incorrect if the model was rotated.
+* Changed color pickers to sRGB instead of linear on Blender 5.0+.
+* Minor bug fixes.
+* Temporarily removed mesh and mdf export support for Pragmata. This is because RE9 and Pragmata share the same file version but have different internal structure. I'll come up with a workaround for it soon.
+
 
 ### V0.61 - 2/11/2026
 * Added support for Monster Hunter Stories 3.
@@ -511,9 +541,11 @@ You may be using an outdated .mdf2 file, be sure to extract from the latest patc
 
 **For additional help, go here:**
 
+[RE Engine Modding Wiki](https://github.com/Havens-Night/REEngine-Modding-Documentation)
+
 [Monster Hunter Modding Discord](https://discord.gg/gJwMdhK)
 
-[Modding Haven Discord](https://discord.gg/modding-haven-718224210270617702)
+[Haven's Night Discord](https://discord.gg/modding-haven-718224210270617702)
 
 ## Credits
 
@@ -523,3 +555,4 @@ You may be using an outdated .mdf2 file, be sure to extract from the latest patc
 - [CG Cookie](https://github.com/CGCookie) - Addon updater module
 - [matyalatte](https://github.com/matyalatte/Texconv-Custom-DLL) - DirectX Texconv DLL library
 - [PittRBM](https://x.com/wDnrbm) - NRRT texture node setup
+- Ridog - NRRT normal conversion code used as reference

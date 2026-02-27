@@ -1,9 +1,10 @@
 	#Author: NSA Cloud
 import bpy
 import os
+import json
 
 from bpy.types import Operator
-from ..gen_functions import raiseWarning
+from ..gen_functions import raiseWarning,openFolder
 
 from .blender_re_mdf import createEmpty,reindexMaterials,createMDFCollection,checkNameUsage,buildMDF
 from .blender_re_mesh_mdf import importMDF
@@ -11,6 +12,7 @@ from ..blender_utils import showErrorMessageBox
 from .file_re_mdf import getMDFVersionToGameName
 from .re_mdf_presets import saveAsPreset,readPresetJSON
 from .ui_re_mdf_panels import tag_redraw
+from ..gen_functions import openFolder
 
 PRESET_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.split(os.path.abspath(__file__))[0])),"Presets")
 class WM_OT_NewMDFHeader(Operator):
@@ -134,7 +136,7 @@ class WM_OT_OpenPresetFolder(Operator):
 	bl_idname = "re_mdf.open_preset_folder"
 
 	def execute(self, context):
-		os.startfile(PRESET_DIR)
+		openFolder(PRESET_DIR)
 		return {'FINISHED'}
 
 
@@ -174,6 +176,7 @@ class WM_OT_FindReplaceTextureBindings(Operator):
 	bl_idname = "re_mdf.replace_texture_bindings"
 	bl_context = "objectmode"
 	bl_description = "Find and replace specified strings inside texture paths"
+	bl_options = {'UNDO'}
 	findValue : bpy.props.StringProperty(name = "Find",default = "ch02_001_0002",options = {"TEXTEDIT_UPDATE"},update = update_findValueCount)
 	replaceValue : bpy.props.StringProperty(name = "Replace With",default = "")
 	instanceCount : bpy.props.IntProperty(name = "Count",default = 0)
@@ -204,3 +207,46 @@ class WM_OT_FindReplaceTextureBindings(Operator):
 		return context.window_manager.invoke_props_dialog(self)
 
 		return {'FINISHED'}	
+
+class WM_OT_NullifyTextureBindings(Operator):
+	bl_label = "Nullify Texture Bindings"
+	bl_idname = "re_mdf.nullify_texture_bindings"
+	bl_context = "objectmode"
+	bl_description = "Replaces the texture bindings of all selected materials with null paths.\nThis is useful for when you want to assign your own textures to a material, but don't know what every texture map does.\nExperimental. May not work correctly for all materials"
+	bl_options = {'UNDO'}
+	@classmethod
+	def poll(self,context):
+		return context.active_object is not None
+	
+	def execute(self, context):
+		jsonPath = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),"workspace","texturepacker","tex_bindings_null.json")
+		try:
+			with open(jsonPath,"r", encoding ="utf-8") as file:
+				texTypeDict = json.load(file)
+				print(f"Loaded {jsonPath}")
+		except Exception as err:
+			print(f"Failed to load {jsonPath} - {err}")
+		replaceCount = 0
+		for obj in bpy.context.selected_objects:
+			if context.active_object.get("~TYPE") == "RE_MDF_MATERIAL":
+				material = context.active_object.re_mdf_material
+				if material.gameName != "":
+					gameName = material.gameName
+				else:
+					print(f"Game name not found on {material.materialName} falling back to active game")
+					gameName = bpy.context.scene.re_mdf_toolpanel.activeGame
+				for entry in material.textureBindingList_items:
+					if entry.textureType in texTypeDict:
+						if gameName in texTypeDict[entry.textureType]:
+							entry.path = texTypeDict[entry.textureType][gameName]
+							replaceCount += 1
+						elif "generic" in texTypeDict[entry.textureType]:
+							entry.path = texTypeDict[entry.textureType]["generic"]
+							replaceCount += 1
+						else:
+							print(f"Unknown texture type {entry.textureType} on {material.materialName}, skipping.")
+				
+			self.report({"INFO"},f"Replaced {replaceCount} texture bindings.")
+			return {'FINISHED'}
+		else:
+			return {'CANCELLED'}

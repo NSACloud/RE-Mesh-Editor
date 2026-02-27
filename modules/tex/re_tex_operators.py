@@ -12,6 +12,7 @@ from .blender_re_tex import convertTexDDSList
 from .re_tex_propertyGroups import PNGConversionEntryPropertyGroup
 from ..mdf.file_re_mdf import getMDFVersionToGameName
 from .re_tex_utils import DDSToTex,ImageListToDDS
+from ..gen_functions import openFolder
 import shutil
 #from .re_tex_utils import
 
@@ -21,6 +22,7 @@ class WM_OT_ConvertDDSTexFile(Operator,ImportHelper):
 	bl_label = "Convert Image/RE Tex Files"
 	bl_idname = "re_tex.convert_tex_dds_files"
 	bl_description = "Opens a window to select textures to convert. Selected image files will be converted to .tex and tex files will be converted to dds/png (configurable in preferences).\nIf you are using Blender 4.1 or higher, you can drag .tex or .dds files into the 3D view to convert them.\nSupported File Types:\n.dds, .png, .tga, .tiff"
+	bl_options = {'REGISTER'}#Disable undo
 	filter_glob: StringProperty(default="*.png;*.dds;*.tex.*", options={'HIDDEN'})
 	files : CollectionProperty(
 			name="File Path",
@@ -98,7 +100,7 @@ class WM_OT_PNGToTexConversionWindow(Operator):
 	   name = "Skip Prompt",
 	   description = "Internal, used to determine if called by a script or by user",
 	   options = {"HIDDEN"},
-	   default = True)
+	   default = False)
 	
 	def execute(self, context):
 		convertedDDSList = []
@@ -139,8 +141,8 @@ class WM_OT_PNGToTexConversionWindow(Operator):
 				os.remove(ddsPath)
 			except:
 				pass
-		
-		showMessageBox(f"Converted {str(successCount)} textures.",title = "Texture Conversion")
+		if not self.skipPrompt:
+			showMessageBox(f"Converted {str(successCount)} textures.",title = "Texture Conversion")
 		self.report({"INFO"},f"Converted {str(successCount)} textures.")
 		
 			
@@ -164,7 +166,8 @@ class WM_OT_PNGToTexConversionWindow(Operator):
 				if os.path.splitext(file.name)[1] in supportedImageExtensions:
 					item = self.fileList_items.add()
 					item.fileName = file.name
-					if "_alb" in item.fileName.lower():
+					lowerFileName = item.fileName.lower()
+					if "_alb" in lowerFileName or "_emi." in lowerFileName:
 						item.ddsCompressionType = "BC7_UNORM_SRGB"
 					else:
 						item.ddsCompressionType = "BC7_UNORM"
@@ -199,6 +202,12 @@ class WM_OT_ConvertFolderToTex(Operator):
 	bl_label = "Convert Directory to Tex"
 	bl_idname = "re_tex.convert_tex_directory"
 	bl_description = "Converts all image files in the chosen directory to .tex\nConverted files will be saved inside a folder called \"converted\"\nSupported File Types:\n.dds, .png, .tga, .tiff"
+	bl_options = {'REGISTER'}#Disable undo
+	skipPrompt : bpy.props.BoolProperty(
+	   name = "Skip Conversion Prompt",
+	   description = "Skip prompt to convert images to DDS.\nIf non DDS files are selected, the compression type will be set automatically",
+	   default = False,
+	   options = {"HIDDEN"})
 	def execute(self, context):
 		texVersion = 28
 		gameName = bpy.context.scene.re_mdf_toolpanel.activeGame
@@ -226,11 +235,11 @@ class WM_OT_ConvertFolderToTex(Operator):
 					files = fileList,
 					directory = texDir,
 					outDir = convertedDir,
-					skipPrompt = False,
+					skipPrompt = self.skipPrompt,
 					)
 				return {"FINISHED"}
 				if bpy.context.scene.re_mdf_toolpanel.openConvertedFolder:
-					os.startfile(convertedDir)
+					openFolder(convertedDir)
 			else:
 				showErrorMessageBox("No image files in provided directory")
 		else:
@@ -240,8 +249,9 @@ class WM_OT_ConvertFolderToTex(Operator):
 class WM_OT_CopyConvertedTextures(Operator):
 	bl_label = "Copy Converted Tex Files"
 	bl_idname = "re_tex.copy_converted_tex"
-	bl_options = {'UNDO'}
+	bl_options = {'REGISTER'}#Disable undo
 	bl_description = "Copies the textures in the converted tex folder into the specified Mod Natives Directory.\nThe textures are placed at the paths set in the active MDF collection"
+	
 	def execute(self, context):
 		texDir = os.path.realpath(bpy.context.scene.re_mdf_toolpanel.textureDirectory)
 		modDir = os.path.realpath(bpy.context.scene.re_mdf_toolpanel.modDirectory)

@@ -73,6 +73,7 @@ def findSFurPathFromMeshPath(meshPath,gameName = None):
 		".221108797":".4",#RE4
 		".240423143":".5",#DD2NEW
 		".241111606":".5",#MHWILDS
+		".250925211":".5",#RE9
 		}
 	sFurVersion = sFurVersionDict.get(meshVersion,None)
 	sFurPath = None

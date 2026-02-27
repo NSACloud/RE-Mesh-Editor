@@ -2,8 +2,8 @@
 bl_info = {
 	"name": "RE Mesh Editor",
 	"author": "NSA Cloud",
-	"version": (0, 61),
-	"blender": (3, 3, 0),
+	"version": (0, 62),
+	"blender": (4, 3, 2),
 	"location": "File > Import-Export",
 	"description": "Import and export RE Engine Mesh files natively into Blender. No Noesis required.",
 	"warning": "",
@@ -19,7 +19,7 @@ from bpy_extras.io_utils import ExportHelper,ImportHelper
 from bpy.props import StringProperty, BoolProperty,IntProperty, EnumProperty, CollectionProperty,PointerProperty
 from bpy.types import Operator, OperatorFileListElement,AddonPreferences
 from rna_prop_ui import PropertyPanel
-from .modules.gen_functions import textColors,raiseWarning,getFolderSize,formatByteSize,splitNativesPath
+from .modules.gen_functions import textColors,raiseWarning,getFolderSize,formatByteSize,splitNativesPath,openFolder
 from .modules.blender_utils import operator_exists
 #mesh
 from .modules.mesh.file_re_mesh import meshFileVersionToGameNameDict
@@ -36,6 +36,7 @@ from .modules.mesh.re_mesh_operators import (
 	WM_OT_CreateMeshCollection,
 	WM_OT_REBatchExporter,
 	WM_OT_SolveRepeatedUVs,
+	WM_OT_QuickBatchExport,
 
 )
 from .modules.mesh.ui_re_mesh_panels import (
@@ -83,6 +84,7 @@ from .modules.mdf.re_mdf_operators import (
 	WM_OT_OpenPresetFolder,
 	WM_OT_ApplyMDFToMeshCollection,
 	WM_OT_FindReplaceTextureBindings,
+	WM_OT_NullifyTextureBindings,
 
 )
 #tex
@@ -135,6 +137,29 @@ from .modules.sfur.ui_re_sfur_panels import (
 from .modules.sfur.re_sfur_propertyGroups import (
 	SFurEntryPropertyGroup,
 	)
+#mod workspace
+
+from .modules.workspace.re_mod_workspace_operators import (
+	WM_OT_CreateModWorkspace,
+	WM_OT_EditModInfo,
+	WM_OT_ConvertToREEngine,
+	WM_OT_TexturePacker,
+	WM_OT_ToggleModFileTracking,
+	WM_OT_CopyModFilesToGameDir,
+	WM_OT_UninstallModFilesFromGameDir,
+	WM_OT_LaunchGame,
+	WM_OT_OpenModWorkspace,
+	)
+
+from .modules.workspace.re_mod_workspace_propertyGroups import (
+	ModWorkspaceToolPanelPropertyGroup,
+	ConvertedMaterialEntryPropertyGroup,
+	REMOD_UL_MaterialConversionList,
+	)
+from .modules.workspace.ui_re_mod_workspace_panels import (
+	OBJECT_PT_REModWorkspacePanel,
+	)
+
 
 os.system("color")#Enable console colors
 
@@ -194,7 +219,7 @@ class WM_OT_OpenTextureCacheFolder(Operator):
 
 	def execute(self, context):
 		try:
-			os.startfile(bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath))
+			openFolder(bpy.path.abspath(bpy.context.preferences.addons[__name__].preferences.textureCachePath))
 		except:
 			pass
 		checkTextureCacheSize()
@@ -263,7 +288,7 @@ class ChunkPathPropertyGroup(bpy.types.PropertyGroup):
 		("MHWILDS", "Monster Hunter Wilds", ""),
 		("PRAG", "Pragmata", ""),
 		("MHS3", "Monster Hunter Stories 3", ""),
-		#("RE9", "Resident Evil 9", ""),#RE9 Placeholder
+		("RE9", "Resident Evil 9", ""),
 		]
     )
     path: StringProperty(
@@ -367,6 +392,11 @@ class REMeshPreferences(AddonPreferences):
 		description = "When converting a tex file, convert it to a .png file instead of .dds",
 		default = False
 	)
+	modFileTrackingPollingRate: IntProperty(
+		name = "Mod File Tracking Polling Rate",
+		description = "Amount of seconds between checking for changes made to files when mod file tracking is enabled",
+		min = 1,
+		default = 5)
 	
 	saveChunkPaths: BoolProperty(
 		name="Save Chunk Paths Automatically",
@@ -558,6 +588,8 @@ class REMeshPreferences(AddonPreferences):
 		layout.prop(self, "showConsole")
 		layout.prop(self, "useDDS")
 		layout.prop(self, "convertTexToPNG")
+		layout.prop(self, "modFileTrackingPollingRate")
+		
 		box = layout.box()
 		row = box.row()
 		
@@ -917,9 +949,9 @@ class ExportREMesh(Operator, ExportHelper):
 				(".240424828", "Dead Rising", "Dead Rising"),
 				(".240827123", "Onimusha 2", "Onimusha 2"),
 				(".241111606", "Monster Hunter Wilds", "Monster Hunter Wilds"),
-				(".250925211", "Pragmata", "Pragmata"),
+				#(".250925211", "Resident Evil 9 / Pragmata", "Resident Evil 9 / Pragmata"),
+				(".250925211", "Resident Evil 9", "Resident Evil 9"),
 				(".250604100", "Monster Hunter Stories 3", "Monster Hunter Stories 3"),
-				#(".250925212", "Resident Evil 9", "Resident Evil 9"),#RE9 Placeholder
 			   ]
 		)
 	targetCollection: bpy.props.StringProperty(
@@ -1184,9 +1216,8 @@ class ExportREMDF(bpy.types.Operator, ExportHelper):
 				(".40", "Dragon's Dogma 2 / Kunitsu-Gami / Dead Rising", "Dragon's Dogma 2, Kunitsu-Gami, Dead Rising"),
 				(".46", "Onimusha 2", "Onimusha 2"),
 				(".45", "Monster Hunter Wilds", "Monster Hunter Wilds"),
-				(".51", "Pragmata", "Pragmata"),
+				(".51", "Resident Evil 9 / Pragmata", "Resident Evil 9 / Pragmata"),
 				(".49", "Monster Hunter Stories 3", "Monster Hunter Stories 3"),
-				#(".52", "Resident Evil 9", "Resident Evil 9"),#RE9 Placeholder
 			  ]
 		)
 	targetCollection : StringProperty(
@@ -1301,8 +1332,7 @@ class ExportREFBXSkel(bpy.types.Operator, ExportHelper):
 				(".5", "RE4R (.5)", ""),
 				(".6", "DD2 (.6)", ""),
 				(".7", "MH Wilds / MHS3 (.7)", ""),
-				(".8", "Pragmata (.8)", ""),
-				#(".9", "Resident Evil 9 (.9)", ""),#RE9 Placeholder
+				(".8", "Resident Evil 9 / Pragmata (.8)", ""),
 
 			   ],
 		default = ".7"
@@ -1443,7 +1473,7 @@ class ExportRESFur(bpy.types.Operator, ExportHelper):
 		description="Set which game to export the MDF for",
 		items=[ 
 				(".4", "Resident Evil 4", ""),
-				(".5", "Dragon's Dogma 2 / Monster Hunter Wilds", ""),
+				(".5", "Resident Evil 9 / Dragon's Dogma 2 / Monster Hunter Wilds", ""),
 			  ]
 		)
 	targetCollection : StringProperty(
@@ -1513,6 +1543,25 @@ classes = [
 	ReorderItemOperator,
 	MESH_UL_ChunkPathList,
 	REMeshPreferences,
+	#mod workspace
+	#property groups
+	ModWorkspaceToolPanelPropertyGroup,
+	ConvertedMaterialEntryPropertyGroup,
+	REMOD_UL_MaterialConversionList,
+	#operators
+	WM_OT_CreateModWorkspace,
+	WM_OT_EditModInfo,
+	WM_OT_ConvertToREEngine,
+	#WM_OT_TexturePacker,#Not implemented yet
+	WM_OT_ToggleModFileTracking,
+	WM_OT_CopyModFilesToGameDir,
+	WM_OT_UninstallModFilesFromGameDir,
+	WM_OT_LaunchGame,
+	WM_OT_OpenModWorkspace,
+	#ui panels
+	OBJECT_PT_REModWorkspacePanel,
+	
+	
 	#mesh
 	
 	ImportREMesh,
@@ -1529,6 +1578,7 @@ classes = [
 	MESH_UL_REExporterList,
 	WM_OT_REBatchExporter,
 	WM_OT_SolveRepeatedUVs,
+	WM_OT_QuickBatchExport,
 	
 	#mdf
 	ImportREMDF,
@@ -1574,6 +1624,7 @@ classes = [
 	WM_OT_ApplyMDFToMeshCollection,
 	WM_OT_ShowREMeshErrorWindow,
 	WM_OT_FindReplaceTextureBindings,
+	WM_OT_NullifyTextureBindings,
 	
 	#sfur
 	ImportRESFur,
@@ -1614,9 +1665,10 @@ classes = [
 	WM_OT_ClearBoneLinkages,
 	
 	
-	
 	#RE asset extra tools
 	OBJECT_PT_REAssetExtensionPanel,
+	
+	
 	
 	]
 
@@ -1753,7 +1805,9 @@ def register():
 	
 	
 	#REGISTER PROPERTY GROUP PROPERTIES
+	bpy.types.WindowManager.enableModFileTracking = bpy.props.BoolProperty(default=False)
 	bpy.types.Scene.re_mdf_toolpanel = PointerProperty(type=MDFToolPanelPropertyGroup)
+	bpy.types.Scene.re_modworkspace_toolpanel = PointerProperty(type=ModWorkspaceToolPanelPropertyGroup)
 	bpy.types.Object.re_mdf_material = PointerProperty(type=MDFMaterialPropertyGroup)
 	
 	bpy.types.Object.re_sfur_data = PointerProperty(type=SFurEntryPropertyGroup)
@@ -1778,6 +1832,7 @@ def register():
 		
 	
 def unregister():
+	del bpy.types.WindowManager.enableModFileTracking
 	addon_updater_ops.unregister()
 	for classEntry in classes:
 		bpy.utils.unregister_class(classEntry)

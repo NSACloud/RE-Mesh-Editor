@@ -64,7 +64,6 @@ SIX_WEIGHT_GAMES = frozenset([
 	VERSION_MHWILDS,
 	VERSION_MHS3,
 	VERSION_PRAGDEMO,
-	VERSION_RE9,
 	])
 
 meshFileVersionToNewVersionDict = {
@@ -86,8 +85,8 @@ meshFileVersionToNewVersionDict = {
 	240827123:VERSION_ONI2,
 	241111606:VERSION_MHWILDS,
 	250604100:VERSION_MHS3,
-	250925211:VERSION_PRAGDEMO,
-	#250925211:VERSION_RE9,#RE9 Placeholder
+	#250925211:VERSION_PRAGDEMO,
+	250925211:VERSION_RE9,
 	}
 newVersionToMeshFileVersion = {
 	VERSION_DMC5:1808282334,
@@ -106,8 +105,8 @@ newVersionToMeshFileVersion = {
 	VERSION_ONI2:240820143,
 	VERSION_MHWILDS:241111606,
 	VERSION_MHS3:250604100,
-	VERSION_PRAGDEMO:250925211,
-	#VERSION_RE9:250925211,#RE9 Placeholder
+	#VERSION_PRAGDEMO:250925211,
+	VERSION_RE9:250925211,
 	}
 meshFileVersionToInternalVersionDict = {
 	1808282334:386270720,#VERSION_DMC5
@@ -126,8 +125,8 @@ meshFileVersionToInternalVersionDict = {
 	240827123:240704828,#VERSION_ONI2
 	241111606:240704828,#VERSION_MHWILDS
 	250604100:250203152,#VERSION_MHS3
-	250925211:250707828,#VERSION_PRAGDEMO
-	#250925211:250707828,#VERSION_RE9#RE9 Placeholder
+	#250925211:250707828,#VERSION_PRAGDEMO
+	250925211:250904410,#VERSION_RE9
 	}
 internalVersionToMeshFileVersionDict = {
 	386270720:1808282334,#VERSION_DMC5
@@ -147,7 +146,7 @@ internalVersionToMeshFileVersionDict = {
 	240704828:241111606,#VERSION_MHWILDS
 	250203152:250604100,#VERSION_MHS3
 	250707828:250925211,#VERSION_PRAGDEMO
-	#250707828:250925211,#VERSION_RE9#RE9 Placeholder
+	250904410:250925211,#VERSION_RE9
 	}
 meshFileVersionToGameNameDict = {
 	1808282334:"DMC5",#VERSION_DMC5
@@ -168,8 +167,8 @@ meshFileVersionToGameNameDict = {
 	240827123:"ONI2",#VERSION_ONI2
 	241111606:"MHWILDS",#VERSION_MHWILDS
 	250604100:"MHS3",#VERSION_MHS3
-	250925211:"PRAG",#VERSION_PRAGDEMO
-	250925212:"RE9",#VERSION_RE9#RE9 Placeholder
+	#250925211:"PRAG",#VERSION_PRAGDEMO
+	250925211:"RE9",#VERSION_RE9
 	}
 
 #Used for unmapped mesh versions, potentially allows for importing
@@ -2017,7 +2016,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 			reMesh.lodHeader.skinWeightCount = 9
 		elif version == VERSION_MHWILDS:
 			reMesh.lodHeader.skinWeightCount = 25#Not sure why but this fixes monsters causing crashes and dead hitbox issues
-		elif version == VERSION_PRAGDEMO:
+		elif version >= VERSION_PRAGDEMO:
 			reMesh.lodHeader.skinWeightCount = 27#
 		if parsedMesh.bufferHasUV2:#This is wrong, uv count is determined by something else. However uv count is unused by the game so it doesn't really matter
 			reMesh.lodHeader.uvCount = 2

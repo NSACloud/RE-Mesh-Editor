@@ -27,7 +27,7 @@ from ..mdf.blender_re_mdf import importMDFFile
 from ..sfur.blender_re_sfur import importSFurFile,findSFurPathFromMeshPath
 from .re_mesh_export_errors import addErrorToDict,printErrorDict,showREMeshErrorWindow
 from ..gen_functions import splitNativesPath,raiseWarning
-from ..blender_utils import showErrorMessageBox
+from ..blender_utils import showErrorMessageBox,showMessageBox
 from ..hashing.mmh3.pymmh3 import hashUTF8
 import time
 import numpy as np																																																																												
@@ -112,6 +112,7 @@ def joinObjects(objList):
 	else:
 		with bpy.context.temp_override(active_object=objList[0], selected_editable_objects=objList):
 			   bpy.ops.object.join()
+	return bpy.context.active_object
 	
 def createMaterialDict(materialNameList):
 	materialDict = {}
@@ -1011,8 +1012,8 @@ def exportREMeshFile(filePath,options):
 	maxWeightsPerVertex = 8
 	maxWeightsPerVertexExtended = 16
 	maxWeightedBones = 256
-	SIX_WEIGHT_GAMES = set(["SF6","MHWILDS","PRAG","RE9"])
-	EXTENDED_WEIGHT_GAMES = set(["MHWILDS","PRAG","MHS3","RE9"])#Games with support for extended weight buffers
+	SIX_WEIGHT_GAMES = set(["SF6","MHWILDS","PRAG"])
+	EXTENDED_WEIGHT_GAMES = set(["MHWILDS","PRAG","MHS3",])#Games with support for extended weight buffers
 	if gameName in SIX_WEIGHT_GAMES:
 		maxWeightsPerVertex = 6
 		maxWeightsPerVertexExtended = 12
@@ -1022,7 +1023,7 @@ def exportREMeshFile(filePath,options):
 	MAX_VERTICES_EXTENDED = 4294967295
 	MAX_FACES = 4294967295
 	
-	
+	showWarningMessage = False
 	
 	subMeshCount = 0
 	
@@ -1178,8 +1179,12 @@ def exportREMeshFile(filePath,options):
 			parsedMesh.skeleton.boneList.append(parsedBone)
 	
 			#print(bone.name)
+			if len(armatureObj.data.bones) == 0:
+				raiseWarning("Armature contains no bones, skipping armature.")
 	else:
 		print(f"Armature: None")
+	
+		armatureObj =  None
 	#Get previously imported bounding boxes if option enabled
 	if boundingBoxCollection != None and options["exportBoundingBoxes"]:
 		for obj in boundingBoxCollection.objects:
@@ -1316,7 +1321,9 @@ def exportREMeshFile(filePath,options):
 						else:
 							remapDict[vgName] = 0
 					if armatureObj != None and not hasWeights:
-						addErrorToDict(errorDict, "NoWeightsOnMesh", obj.name)  
+						raiseWarning(f"No valid vertex weights found on {obj.name}!")
+						showWarningMessage = True
+						#addErrorToDict(errorDict, "NoWeightsOnMesh", obj.name)  
 					if armatureObj == None and len(remapDict) != 0:
 						addErrorToDict(errorDict, "NoArmatureInCollection", obj.name)
 				if not visconDict.get(groupID):
@@ -1379,6 +1386,9 @@ def exportREMeshFile(filePath,options):
 					parsedMesh.skeleton.weightedBones.append(bone.name)
 					remapDict[bone.name] = remapIndex
 					remapIndex += 1
+			if len(parsedMesh.skeleton.weightedBones) == 0:
+				raiseWarning(f"No bones have any weights assigned to them. Defaulting all weights to {armatureObj.data.bones[0].name}")
+				parsedMesh.skeleton.weightedBones = [armatureObj.data.bones[0].name]
 			boneRemapEndTime = time.time()
 			boneRemapTime =  boneRemapEndTime - boneRemapStartTime
 			boneVertDict = {boneName: [] for boneName in parsedMesh.skeleton.weightedBones}
@@ -1823,7 +1833,8 @@ def exportREMeshFile(filePath,options):
 	print(f"Materials ({str(len(parsedMesh.materialNameList))}):")
 	for materialName in parsedMesh.materialNameList:
 		print(materialName)
-	
+	if showWarningMessage:
+		showMessageBox("Warnings occured during export. Check Window > Toggle System Console for details.",title = "Mesh Export Warning", icon = "ERROR")
 	print("\033[92m__________________________________\nRE Mesh export finished.\033[0m")
 	return True	
 	

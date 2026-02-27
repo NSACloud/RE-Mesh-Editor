@@ -1,0 +1,193 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE4",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "EyeMat",
+        "Master Material Path": "_Chainsaw/MasterMaterial/Master/Character_Eye_Parallax.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 134217882,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "FlattenNormal_CenterOffset",
+            "Data Type": "VEC4",
+            "Value": [
+                0.5,
+                0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.8941176533699036,
+                0.9333333373069763,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeEmissive_ColorLow",
+            "Data Type": "COLOR",
+            "Value": [
+                0.0,
+                0.20000000298023224,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeEmissive_ColorHigh",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "FlattenNormal_Enable",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FlattenNormal_Threthold",
+            "Data Type": "FLOAT",
+            "Value": 0.25,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FlattenNormal_EdgeBlur",
+            "Data Type": "FLOAT",
+            "Value": 0.009999999776482582,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Cavity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSS_Channel",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UV_Scaler",
+            "Data Type": "FLOAT",
+            "Value": -0.029999999329447746,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Depth",
+            "Data Type": "FLOAT",
+            "Value": 0.11999999731779099,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LayerNum",
+            "Data Type": "FLOAT",
+            "Value": 8.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SmoothParallax",
+            "Data Type": "FLOAT",
+            "Value": 0.25999999046325684,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Enable_EyeEmissive",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeEmissive_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeEmissive_ColorCurve",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeEmissive_AngleMin",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeEmissive_AngleMax",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dissolve_Saturation",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Enable_BlueNoiseDither",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 8
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "_Chainsaw/Character/ch/cha2/cha200/10/cha200_10_Eye_ALBD.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionCavityMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "HightMap",
+            "Texture Path": "_Chainsaw/Character/Textures/Eye/Eyeball_aso_Hight_3_MSK1.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

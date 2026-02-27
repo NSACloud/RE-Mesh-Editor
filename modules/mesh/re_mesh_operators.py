@@ -333,6 +333,10 @@ class WM_OT_REBatchExporter(Operator):
 	   update = update_uncheckAllItems
 	   )
 	
+	skipPrompt : bpy.props.BoolProperty(#Not exposed to user
+	   name = "Skip Conversion Prompt",
+	   description = "",
+	   default = False)
 	def execute(self, context):
 		print("Batch export started.")
 		
@@ -503,17 +507,19 @@ class WM_OT_REBatchExporter(Operator):
 								item.path = determineExportPath(split[0],item.exportType,assetPath.replace("/",os.sep),bpy.context.scene)
 					except Exception as err:
 						print(f"Batch Export: Cannot auto determine path for {item.name}: {str(err)}")
-		#Move cursor to center so extract window is at the center of the window
-		context.window.cursor_warp(centerX,centerY)
-	
-		return context.window_manager.invoke_props_dialog(self,width = EXPORTER_WINDOW_SIZE,confirm_text = "Batch Export Files")
+		if self.skipPrompt:
+			return self.execute(context)
+		else:
+			#Move cursor to center so extract window is at the center of the window
+			context.window.cursor_warp(centerX,centerY)
+		
+			return context.window_manager.invoke_props_dialog(self,width = EXPORTER_WINDOW_SIZE,confirm_text = "Batch Export Files")
 
 	
 	def draw(self,context):
 		layout = self.layout
 		rowCount = 13
 		uifontscale = 9 * context.preferences.view.ui_scale
-		max_label_width = int((EXPORTER_WINDOW_SIZE*(1-SPLIT_FACTOR)*(2-SPLIT_FACTOR)) // uifontscale)
 		row = layout.row().separator()
 		split = layout.split(factor = SPLIT_FACTOR)#Indent list slightly to make it more clear it's a part of a sub panel
 		col1 = split.column()
@@ -580,4 +586,12 @@ class WM_OT_SolveRepeatedUVs(Operator):
 			self.report({"INFO"},"Solved repeated UVs on all objects.")
 		else:
 			self.report({"INFO"},"Solved repeated UVs on selected objects.")
+		return {'FINISHED'}
+	
+class WM_OT_QuickBatchExport(Operator):
+	bl_label = "Quick Batch Export"
+	bl_idname = "re_mesh.quick_batch_export"
+	bl_description = "Single click batch export. Works the same as RE Batch Export but there is no prompt to configure settings.\nThe previous settings of RE Batch Export are used."
+	def execute(self, context):
+		bpy.ops.re_mesh.batch_exporter(skipPrompt = True)
 		return {'FINISHED'}

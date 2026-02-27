@@ -39,11 +39,7 @@ def loadTex(texPath,outputPath,texConv,reloadCachedTextures,useDDS):
 			else:
 				arrayMaxExceeded = False
 			if texInfo["isArray"] and not arrayMaxExceeded:
-				digitCount = 2
-				if texInfo["arrayNum"] > 99:
-					digitCount = 3
-				elif texInfo["arrayNum"] > 999:#Highest possible image count is technically 4095 but I'm going to pretend nobody will try to make something that unholy
-					digitCount = 4
+				digitCount = max((2,len(str(texInfo["arrayNum"]))))
 				#print("TEX ARRAY FOUND")
 				newDDSPathRoot = os.path.splitext(ddsPath)[0]+ " #ARRAY_"
 				print(f"Converting array texture: {texPath}")
@@ -66,11 +62,7 @@ def loadTex(texPath,outputPath,texConv,reloadCachedTextures,useDDS):
 							raiseWarning("Could not delete temporary dds file: {newDDSPath}")
 			else:#Convert single image tex
 				if arrayMaxExceeded:
-					digitCount = 2
-					if texInfo["arrayNum"] > 99:
-						digitCount = 3
-					elif texInfo["arrayNum"] > 999:#Highest possible image count is technically 4095 but I'm going to pretend nobody will try to make something that unholy
-						digitCount = 4
+					digitCount = max((2,len(str(texInfo["arrayNum"]))))
 					#print("TEX ARRAY FOUND")
 					ddsPath = f"{os.path.splitext(ddsPath)[0]} #ARRAY_{str(0)*digitCount}.dds"
 				if not useDDS:

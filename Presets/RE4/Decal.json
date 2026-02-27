@@ -1,0 +1,101 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE4",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "DecalMat",
+        "Master Material Path": "_Chainsaw/MasterMaterial/Master/Env_Decal.mmtr",
+        "Material Shader Type": "1"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 0,
+        "FlagBitFlagB": 2,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BasicMap_Tiling_Offset",
+            "Data Type": "VEC4",
+            "Value": [
+                1.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BasicMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BasicMap_Tiling",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_AdvancedUVSetting",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaThreshold",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaContrast",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wetness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 4
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "_Chainsaw/MasterMaterial/Textures/NullWhiteBlack.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessCavityMap",
+            "Texture Path": "systems/rendering/NullNormalRoughnessOcclusion.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionSSSMap",
+            "Texture Path": "systems/rendering/NullATOS.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

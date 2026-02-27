@@ -82,7 +82,8 @@ albedoTypeSet = set([
 	"Face_BaseDielectricMap",
 	"Moon_Tex",
 	"Sky_Top_Tex",
-	"RTReflectionBaseMap"
+	"RTReflectionBaseMap",
+	"SecondaryBaseColorMap",
 	#"IrisBaseMap"
 
 	])
@@ -168,16 +169,20 @@ ATOSTypes = set([
 	"AlphaTranslucentOcclusionCavityMap",
 	"AlphaTranslucentOcclusionSSSMap",
 	"ATOCorASOC",
+	"AlphaCavityOcclusionTranslucentMap",
 	])
 NAMTypes = set([
 	"Stitch_NAM",
+	"StitchMap",
 	])
 OCTDTypes = set([
 	"OcclusionCavityTranslucentDetailMap",
 	"OcclusionCavitySSSDetailMap",
 	"OcclusionCavityMaskAnisoMap",
 	])
-
+SCOTTypes = set([
+	"SSSCavityOcclusionTranslucentMap",
+	])
 MiscMapTypes = set([
 	"SkinMap",
 	"HairOverMap",
@@ -187,7 +192,8 @@ MiscMapTypes = set([
 	"Tex_Effect",
 	"Tex_Normal",
 	"tex_lineMusk",
-	"Tex2D_0"
+	"Tex2D_0",
+	"FakeSpecular",
 	
 	#"Detail_ALBD_R",
 	#"Detail_ALBD_G",
@@ -210,6 +216,7 @@ usedTextureSet.update(normalTypeSet)
 usedTextureSet.update(alphaTypeSet)
 usedTextureSet.update(ATOSTypes)
 usedTextureSet.update(OCTDTypes)
+usedTextureSet.update(SCOTTypes)
 usedTextureSet.update(NAMTypes)
 usedTextureSet.update(MiscMapTypes)
 
@@ -275,8 +282,8 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 		".241111606":".45",#MHWILDS
 		".240827123":".46",#ONI2
 		".250604100":".49",#MHS3
-		".250925211":".51",#PRAG
-		#".250925212":".52",#RE9 Placeholder
+		#".250925211":".51",#PRAG
+		".250925211":".51",#RE9
 		
 		
 		}
@@ -302,6 +309,16 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 		if not os.path.isfile(mdfPath):
 			print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
 			mdfPath = f"{fileRoot}_A.mdf2{mdfVersion}"	
+		
+		if gameName == "RE9" and not os.path.isfile(mdfPath):
+			mdfPath = f"{fileRoot}_00.mdf2{mdfVersion}"
+			if not os.path.isfile(mdfPath):
+				print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
+				mdfPath = f"{fileRoot}_01.mdf2{mdfVersion}"
+			if not os.path.isfile(mdfPath):
+				print(f"Could not find {mdfPath}.\n Trying alternate mdf names...")
+				mdfPath = f"{fileRoot}_02.mdf2{mdfVersion}"
+		
 		if not os.path.isfile(mdfPath) and fileRoot.endswith("_f"):
 			
 			mdfPath = f"{fileRoot[:-1] + 'm'}.mdf2{mdfVersion}"#DD2 female armor uses male mdf, so replace _f with _m
@@ -514,12 +531,17 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						textureNodeInfoList.append(("CMASK",textureType,imageList,outputPath))
 					elif textureType in emissionTypeSet:
 						textureNodeInfoList.append(("EMI",textureType,imageList,outputPath))
-					elif textureType in ATOSTypes:
-						textureNodeInfoList.append(("ATOS",textureType,imageList,outputPath))
 					elif textureType in NAMTypes:
 						textureNodeInfoList.append(("NAM",textureType,imageList,outputPath))
+					elif textureType in ATOSTypes:
+						textureNodeInfoList.append(("ATOS",textureType,imageList,outputPath))
+					
 					elif textureType in OCTDTypes:
 						textureNodeInfoList.append(("OCTD",textureType,imageList,outputPath))
+					elif textureType in SCOTTypes:
+						textureNodeInfoList.append(("SCOT",textureType,imageList,outputPath))
+						
+					
 					elif autoDetectedAlbedo:
 						textureNodeInfoList.append(("ALB",textureType,imageList,outputPath))
 					
@@ -614,6 +636,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					newNode = addImageNode(blenderMaterial.node_tree,textureType,imageList,texturePath,(currentXPos,currentYPos))
 					currentYPos += 350
 					#print(newNode)
+	
 					matInfo["textureNodeDict"][textureType] = newNode
 					
 					if newNode.bl_idname == "ShaderNodeGroup":
@@ -965,14 +988,20 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						if dirtRoughnessNode != None:
 							matInfo["roughnessNodeLayerGroup"].addMixLayer(dirtRoughnessNode.outputs["Value"],DirtWearSepNode.outputs["Blue"],mixType = "MULTIPLY")
 					
-				
+				if matInfo["gameName"] == "RE9":
+					if "ch_hair" in matInfo["mmtrName"]:
+						matInfo["disableAO"] = True#TODO Figure out what's wrong with secondary UV hair AO
+					if "SecondaryBaseColorMap" in matInfo["textureNodeDict"]:
+						secondaryBaseColorNode = matInfo["textureNodeDict"]["SecondaryBaseColorMap"]
+						matInfo["albedoNodeLayerGroup"].addMixLayer(secondaryBaseColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
 				#MHWilds detail map
 				#TODO - will come back to this
 				
 				#RE4 detail map
-				if "DetailMap" in matInfo["textureNodeDict"] and matInfo["gameName"] != "PRAG":#Disable detail maps for pragmata since they don't look right yet
+				if "DetailMap" in matInfo["textureNodeDict"] and matInfo["gameName"] != "PRAG":
 					detailMapNode = matInfo["textureNodeDict"]["DetailMap"]
 					currentPos = [detailMapNode.location[0]+300,detailMapNode.location[1]]
+					
 					#R Normal X
 					#G Normal Y
 					#B Cavity
@@ -1114,6 +1143,8 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					links.new(normalInfluenceNode.outputs["Value"],detailNormalNode.inputs["Strength"])
 					links.new(nodeGroupNode.outputs["Color"],detailNormalNode.inputs["Color"])
 					matInfo["detailNormalSocket"] = detailNormalNode.outputs["Normal"]
+				
+				
 				#Texture map overrides
 				
 				
@@ -1156,7 +1187,9 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				#if "eye" in matInfo["mmtrName"]:
 				if "eye" in matInfo["blenderMaterial"].name or "eye" in matInfo["mmtrName"] or matInfo["mmtrName"].endswith("_ao.mmtr"):
 					#Tearline mat setup
-					
+					if "FakeSpecular" in matInfo["textureNodeDict"]:
+							matInfo["alphaSocket"] = nodes["FakeSpecular"].outputs["Color"]#RE9 TODO Figure out eye shell rendering properly
+							
 					if "TearColor" in matInfo["mPropDict"]:  
 						baseColorNode = addPropertyNode(matInfo["mPropDict"]["TearColor"], matInfo["currentPropPos"], nodeTree)
 						matInfo["albedoNodeLayerGroup"].addMixLayer(baseColorNode.outputs["Color"],factorOutSocket = None,mixType = "MULTIPLY",mixFactor = 1.0)
@@ -1193,7 +1226,7 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 					if "lens" in matInfo["blenderMaterial"].name.lower():
 						matInfo["isAlphaBlend"] = True
 						
-				if "Alpha" in matInfo["mPropDict"]:  
+				if "Alpha" in matInfo["mPropDict"] and "StitchMap" not in matInfo["textureNodeDict"]:  
 					alphaNode = addPropertyNode(matInfo["mPropDict"]["Alpha"], matInfo["currentPropPos"], nodeTree)
 					if matInfo["alphaSocket"] == None:
 						matInfo["alphaSocket"] = alphaNode.outputs["Value"]
@@ -1385,23 +1418,23 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 						links.new(normalNode.outputs["Normal"],nodeBSDF.inputs["Normal"])
 					else:
 						detailNodeLoc = matInfo["detailNormalSocket"].node.location
-						if "textureCoordinateNode" in nodeTree.nodes:
-							textureCoordinateNode = nodeTree.nodes["textureCoordinateNode"]
+						if "geometryNode" in nodeTree.nodes:#Changed this from tex coord normal to geometry normal, so that the normals don't break when the model rotates
+							geometryNode = nodeTree.nodes["geometryNode"]
 						else:
-							textureCoordinateNode = nodeTree.nodes.new("ShaderNodeTexCoord")
-							textureCoordinateNode.name = "textureCoordinateNode"
-							textureCoordinateNode.location = (-800,400)
+							geometryNode = nodeTree.nodes.new("ShaderNodeNewGeometry")
+							geometryNode.name = "geometryNode"
+							geometryNode.location = (-800,400)
 						crossProductNode =  nodeTree.nodes.new("ShaderNodeVectorMath")
 						crossProductNode.location = (detailNodeLoc[0] + 300,detailNodeLoc[1]+300)
 						crossProductNode.operation = "CROSS_PRODUCT"
 						links.new(matInfo["detailNormalSocket"],crossProductNode.inputs[0])
-						links.new(textureCoordinateNode.outputs["Normal"],crossProductNode.inputs[1])
+						links.new(geometryNode.outputs["Normal"],crossProductNode.inputs[1])
 						
 						dotProductNode = nodeTree.nodes.new("ShaderNodeVectorMath")
 						dotProductNode.location = (detailNodeLoc[0] + 300,detailNodeLoc[1])
 						dotProductNode.operation = "DOT_PRODUCT"
 						links.new(matInfo["detailNormalSocket"],dotProductNode.inputs[0])
-						links.new(textureCoordinateNode.outputs["Normal"],dotProductNode.inputs[1])
+						links.new(geometryNode.outputs["Normal"],dotProductNode.inputs[1])
 						
 						arcCosineNode =  nodeTree.nodes.new("ShaderNodeMath")
 						arcCosineNode.location = (detailNodeLoc[0] + 600,detailNodeLoc[1])

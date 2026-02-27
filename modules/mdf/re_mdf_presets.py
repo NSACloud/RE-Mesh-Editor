@@ -104,14 +104,18 @@ def saveAsPreset(activeObj,presetName,gameName):
 		showErrorMessageBox("A material object must be selected when saving a preset.")
 		
 
-def readPresetJSON(filepath):
-	mdfCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
+def readPresetJSON(filepath,targetCollection = None):
+	materialObj = None
+	if targetCollection == None:
+		mdfCollection = bpy.context.scene.re_mdf_toolpanel.mdfCollection
+	else:
+		mdfCollection = targetCollection
 	if mdfCollection != None:	
 		try:
 			with open(filepath) as jsonFile:
 				materialJSONDict = json.load(jsonFile)
 				if materialJSONDict["presetVersion"] > PRESET_VERSION:
-					showErrorMessageBox("Preset was created in a newer version and cannot be used. Update to the latest version of the MDF editor.")
+					showErrorMessageBox("Preset was created in a newer version and cannot be used. Update to the latest version of the mesh editor.")
 					return False
 				
 		except Exception as err:
@@ -194,7 +198,7 @@ def readPresetJSON(filepath):
 		bpy.context.view_layer.objects.active = materialObj
 	else:
 		showErrorMessageBox("The active MDF collection must be set.")
-	return True
+	return materialObj
 def reloadPresets(folderPath):
 	presetList = []
 	relPathStart = os.path.join(PRESET_DIR,folderPath)

@@ -1,0 +1,185 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE4",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "StageMat",
+        "Master Material Path": "_Chainsaw/MasterMaterial/Master/Env_Default.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 134217864,
+        "FlagBitFlagB": 2,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BasicMap_Tiling_Offset",
+            "Data Type": "VEC4",
+            "Value": [
+                1.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BasicMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OcclusionMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BasicMap_Tiling",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_AdvancedUVSetting",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_ATOSMap",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTestRef",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DissolveRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSS_Channel",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Debug_Rain",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_OCCGreenChannel_For_RainMask",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LocalUseRain",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rain_Tiling",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wetness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainStreak_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrops_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainStreak_Speed",
+            "Data Type": "FLOAT",
+            "Value": 0.800000011920929,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrops_Speed",
+            "Data Type": "FLOAT",
+            "Value": 0.550000011920929,
+            "Padding": 4
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "_Chainsaw/MasterMaterial/Textures/NullWhiteBlack.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessCavityMap",
+            "Texture Path": "systems/rendering/NullNormalRoughnessOcclusion.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionSSSMap",
+            "Texture Path": "systems/rendering/NullATOS.tex"
+        },
+        {
+            "Texture Type": "OcclusionMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "RainStreakMaskMap",
+            "Texture Path": "_Chainsaw/MasterMaterial/Textures/RainMask2_NRRC.tex"
+        },
+        {
+            "Texture Type": "RainDropsMaskMap",
+            "Texture Path": "_Chainsaw/MasterMaterial/Textures/RainMask1_NRRC.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

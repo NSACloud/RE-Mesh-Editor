@@ -1,0 +1,997 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "MHWILDS",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "ShellFurMat_UseSC",
+        "Master Material Path": "MaterialShader/Variation/Base_Equip_Fur.mmtr",
+        "Material Shader Type": "25"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": -2013265765,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "ColorParam",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Emissive_Color",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "RayTrace_BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ObjectOffset",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BB_Min",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BB_Max",
+            "Data Type": "VEC4",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_ColorParam1",
+            "Data Type": "COLOR",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_ColorParam2",
+            "Data Type": "COLOR",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param1",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param2",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param3",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param4",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param5",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param6",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param7",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param8",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param9",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFX_Param10",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "HairOverColorA",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "HairOverColorB",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_A",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_B",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_C",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_D",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_E",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_F",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_G",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_H",
+            "Data Type": "VEC4",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorLayer_R",
+            "Data Type": "COLOR",
+            "Value": [
+                0.5686274766921997,
+                0.41960784792900085,
+                0.2705882489681244,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorLayer_G",
+            "Data Type": "COLOR",
+            "Value": [
+                0.18431372940540314,
+                0.13333334028720856,
+                0.08235294371843338,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorLayer_B",
+            "Data Type": "COLOR",
+            "Value": [
+                0.501960813999176,
+                0.501960813999176,
+                0.501960813999176,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorLayer_A",
+            "Data Type": "COLOR",
+            "Value": [
+                0.501960813999176,
+                0.501960813999176,
+                0.501960813999176,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorLayer_Roughness",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorLayer_Mask_Width",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ColorLayer_Mask_Fade",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wind_Effect_Scale",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wind_Effect_Speed",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wind_Effect_Power",
+            "Data Type": "FLOAT",
+            "Value": 0.05000000074505806,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fur_Push",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fur_Stand",
+            "Data Type": "FLOAT",
+            "Value": 0.029999999329447746,
+            "Padding": 0
+        },
+        {
+            "Property Name": "GpuWind_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_GpuWind_NormalMask",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_WaveMove",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Roughness",
+            "Data Type": "FLOAT",
+            "Value": 0.25,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Basecolor_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseBaseColorFilm",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FullFIlm",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Thickness_Scale",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IOR_Scale",
+            "Data Type": "FLOAT",
+            "Value": 0.0010000000474974513,
+            "Padding": 0
+        },
+        {
+            "Property Name": "VFXBlend_Weight",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DynamicMat_Weight",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Stain_ID",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DynamicMat_Tex_Tile",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HairOverColorA_B_Contrast",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HairOverColorA_B_Shift",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_MultiBlend_NRRO",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_EmitMask",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseSecondaryUV_ColorLayer_MaskMap",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RoughnessParam",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "MetalParam",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "TranslucentParam",
+            "Data Type": "FLOAT",
+            "Value": 4.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_RimTranslucent",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTrasnlucent_Power",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTranslucent_NormalBlend",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OcclusionParam",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSParam",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSProfile",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_Basecolor_to_Emissive",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fix_BaseColor_to_Emissive",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Emissive_Power",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Emissive_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseCounterExposureEmit",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CounterExposureEmit_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaAdjust",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTest_Ref",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseTempDither",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DitherShift",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseAOSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AO_to_Cavity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 4
+        },
+        {
+            "Property Name": "ChangeUV",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HorizonFade",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_AntiTranslucent_Diffuse",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PassThrough",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dissolve",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WetBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SandBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_VertexColor_Offset",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RayTrace_Emissive_Booster",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AnimEmit_Min",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AnimEmit_Speed",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseWaveEmit",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WetHeightMask_Width",
+            "Data Type": "FLOAT",
+            "Value": 0.20000000298023224,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AnimEmitWave",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_InstanceID",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_MoveEmit",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "MoveEmit",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "MoveEmit_Width",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Film_Thickness",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Film_IOR",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Film_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeRefraction_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Refraction_Index",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fuzz_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fuzz_Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Enable_VFXMaterialBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Sand_Weight",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseHairOverMap",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PrimaryUV_OverMap",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FurNoise_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.5600000023841858,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fur_Density",
+            "Data Type": "FLOAT",
+            "Value": -8.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FurNormal_Blend",
+            "Data Type": "FLOAT",
+            "Value": 0.009999999776482582,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FurAlpha_Contrast",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FurAlpha_Fade",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FurKink",
+            "Data Type": "FLOAT",
+            "Value": 0.2680000066757202,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_num",
+            "Data Type": "FLOAT",
+            "Value": 4.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "use_overlay",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_Contrast",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blend_Alpha_Threshold",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "sRGB_Overlay",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UseOverRay_ColorLayer",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 8
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "MP_noise",
+            "Texture Path": "MasterMaterial/Textures/MP_noise_MSK4.tex"
+        },
+        {
+            "Texture Type": "Wind_Effect_VolumeMap",
+            "Texture Path": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Vectorfield/tex_capcom_vectorfield_0003_MSK4.tex"
+        },
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessOcclusionMap",
+            "Texture Path": "systems/rendering/NullNormalRoughnessOcclusion.tex"
+        },
+        {
+            "Texture Type": "EmissiveMap",
+            "Texture Path": "MasterMaterial/Textures/NullBlack_Alpha_MSK4.tex"
+        },
+        {
+            "Texture Type": "FxMap",
+            "Texture Path": "MasterMaterial/Textures/NullBlack_Alpha_MSK4.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionSSSMap",
+            "Texture Path": "systems/rendering/NullATOS.tex"
+        },
+        {
+            "Texture Type": "noisemap",
+            "Texture Path": "MasterMaterial/Textures/bluenoise_msk1.tex"
+        },
+        {
+            "Texture Type": "PanoramaMap",
+            "Texture Path": "MasterMaterial/Textures/kirakira_PAN_ALB.tex"
+        },
+        {
+            "Texture Type": "VFX_Texture2D",
+            "Texture Path": "MasterMaterial/Textures/VFX_Uber/VFX_Uber_MSK4.tex"
+        },
+        {
+            "Texture Type": "VFX_Texture3D",
+            "Texture Path": "MasterMaterial/Textures/VFX_Uber/VFX_Uber3D_MSK4.tex"
+        },
+        {
+            "Texture Type": "HairOverMap",
+            "Texture Path": "systems/rendering/NullGray.tex"
+        },
+        {
+            "Texture Type": "FurNoiseMap",
+            "Texture Path": "MasterMaterial/Textures/FurNoise/FurPattern_04_v4.tex"
+        },
+        {
+            "Texture Type": "FurFlowMap",
+            "Texture Path": "systems/rendering/NullNormal.tex"
+        },
+        {
+            "Texture Type": "MultiBlend_ALBDMap",
+            "Texture Path": "systems/rendering/NullGray.tex"
+        },
+        {
+            "Texture Type": "MultiBlend_NRMMap",
+            "Texture Path": "systems/rendering/NullNormal.tex"
+        },
+        {
+            "Texture Type": "GpuWind_MaskMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "ColorLayer_MaskMap",
+            "Texture Path": "MasterMaterial/Textures/NullBlack_Alpha_MSK4.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": [
+        "DynamicMat_BAB,MasterMaterial/ByteAddressBuffer/StainMeshBAB.gpbf,0,1",
+        "FoliageBAB_StaticParam,MasterMaterial/ByteAddressBuffer/FoliageBAB_StaticParam.gpbf,0,1",
+        "FoliageBAB_DynamicParam,MasterMaterial/ByteAddressBuffer/FoliageBAB_DynamicParam.gpbf,0,1",
+        "MultiBlend_BAB,systems/rendering/Empty.gpbf,0,1"
+    ]
+}

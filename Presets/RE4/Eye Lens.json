@@ -1,0 +1,214 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE4",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "EyeLensMat",
+        "Master Material Path": "_Chainsaw/MasterMaterial/Master/Character_ReflectiveTransparent.mmtr",
+        "Material Shader Type": "14"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 144,
+        "FlagBitFlagB": 2,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilFilmMaskMap_Tiling_Offset",
+            "Data Type": "VEC4",
+            "Value": [
+                1.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeCatch_Color",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 0.699999988079071,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 0.30000001192092896,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Occlusion",
+            "Data Type": "FLOAT",
+            "Value": 0.25,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Cavity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Alpha",
+            "Data Type": "FLOAT",
+            "Value": 0.2199999988079071,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeGlassIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeGlassColor_Add",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeGlass_Enable",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Enable_OilFilm",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilFilm_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilFilm_Thickness",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilFilm_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeSphere_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeSphere_DisTransparent",
+            "Data Type": "FLOAT",
+            "Value": 0.25,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeCatch_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeCatch_Radius",
+            "Data Type": "FLOAT",
+            "Value": 0.05000000074505806,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeCatch_Blur",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeCatch_Horizontal",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EyeCatch_Vertical",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dissolve_Saturation",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Enable_BlueNoiseDither",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 8
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "_Chainsaw/MasterMaterial/Textures/NullWhiteBlack.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "_Chainsaw/Character/Textures/Eye/EyeCover_NRMR.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionCavityMap",
+            "Texture Path": "_Chainsaw/Character/Textures/Eye/EyeCover_ATOC.tex"
+        },
+        {
+            "Texture Type": "FakeGlassMap",
+            "Texture Path": "_Chainsaw/MasterMaterial/Textures/FakeGlass_ALBA.tex"
+        },
+        {
+            "Texture Type": "OilFilmMaskMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "FakeSphereMap",
+            "Texture Path": "_Chainsaw/Character/Textures/Eye/BH_human_eye_BM.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}
