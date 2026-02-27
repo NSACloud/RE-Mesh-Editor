@@ -10,7 +10,7 @@
 This addon allows for importing and exporting of RE Engine mesh and mdf2 (material) files natively in Blender.
 ### [Download RE Mesh Editor](https://github.com/NSACloud/RE-Mesh-Editor/archive/refs/heads/main.zip)
 
-<img width="1718" height="968" alt="meshEditorPreview" src="https://github.com/user-attachments/assets/df5c3f7f-a4a2-4f97-98d5-c747b5124a55" />
+<img width="1888" height="945" alt="image" src="https://github.com/user-attachments/assets/3a072b6e-fa98-43d1-9fb0-34c2942c97a1" />
 
 ## Features
  - Allows for importing and exporting of RE Engine mesh files.
