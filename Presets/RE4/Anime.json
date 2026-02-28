@@ -1,0 +1,110 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE4",
+    "presetVersion": 4,
+    "Material Header": {
+        "Material Name": "AnimeMat",
+        "Master Material Path": "_Chainsaw/Test/escapeOnline/MasterMaterial/Master/Env_Emissive.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": 0,
+        "Ver32Unknown1": 0,
+        "Ver32Unknown2": 0,
+        "FlagBitFlag": 149
+    },
+    "Property List": [
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "EmissiveColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "EmissiveIntensity",
+            "Data Type": "FLOAT",
+            "Value": 10.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EmissiveRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EmissiveRateGamma",
+            "Data Type": "FLOAT",
+            "Value": 4.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 10.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "UV_Select",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "bUseFlicker",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FlickerFreq",
+            "Data Type": "FLOAT",
+            "Value": 0.0010000000474974513,
+            "Padding": 0
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseMetalMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "EmissiveMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

@@ -1,0 +1,83 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE3",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "pl2001_Eyes_In_Mat",
+        "Master Material Path": "MasterMaterial/Master/EyeLeon.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 16,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "MetallicMod",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RoughnessMod",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HieghtScale",
+            "Data Type": "FLOAT",
+            "Value": 0.949999988079071,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HightThrethold",
+            "Data Type": "FLOAT",
+            "Value": 0.15000000596046448,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ON_multiply_OFF_add",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 12
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "SpecularMap",
+            "Texture Path": "SectionRoot/Character/Player/pl1000/pl1050/pl1050_Face_SPC.tex"
+        },
+        {
+            "Texture Type": "BaseMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "HeightMap",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "RoughnessMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "Metallic",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "NormalMap",
+            "Texture Path": "systems/rendering/NullNormal.tex"
+        },
+        {
+            "Texture Type": "FakeSphereMap",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

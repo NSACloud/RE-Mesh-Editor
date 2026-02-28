@@ -75,11 +75,11 @@ class SingletonUpdater:
         self._version_max_update = None
 
         # By default, backup current addon on update/target install.
-        self._backup_current = True
+        self._backup_current = False
         self._backup_ignore_patterns = None
 
         # Set patterns the files to overwrite during an update.
-        self._overwrite_patterns = ["*.py", "*.pyc"]
+        self._overwrite_patterns = ["*.py", "*.pyc","*.dll","*.so","*.json","*.dylib"]
         self._remove_pre_update_patterns = list()
 
         # By default, don't auto disable+re-enable the addon after an update,

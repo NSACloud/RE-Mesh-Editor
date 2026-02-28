@@ -1,0 +1,180 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE7RT",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "pl9000_Body_m",
+        "Master Material Path": "MasterMaterial/Master/Record_Ethan_Body.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 134217856,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "TranslucencyIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTestRef",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlbedoOffsetIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "skin_enable",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blood_DarkMask_min",
+            "Data Type": "FLOAT",
+            "Value": 0.5099999904632568,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blood_DarkMask_max",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blood_NormalBlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SlightInjury_uvScale",
+            "Data Type": "FLOAT",
+            "Value": 4.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Risotto_uvScale",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Stain_uvScale",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ClothDamage_uvScale",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SlightInjury_NormalHaightRange",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Risotto_DarkMaskRate",
+            "Data Type": "FLOAT",
+            "Value": 0.6499999761581421,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Stamp_use_SecondaryUV",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Burn_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Burn_BlackRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 8
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BaseMetalMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionSSSMap",
+            "Texture Path": "systems/rendering/NullATOS.tex"
+        },
+        {
+            "Texture Type": "SlightInjury_Map_ALB",
+            "Texture Path": "VFX/VFX_RecordSystem/VFX_RecordTexture/BaseTexture/SlightInjury_Map_ALB.tex"
+        },
+        {
+            "Texture Type": "SlightInjury_Map_NRM",
+            "Texture Path": "VFX/VFX_RecordSystem/VFX_RecordTexture/BaseTexture/SlightInjury_Map_NRM.tex"
+        },
+        {
+            "Texture Type": "Risotto_Map_ALB",
+            "Texture Path": "VFX/VFX_RecordSystem/VFX_RecordTexture/BaseTexture/Risotto_Map_ALB.tex"
+        },
+        {
+            "Texture Type": "Risotto_Map_NRM",
+            "Texture Path": "VFX/VFX_RecordSystem/VFX_RecordTexture/BaseTexture/Risotto_Map_NRM.tex"
+        },
+        {
+            "Texture Type": "Stain_Cloth_Bum_Map_MSK4",
+            "Texture Path": "VFX/VFX_RecordSystem/VFX_RecordTexture/BaseTexture/Stain_Cloth_Bum_Map_MSK3.tex"
+        },
+        {
+            "Texture Type": "RecordSys_rtt",
+            "Texture Path": "CH9/VFX/VFX_RecordSystem/VFX_RecordTexture/pl9000/pl9002_RecordSys_rtt.rtex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

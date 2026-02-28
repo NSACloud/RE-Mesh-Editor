@@ -1,0 +1,59 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE3RT",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "pl2001_Tearline_Mat",
+        "Master Material Path": "MasterMaterial/Master/Eye_Tear.mmtr",
+        "Material Shader Type": "1"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 4,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "ColorParam",
+            "Data Type": "COLOR",
+            "Value": [
+                0.250980406999588,
+                0.09803921729326248,
+                0.062745101749897,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BeginBlendFactor",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EndBlendFactor",
+            "Data Type": "FLOAT",
+            "Value": 0.3499999940395355,
+            "Padding": 0
+        },
+        {
+            "Property Name": "TearBlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.009999999776482582,
+            "Padding": 0
+        },
+        {
+            "Property Name": "TearRoughness",
+            "Data Type": "FLOAT",
+            "Value": 0.15000000596046448,
+            "Padding": 0
+        }
+    ],
+    "Texture Bindings": [],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

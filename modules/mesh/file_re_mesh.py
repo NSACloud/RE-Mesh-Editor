@@ -889,7 +889,7 @@ class FileHeader():
 		self.magic = 1213416781
 		self.version = 0
 		self.fileSize = 0
-		self.unknHash = 0
+		self.lodGroupNameHash = 0#This determines what LOD distance scaling to use based on category of object
 		self.contentFlag = ContentFlag() #Bitflag 1000 XXXX-[GroupPivot/Floats][Blendshape][Skeleton][AABB]
 		self.nameCount = 0
 		self.unkn = 0
@@ -938,7 +938,7 @@ class FileHeader():
 				raise Exception("File is not an RE mesh file.")
 		self.version = read_uint(file)
 		self.fileSize = read_uint(file)
-		self.unknHash = read_uint(file)
+		self.lodGroupNameHash = read_uint(file)
 		
 		
 		if version < VERSION_SF6:
@@ -1033,7 +1033,7 @@ class FileHeader():
 		write_uint(file, self.magic)
 		write_uint(file, self.version)
 		write_uint(file, self.fileSize)
-		write_uint(file, self.unknHash)
+		write_uint(file, self.lodGroupNameHash)
 		
 		
 		if version < VERSION_SF6:
@@ -2390,7 +2390,7 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 	
 	if version == VERSION_SF6:
 		reMesh.fileHeader.sf6UnknCount = 6
-		reMesh.fileHeader.unknHash = 3407096719	
+		reMesh.fileHeader.lodGroupNameHash = 3407096719	
 	
 	
 	currentOffset = getPaddedPos(reMesh.meshBufferHeader.faceBufferOffset + reMesh.meshBufferHeader.faceBufferSize,16)

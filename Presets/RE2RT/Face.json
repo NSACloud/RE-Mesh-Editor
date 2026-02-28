@@ -1,0 +1,307 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE2RT",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "pl1050_Face_Mat",
+        "Master Material Path": "MasterMaterial/Master/Record_Player_Face.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 134217880,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "Adjust",
+            "Data Type": "VEC4",
+            "Value": [
+                11.0,
+                0.0,
+                4.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "AmbientColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.3450980484485626,
+                0.21568627655506134,
+                0.18039216101169586,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_RTTChannelControl",
+            "Data Type": "VEC4",
+            "Value": [
+                0.8999999761581421,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_RTTUseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Cloth",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_DentMapUseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Dent_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSS_ProfileNumber",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IndirectLight_InfluenceRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTestRef",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_smooth_min",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_smooth_max",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_EmissiveIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_DiffuseIntensity",
+            "Data Type": "FLOAT",
+            "Value": 5.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_Scale",
+            "Data Type": "FLOAT",
+            "Value": 4.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_WetRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_RainRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Rain_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Injury_InSideUVScale",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Injury_OutSideUVScale",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Mud_UVScale",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Mud_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_BurnUVScale",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_0",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_1",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_2",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodMask_Rate_3",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 12
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "BlendNRMR",
+            "Texture Path": "systems/rendering/NullNormal.tex"
+        },
+        {
+            "Texture Type": "PressureMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "IntensityMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "BaseMetalMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionSSSMap",
+            "Texture Path": "systems/rendering/NullATOS.tex"
+        },
+        {
+            "Texture Type": "Rec_RTT",
+            "Texture Path": "VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_FIX",
+            "Texture Path": "VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_Protect",
+            "Texture Path": "VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_Rain_WaterRiple",
+            "Texture Path": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Vector/tex_capcom_vector_water_0011_Array_NRMR.tex"
+        },
+        {
+            "Texture Type": "Rec_Rain_WetMask",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "Rec_Injury_BaseMap",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "Rec_Injury_NormalMap",
+            "Texture Path": "VFX/RecordSystem/RecordTexture/BaseTextures/Record_InjuryMap_NRM.tex"
+        },
+        {
+            "Texture Type": "Rec_Mud_Map",
+            "Texture Path": "VFX/RecordSystem/RecordTexture/BaseTextures/Record_Mad_Map_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_Dent_Map",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "BloodMask",
+            "Texture Path": "VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

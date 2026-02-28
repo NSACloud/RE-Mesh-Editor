@@ -1,0 +1,231 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE3RT",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "pl2005_Hair_Mat",
+        "Master Material Path": "MasterMaterial/Master/Record_Player_Hair.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 131,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "PrimalySpecularColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.6627451181411743,
+                0.6470588445663452,
+                0.6352941393852234,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "SecondarySpecularColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.20392157137393951,
+                0.1921568661928177,
+                0.18431372940540314,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "LightDirection",
+            "Data Type": "VEC4",
+            "Value": [
+                0.5137255191802979,
+                0.250980406999588,
+                0.250980406999588,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "SpecularMaskIntensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SpecularIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.2199999988079071,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Primaly_Anisotropy",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Secondary_AnisoOffset",
+            "Data Type": "FLOAT",
+            "Value": 0.6899999976158142,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PrimalySpec_Sharpness",
+            "Data Type": "FLOAT",
+            "Value": 100.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SecondSpec_Sharpness",
+            "Data Type": "FLOAT",
+            "Value": 105.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SpecularShiftIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.23999999463558197,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LimLightIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic_EscapeChange",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BackFaceNormalReverse",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OccDark",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OccMap_BrightnessScaling",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Shadow_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IndirectLight_InfluenceRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SpecularRefrectance",
+            "Data Type": "FLOAT",
+            "Value": 0.03999999910593033,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DissolveDetail",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DissolveScale",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rain_WetRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rain_Roughness",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rain_BaseColorDarkRate",
+            "Data Type": "FLOAT",
+            "Value": 0.9399999976158142,
+            "Padding": 4
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "LimLightMap",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "BaseShiftMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionSSSMap",
+            "Texture Path": "systems/rendering/NullATOS.tex"
+        },
+        {
+            "Texture Type": "Rain_WetMask",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "Rec_RTT",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

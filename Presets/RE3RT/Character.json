@@ -1,0 +1,590 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE3RT",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "pl2000_Body_Mat",
+        "Master Material Path": "MasterMaterial/Master/Record_Player_Cloth.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 134217880,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "ParasiteDamageMap_UVOffset",
+            "Data Type": "VEC4",
+            "Value": [
+                -0.8999999761581421,
+                -2.700000047683716,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ParasiteDamageMap_ChannelControl",
+            "Data Type": "VEC4",
+            "Value": [
+                1.0,
+                0.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ParasiteDamage_Color",
+            "Data Type": "COLOR",
+            "Value": [
+                0.125490203499794,
+                0.250980406999588,
+                0.250980406999588,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_RTTChannelControl",
+            "Data Type": "VEC4",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskColoRate_1",
+            "Data Type": "VEC4",
+            "Value": [
+                0.062745101749897,
+                0.0470588244497776,
+                0.03529411926865578,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskColoRate_2",
+            "Data Type": "VEC4",
+            "Value": [
+                0.10196078568696976,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskColoRate_3",
+            "Data Type": "VEC4",
+            "Value": [
+                0.05098039284348488,
+                0.027450980618596077,
+                0.01568627543747425,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskColoRate_4",
+            "Data Type": "VEC4",
+            "Value": [
+                0.3176470696926117,
+                0.3176470696926117,
+                0.3176470696926117,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_1_UVScale",
+            "Data Type": "VEC4",
+            "Value": [
+                0.5,
+                0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_1_UVOffset",
+            "Data Type": "VEC4",
+            "Value": [
+                -0.5,
+                -0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_2_UVScale",
+            "Data Type": "VEC4",
+            "Value": [
+                0.5,
+                0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_2_UVOffset",
+            "Data Type": "VEC4",
+            "Value": [
+                -0.5,
+                -0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_3_UVScale",
+            "Data Type": "VEC4",
+            "Value": [
+                0.5,
+                0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_3_UVOffset",
+            "Data Type": "VEC4",
+            "Value": [
+                -0.5,
+                -0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_4_UVScale",
+            "Data Type": "VEC4",
+            "Value": [
+                0.5,
+                0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_4_UVOffset",
+            "Data Type": "VEC4",
+            "Value": [
+                -0.5,
+                -0.5,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "ParasiteDamage",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ParasiteDamageMap_UVScale",
+            "Data Type": "FLOAT",
+            "Value": 4.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_RTTUseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Cloth",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_DentMapUseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Dent_Rate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Detail_UVScale",
+            "Data Type": "FLOAT",
+            "Value": 0.3499999940395355,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Detail_AO_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 0.3199999928474426,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Detail_Normal_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSS_ProfileNumber",
+            "Data Type": "FLOAT",
+            "Value": 7.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTestRef",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IndirectLight_InfluenceRate",
+            "Data Type": "FLOAT",
+            "Value": 0.699999988079071,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_smooth_min",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_smooth_max",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_EmissiveIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Fresnel_DiffuseIntensity",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_RTT_V_Offset",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodRoughness_Power",
+            "Data Type": "FLOAT",
+            "Value": 100.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodRoughness_Offset",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodFlow_RTT_Noise_tiling",
+            "Data Type": "FLOAT",
+            "Value": 10.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BloodFlow_RTT_Noise_BlurPow",
+            "Data Type": "FLOAT",
+            "Value": 1.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Injury_InSideUVScale",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Injury_OutSideUVScale",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Mud_UVScale",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_Mud_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Rec_BurnUVScale",
+            "Data Type": "FLOAT",
+            "Value": 3.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtRoughness",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtUVScale",
+            "Data Type": "FLOAT",
+            "Value": 25.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dirt_DamageNormalAlpha_Rate",
+            "Data Type": "FLOAT",
+            "Value": 5.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Dirt_DamageBaseAlpha_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskRate_1",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskRate_2",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskRate_3",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "DirtMaskRate_4",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_1_Angle",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_1_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_2_Angle",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_2_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_3_Angle",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_3_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_4_Angle",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Damage_4_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 4
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "DetailMap",
+            "Texture Path": "systems/rendering/NullNormal.tex"
+        },
+        {
+            "Texture Type": "DetailMaskMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "BaseMetalMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "AlphaTranslucentOcclusionSSSMap",
+            "Texture Path": "systems/rendering/NullATOS.tex"
+        },
+        {
+            "Texture Type": "Rec_RTT",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_FIX",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_Protect",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_ParasiteDamageMap",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "BloodFlow_RTT",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "BloodFlow_RTT_Noise",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_Injury_BaseMap",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "Rec_Injury_NormalMap",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_Mud_Map",
+            "Texture Path": "Escape/VFX/RecordSystem/RecordTexture/BaseTextures/Record_Mad_Map_MSK4.tex"
+        },
+        {
+            "Texture Type": "Rec_Dent_Map",
+            "Texture Path": "systems/rendering/NullBlack.tex"
+        },
+        {
+            "Texture Type": "DirtMaskMap",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Damage_1_BaseAlphaMap",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Damage_1_NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "Damage_2_BaseAlphaMap",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Damage_2_NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "Damage_3_BaseAlphaMap",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Damage_3_NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "Damage_4_BaseAlphaMap",
+            "Texture Path": "MasterMaterial/Textures/null_black_MSK4.tex"
+        },
+        {
+            "Texture Type": "Damage_4_NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

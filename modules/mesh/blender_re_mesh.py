@@ -693,6 +693,7 @@ def importREMeshFile(filePath,options):
 		meshCollection = getCollection(meshFileName,parentCollection,makeNew = True)
 		meshCollection.color_tag = "COLOR_01"
 		meshCollection["~TYPE"] = "RE_MESH_COLLECTION"
+		meshCollection["LODGroupNameHash"] = str(reMesh.fileHeader.lodGroupNameHash)
 		try:
 				split = splitNativesPath(filePath)
 				if split != None:
@@ -1035,6 +1036,7 @@ def exportREMeshFile(filePath,options):
 	else:
 		print(f"Target collection: {targetCollection.name}")
 		bpy.context.scene["REMeshLastExportedCollection"] = targetCollection.name
+		
 	#print(targetCollection)
 	
 	meshLODCollectionList = []
@@ -1795,6 +1797,8 @@ def exportREMeshFile(filePath,options):
 	
 	meshWriteStartTime = time.time()
 	reMesh = ParsedREMeshToREMesh(parsedMesh, meshVersion)
+	if targetCollection != None:
+		reMesh.fileHeader.lodGroupNameHash = int(targetCollection.get("LODGroupNameHash","0"))
 	writeREMesh(reMesh, filePath)
 	meshWriteEndTime = time.time()
 	meshWriteExportTime =  meshWriteEndTime - meshWriteStartTime
