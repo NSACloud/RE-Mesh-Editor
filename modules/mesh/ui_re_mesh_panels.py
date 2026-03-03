@@ -39,7 +39,7 @@ class OBJECT_PT_MeshObjectModePanel(Panel):
 		layout.operator("re_mesh.remove_zero_weight_vertex_groups",icon = "MESH_DATA")
 		layout.operator("re_mesh.limit_total_normalize",icon = "MOD_VERTEX_WEIGHT")
 		layout.operator("re_mesh.batch_exporter",icon = "OUTLINER_OB_GROUP_INSTANCE")
-		layout.operator("re_mesh.quick_batch_export",icon = "OUTLINER_OB_GROUP_INSTANCE")
+		#layout.operator("re_mesh.quick_batch_export",icon = "OUTLINER_OB_GROUP_INSTANCE")#TODO FIX
 		
 class OBJECT_PT_MeshArmatureToolsPanel(Panel):
 	bl_label = "Armature Tools"

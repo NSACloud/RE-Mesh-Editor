@@ -115,10 +115,21 @@ def ReadNorBuffer(norBuffer,tags):
 	norArray = np.delete(norArray, 3, axis=1)
 	return (norArray.tolist())
 
-def ReadCompressedPosBuffer(vertexPosBuffer,use32BitPos,positionModifier,scaleModifier,partCenter):
+def ReadCompressedPosBuffer(vertexPosBuffer,bitFlag,center,relOffset):
 	
 	
-	if use32BitPos:
+	if bitFlag.flags.use24BitPos:
+		#print("DEBUG 24 bit pos")
+		byte3Array = np.frombuffer(vertexPosBuffer,dtype="<3b")
+		posArray = np.zeros(len(byte3Array),np.dtype("<3f"))
+		posArray = byte3Array * (1.0/255)
+		
+		#posArray[:,0] = byte3Array[:,0] * (1.0/255)
+		#posArray[:,1] = byte3Array[:,1] * (1.0/255)
+		#posArray[:,2] = byte3Array[:,2] * (1.0/255)
+		posArray[:] = 0#TODO FIX 24 bit import
+	elif bitFlag.flags.use32BitPos:
+		#print("DEBUG 32 bit pos")
 		packedIntArray = np.frombuffer(vertexPosBuffer,dtype="<I")
 		posArray = np.zeros(len(packedIntArray),np.dtype("<3f"))
 		
@@ -129,21 +140,24 @@ def ReadCompressedPosBuffer(vertexPosBuffer,use32BitPos,positionModifier,scaleMo
 		posArray[:,2] = ((packedIntArray >> 21) & 2047) / 2047
 		"""
 		#10-10-10 packing
-		posArray[:,0] = (packedIntArray & 1023) / 1023
-		posArray[:,1] = ((packedIntArray >> 10) & 1023) / 1023
-		posArray[:,2] = ((packedIntArray >> 20) & 1023) / 1023
-		#TODO
-		#Scaling or pos doesn't seem right on meshlets that have 10 bit packed pos
+		posArray[:,0] = (packedIntArray & 1023)
+		posArray[:,1] = ((packedIntArray >> 10) & 1023)
+		posArray[:,2] = ((packedIntArray >> 20) & 1023)
 	else:
 		posArray = np.frombuffer(vertexPosBuffer,dtype="<3H")
 		posArray = posArray.astype(dtype="f")
-		posArray /= 32767.0
-	#posArray += AABBOffset
+		posArray /= 65535.0
+		
+	#Thank you shadowcookie for figuring this out
+	num = bitFlag.asUInt32
+	divByte = (num >> 24) & 0xFF
+	multByte = (num >> 16) & 0xFF
+	divShift = (divByte - 127)
+	scale = (1 << divShift) if divShift >= 0 else (1.0 / (1 << -divShift))
+	offset = 1 << (multByte - divByte)
 	
-	#
-	posArray *= scaleModifier
-	posArray += positionModifier
-	#TODO Correct the position offset, the game does this using the part center value
+	posArray = (posArray - 0.5 + relOffset * offset) * scale + center
+	#posArray
 	
 	return posArray.tolist()
 
@@ -769,53 +783,10 @@ class ParsedREMesh:
 					submesh.boundingBox.max.y = subAABBMax[1]
 					submesh.boundingBox.max.z = subAABBMax[2]
 					
-					positionScaling = 2.0
-					if meshEntry.bitFlag.flags.usePosScalingMaybe:
-						if meshEntry.bitFlag.flags.positionScaling2x:
-							positionScaling *= 2
-						if meshEntry.bitFlag.flags.positionScaling4x:
-							positionScaling *= 4
-						if meshEntry.bitFlag.flags.positionScaling8x:
-							positionScaling *= 8
-						if meshEntry.bitFlag.flags.positionScaling256x:
-							positionScaling *= 256
-					else:
-						positionScaling = 1.0
-						if not meshEntry.bitFlag.flags.positionScaling2x:
-							positionScaling *= 0.5
-						if not meshEntry.bitFlag.flags.positionScaling4x:
-							positionScaling *= 0.25
-						if not meshEntry.bitFlag.flags.positionScaling8x:
-							positionScaling *= 0.125
-						if not meshEntry.bitFlag.flags.positionScaling256x:
-							positionScaling *= 0.0625
-						
-					positionModifier = center.copy() * positionScaling
 					
-					scaleModifier = 1.0
-					if meshEntry.bitFlag.flags.useScalingMaybe:
-						if meshEntry.bitFlag.flags.scale2x:
-							scaleModifier *= 2
-						if meshEntry.bitFlag.flags.scale4x:
-							scaleModifier *= 4
-						if meshEntry.bitFlag.flags.scale8x:
-							scaleModifier *= 8
-						if meshEntry.bitFlag.flags.scale256x:
-							scaleModifier *= 256
-					else:#If the flag is false, the scaling flags get flipped
-						scaleModifier = 0.5
-						
-						if not meshEntry.bitFlag.flags.scale2x:
-							scaleModifier *= .5
-						if not meshEntry.bitFlag.flags.scale4x:
-							scaleModifier *= .25
-						if not meshEntry.bitFlag.flags.scale8x:
-							scaleModifier *= .125
-						if not meshEntry.bitFlag.flags.scale256x:
-							scaleModifier *= .0625
 					#print(f"Transform: {positionModifier}")
 					#print(f"Scaling: {scaleModifier}")
-					submesh.vertexPosList = ReadCompressedPosBuffer(meshEntry.posBuffer,meshEntry.bitFlag.flags.use32BitPos,positionModifier,scaleModifier,np.array(meshEntry.partAABBCenter))
+					submesh.vertexPosList = ReadCompressedPosBuffer(meshEntry.posBuffer,meshEntry.bitFlag,np.array(meshEntry.partAABBCenter),center - np.array((0.5,0.5,0.5)))
 					if meshEntry.bitFlag.flags.isMeshletNoTangent:
 						submesh.normalList = ReadNorBuffer(meshEntry.normalBuffer,tags)
 					else:

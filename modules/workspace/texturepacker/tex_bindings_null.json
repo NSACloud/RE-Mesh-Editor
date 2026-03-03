@@ -17,6 +17,12 @@
     "ALBDmap": {
         "MHRSB": "enemy/em071/00/mod/em071_00_fur_ALBD.tex"
     },
+    "ALBH_1": {
+        "RE9": "Character/ch/ch42/4200/Textures/ch4200_10_62_BreathFog_ALBH.tex"
+    },
+    "ALBH_Map": {
+        "RE9": "MaterialShader/Textures/Vinyl/tx_base_Vinyl_00_ALBH.tex"
+    },
     "ALBRGHchange_MSK": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -31,6 +37,9 @@
         "RE3": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_wastewater_st3_603_meshwater_0000/mesh_0002_WasteWater_st3_603_meshwater_0000_00_00_MSK4.tex",
         "RE3RT": "Escape/VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0006_ch5_acidwater_0301_0_0/mesh_0006_ch5_acidwater_0301_0_0_0_MSK4.tex",
         "RE4": "_Chainsaw/VFX/Texture/TEX_Stage/TEX_st43/TEX_st43_300/tex_0015_st43_300_ShallowWaterMask_0000_00_ALPG.tex"
+    },
+    "ALP_MudMSK_dirtyBubble_MAP": {
+        "RE9": "VFX/Texture/TEX_Other/20_other_ch1_01_WaterMask_00_MSK4.tex"
     },
     "ALPmap": {
         "MHRSB": "enemy/em071/00/mod/em071_00_fur_ALP.tex"
@@ -163,6 +172,12 @@
     "AlphaAemissiveSemissiveNoiseMap": {
         "DMC5": "Props/mesh/textures/sm0903_gate_A_ATOS.tex"
     },
+    "AlphaArrayMap": {
+        "generic": "systems/rendering/NullGray.tex"
+    },
+    "AlphaCavityOcclusionTranslucentMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "AlphaColorNoiseMorphMap": {
         "DMC5": "Character/Player/pl0310_Vergil_Majin/pl0310_Body/pl0310_Blade_ATOS.tex"
     },
@@ -201,6 +216,7 @@
         "generic": "systems/rendering/NullBlack.tex"
     },
     "AlphaMaskMap": {
+        "RE9": "MaterialShader/Textures/NullWhite_64.tex",
         "generic": "systems/rendering/NullWhite.tex"
     },
     "AlphaMaskTex": {
@@ -229,6 +245,12 @@
     },
     "AlphaTex2D": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "AlphaTex_FIX": {
+        "RE9": "VFX/Texture/TEX_Other/20_other_SmokeAlpha_000_00_MSK1.tex"
+    },
+    "AlphaTex_Scroll": {
+        "RE9": "VFX/Texture/TEX_Other/20_other_SmokeAlpha_000_01_MSK1.tex"
     },
     "AlphaThicknessOffsetGradationMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -286,6 +308,12 @@
     "AmbientLightLUT": {
         "MHWILDS": "Art/Library/Light/LightPostLibrary/LP_Assets/Cloudscape2/StandardCloud2/StdCld2_AmbientLightLUT_RTT.rtex"
     },
+    "AmpouleExplosion_ALBA": {
+        "RE9": "MaterialShader/Textures/NullBlack_MSK4.tex"
+    },
+    "AmpouleExplosion_NRMR": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
     "AnWen_ColorMap": {
         "DMC5": "Event/Mission03/m03_600/Shader/Texture/tex_03_cs_threshold_50_000_MSK3.tex"
     },
@@ -304,8 +332,20 @@
     "AngerAnimMap": {
         "RE3RT": "Escape/VFX/Texture/TEX_Character/TEX_em9300/tex_0006_em9300_anim_0000_ALB.tex"
     },
+    "AngerAnim_MSK1": {
+        "RE9": "Character/ch/ch51/5120/Textures/ch5120_00_00_00_AngerAnim_MSK1.tex"
+    },
     "AngerMaskMap": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "AngerMask_MSK1": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "AnimPush_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_00_noise_00_NRMR.tex"
+    },
+    "Anim_Noise_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_00_noise_00_NRMR.tex"
     },
     "AnimationMaskMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -442,6 +482,9 @@
     "BP_NoiseMap": {
         "DMC5": "Character/Enemy/em5000/BloodyPalaceDeathNoise_ALP.tex"
     },
+    "BRDFColorMap": {
+        "RE9": "MaterialShader/Textures/CarPaint/CarPaintBRDFColor_ALB.tex"
+    },
     "B_BG_tex": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -506,6 +549,21 @@
     "BaseAnisoShiftMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "BaseBlend_ALBD": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "BaseBlend_GradationMask": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "BaseBlend_NRMR": {
+        "generic": "systems/rendering/NullNormalRoughness.tex"
+    },
+    "BaseBlend_SCOT": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "BaseCoat": {
+        "generic": "systems/rendering/NullGray.tex"
+    },
     "BaseColor": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -526,7 +584,7 @@
         "generic": "systems/rendering/NullWhite.tex"
     },
     "BaseDielectricMap1": {
-        "generic": "systems/rendering/NullGray.tex"
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "BaseDielectricMap2": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -560,6 +618,9 @@
     },
     "BaseDielectricMap_C": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "BaseDielectricMap_CoverMat": {
+        "RE9": "Environment/Textures/tx_088_ALBH.tex"
     },
     "BaseDielectricMap_G": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -607,6 +668,9 @@
     "BaseFlowDiffuse_U_03_01": {
         "RE3": "ObjectRoot/SetModel/textures/sm24_1008_WavyCeiling01A_A_EMI_02.tex"
     },
+    "BaseFlowMap_Tex": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch4_50_River_FlowMap_00_MSK2.tex"
+    },
     "BaseGradMap": {
         "DMC5": "Props/mesh/textures/sm1288_ALBA.tex"
     },
@@ -618,6 +682,15 @@
     },
     "BaseImage": {
         "DD2": "Gui/Model/ui06/01/02/ui06_01_02_outer_ALBD.tex"
+    },
+    "BaseLayer_BRDFColorMap": {
+        "RE9": "MaterialShader/Textures/CarPaint/CarPaintBRDFColor_ALB.tex"
+    },
+    "BaseLayer_FlakesMap": {
+        "RE9": "MaterialShader/Textures/CarPaint/CarPaintFlakes_ALB.tex"
+    },
+    "BaseMadMap": {
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_00_ALBA.tex"
     },
     "BaseMap": {
         "MHS3": "Art/Effect/99_res/tex/tex_other/tex_24_other_0_900_nullwhite_ALBA.tex",
@@ -662,6 +735,9 @@
     "BaseNormalOcclusionMap": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
     },
+    "BaseShapeMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "BaseShiftMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
@@ -688,11 +764,18 @@
     "BaseWeatherMap": {
         "MHS3": "Art/Light/CloudScape/CloudTexture/CloudScape_BaseNoise_003.tex"
     },
+    "Base_ALB": {
+        "RE9": "Gui/Material/ui1506/ui1506_Base_ALB.tex"
+    },
     "Base_ColorMetalTexture": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "Base_FlowMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "Base_Map": {
-        "PRAG": "VFX/Texture/Null/17_NullWhite_000_00_MSK4.tex"
+        "PRAG": "VFX/Texture/Null/17_NullWhite_000_00_MSK4.tex",
+        "RE9": "VFX/Mesh/MESH_Gimmick/Gm99_004/20_gm99_004_topsidemoss_00_MSK2.tex"
     },
     "Base_ObjectNormalRoughness": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
@@ -711,6 +794,15 @@
     },
     "Base_tex": {
         "MHS3": "Art/Effect/99_res/tex/tex_other/tex_24_other_0_900_nullwhite_ALBA.tex"
+    },
+    "Basemap": {
+        "RE9": "VFX/Mesh/MESH_Debris/Amor/20_debris_Amor_000_00_ALB.tex"
+    },
+    "Basemap_A": {
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_childSpider_000_00_ALB.tex"
+    },
+    "Basemap_B": {
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_childSpider_001_00_ALB.tex"
     },
     "BasicMap": {
         "SF6": "Product/Environment/Texture/sm06_007_Tournament1_00_A_ALBA.tex"
@@ -802,11 +894,26 @@
     "BlackeningMap": {
         "PRAG": "MasterMaterial/Textures/Filament/Blackening_NRRH.tex"
     },
+    "Blend1Normal": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
+    "Blend1_BaseDielectricMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "Blend1_tex": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "Blend2Normal": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
+    "Blend2_BaseDielectricMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
     "Blend2_tex": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "Blend3Normal": {
+        "generic": "systems/rendering/NullNormal.tex"
     },
     "BlendATOS": {
         "DMC5": "Character/Player/COMMON/teeth_ao1_ATOS.tex"
@@ -827,7 +934,7 @@
         "generic": "systems/rendering/NullNormalRoughness.tex"
     },
     "BlendMap": {
-        "generic": "systems/rendering/NullWhite.tex"
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "BlendMap_NRMR": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
@@ -886,11 +993,17 @@
     "Blend_NormalRoughnessMap": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
     },
+    "BlinkTex": {
+        "RE9": "VFX/Texture/TEX_Other/20_other_SmokeAlpha_000_02_MSK1.tex"
+    },
     "BlockNoiseMap": {
         "PRAG": "VFX/Texture/Mask/17_Mask_000_04_MSK1.tex"
     },
     "BlockNoise_GradientMap": {
         "PRAG": "VFX/Texture/Gradient/17_NullWhite1D_000_00_MSK4.tex"
+    },
+    "BloodDirtMap": {
+        "generic": "systems/rendering/NullNormal.tex"
     },
     "BloodDropMaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -908,6 +1021,12 @@
     "BloodFlow_uv": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "BloodFog_Distortion_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_DiveInBlood_Distortion_000_01_MSK2.tex"
+    },
+    "BloodFog_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_DiveInBlood_Fog_000_00_ALBA.tex"
+    },
     "BloodGradientMap": {
         "RE3RT": "Escape/VFX/Mesh/MESH_CutScene/MESH_EV560_s00/mesh_0006_ev560_s00_blood_0000/mesh_0006_ev560_s00_blood_0000_MSK.tex"
     },
@@ -917,8 +1036,14 @@
     "BloodHit_NRMR": {
         "DMC5": "Event/Mission01/m01_010/Shader/Texture/mesh_03_cs_BloodWindow_50_002_NRMR.tex"
     },
+    "BloodImpurity_Distortion_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_DiveInBlood_Distortion_000_01_MSK2.tex"
+    },
+    "BloodImpurity_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_DiveInBlood_Fog_000_01_ALBA.tex"
+    },
     "BloodMap": {
-        "RE3RT": "Escape/VFX/Mesh/MESH_SetModel/MESH_sm46_020/mesh_0006_sm46_020_ES_0000/sm46_020mesh_0006_sm46_020_ES_0000_blood_01_MSK4.tex"
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "BloodMap2": {
         "RE3RT": "Escape/VFX/Mesh/MESH_SetModel/MESH_sm46_020/mesh_0006_sm46_020_ES_0000/sm46_020mesh_0006_sm46_020_ES_0000_blood_02_MSK4.tex"
@@ -935,11 +1060,20 @@
     "BloodMaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "BloodShed_rtt": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "BloodTex": {
         "RE4": "_Chainsaw/Test/VFX/shiomi/Boat/Fluid2d/tex_0015_water_in_blood_00_MSK1.tex"
     },
     "BloodTexture": {
         "generic": "systems/rendering/NullNormal.tex"
+    },
+    "BloodTexture_ALBA": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "BloodTexture_NRMR": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "BloodVessel_BaseAlphaMap": {
         "DMC5": "MasterMaterial/NullBlack.tex"
@@ -949,6 +1083,9 @@
     },
     "Blood_BaseAlpha": {
         "RE2RT": "SectionRoot/UI/ui2100/scene/GObloodt_RGBA.tex"
+    },
+    "Blood_BaseMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_99_098_BlodMask_000_00_MSK4.tex"
     },
     "Blood_FlowMap": {
         "RE3RT": "Escape/VFX/Mesh/MESH_SetModel/MESH_sm46_020/mesh_0006_sm46_020_ES_0000/sm46_020mesh_0006_sm46_020_ES_0000_flow_00_MSK2.tex"
@@ -961,6 +1098,9 @@
     },
     "Blood_LevelMask": {
         "RE2RT": "SectionRoot/UI/ui2100/scene/GO4chmsk_MSK4.tex"
+    },
+    "Blood_MaskMap": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Blood_Mask_line01": {
         "RE4": "_Chainsaw/VFX/Mesh/MESH_Event/cs/MESH_csa157_s00/tex_0015_csa157_s00_line01_MSK4.tex"
@@ -976,6 +1116,12 @@
     },
     "Blood_MetalMap": {
         "RE3RT": "Escape/VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0006_shallowwater_604_0_0/mesh_0006_shallowwater_604_0_0_0000_NRM.tex"
+    },
+    "Blood_NRRA": {
+        "RE9": "MaterialShader/Textures/Record_Base/Blood_NRRA.tex"
+    },
+    "Blood_NormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_99_098_BlodMask_000_00_NRM.tex"
     },
     "Blood_NormalRoughnessMap": {
         "RE2RT": "SectionRoot/UI/ui2100/scene/GObloodnr_NRMR.tex",
@@ -1011,6 +1157,9 @@
     },
     "BodyMuscle_NormalD": {
         "SF6": "Product/MasterMaterial/texture/NullNormalRoughnessCavity.tex"
+    },
+    "BodyResize_ProtectMask": {
+        "RE9": "MaterialShader/Textures/NullBlack_MSK4.tex"
     },
     "BodySA_AnimTransMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -1096,9 +1245,16 @@
     "Bubble_Mask": {
         "RE3": "MasterMaterial/Textures/Env_Water/Env_Water_Range_MSK3.tex"
     },
+    "Bubble_NoiseMaskMap": {
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_01_MSK2.tex"
+    },
     "Bubble_NormalMap": {
         "RE2RT": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_wastewater_st3_603_meshwater_0000/mesh_0002_wastewater_st3_603_meshwater_0000_00_00_NRM.tex",
-        "RE3": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_wastewater_st3_603_meshwater_0000/mesh_0002_wastewater_st3_603_meshwater_0000_00_00_NRM.tex"
+        "RE3": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_wastewater_st3_603_meshwater_0000/mesh_0002_wastewater_st3_603_meshwater_0000_00_00_NRM.tex",
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_00_NRMR.tex"
+    },
+    "Bubble_NormalRoughnessMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Item/20_material_item_it70_01_000_BloodyGuts_000_01_NRMR.tex"
     },
     "Bubble_Texture": {
         "RE3": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_rpd_st3_635_shallowwater_0000/mesh_0002_rpd_st3_634_shallowwater_0000_00_00_ALBA.tex"
@@ -1108,6 +1264,9 @@
     },
     "BublleMap": {
         "SF6": "Product/MasterMaterial/texture/SphereMap_MSK1.tex"
+    },
+    "BumpMap": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "BumpMap_EyeCaustics": {
         "MHS3": "MaterialShader/Texture/EyeShader/ch00_000_0000_pupil_CausticsMap_MSK1.tex"
@@ -1124,12 +1283,18 @@
     "BurningTex": {
         "DMC5": "alphaTest/UXTest/hayakawa/tex/smoke_00_IM.tex"
     },
+    "BurntMap_ALBM": {
+        "RE9": "MaterialShader/Textures/Record_Base/BurntMap_ALBM.tex"
+    },
+    "BurntMap_NRMR": {
+        "RE9": "MaterialShader/Textures/Record_Base/BurntMap_NRMR.tex"
+    },
     "C_NoiseTexture": {
         "MHS3": "Art/Library/Light/LightPostLibrary/LP_Assets/Texture/Noise/InvWorley3D_32_MSK1.tex",
         "MHWILDS": "Art/Light/Light_Assets/Texture/Noise/InvWorley3D_32_MSK1.tex"
     },
     "Camera_RTT": {
-        "generic": "systems/rendering/NullBlack.tex"
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "Camouflage_ALBD_Array": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -1137,8 +1302,32 @@
     "Camouflage_NormalRoughnessMap": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
     },
+    "CarDamage_AlphaMap": {
+        "RE9": "MaterialShader/Textures/CarDamage/CarDamage_ALP.tex"
+    },
+    "CarDamage_BaseDielectricMap": {
+        "RE9": "MaterialShader/Textures/CarDamage/CarDamage_ALBD.tex"
+    },
+    "CarDamage_NormalRoughnessCavityMap": {
+        "RE9": "MaterialShader/Textures/CarDamage/CarDamage_NRRC.tex"
+    },
+    "CarDirt_AlphaMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "CarDirt_BaseDielectricMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "CarDirt_NormalRoughnessCavityMap": {
+        "generic": "systems/rendering/NullNormalRoughness.tex"
+    },
+    "CarDirt_UniqueAlphaMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "CausticMap": {
         "generic": "systems/rendering/NullBlack.tex"
+    },
+    "Caustics": {
+        "RE9": "Light/Texture/ProjectionSpotLight/PSL_WaterCaustics_ALB.tex"
     },
     "Caustics3D": {
         "MHWILDS": "MasterMaterial/Textures/VFX_Uber/VFX_Caustics3D_MSK1.tex"
@@ -1166,6 +1355,9 @@
     },
     "CavityNormalAlphaMap": {
         "DMC5": "Character/Enemy/em5802/em5802_01_Cavity_NRMR.tex"
+    },
+    "CenterDentNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch4400_DamegeRipple_02_NRM.tex"
     },
     "Ch90_161_wave_heightmap": {
         "MHWILDS": "MasterMaterial/Textures/wave_MSK4.tex"
@@ -1258,13 +1450,19 @@
         "PRAG": "Environment/Textures/tx_050_NRRC.tex"
     },
     "ClearCoat_NormalRoughnessMap": {
-        "DD2": "Character/_kit/eyes/common/eye_001_Cover_NRMR.tex"
+        "generic": "systems/rendering/NullNormalRoughness.tex"
     },
     "Cliff01_ALBD": {
         "MHS3": "Art/Stage/textures/tx_Rock_234_B_ALBD.tex"
     },
     "Cliff01_NRMR": {
         "MHS3": "Art/Stage/textures/tx_Rock_234_B_NRMR.tex"
+    },
+    "ClothDamageMap": {
+        "RE9": "MaterialShader/Textures/Record_Base/ClothDamage_Common_MSK4.tex"
+    },
+    "ClothDamage_AlphaMask": {
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "ClothWaveMask": {
         "SF6": "Product/MasterMaterial/texture/Null_RGBA_0_255_0_255.tex"
@@ -1338,6 +1536,15 @@
     "CollisionMap_1": {
         "MHWILDS": "@System/SpeedTree/DualHeightFieldTrail_1.rtex"
     },
+    "Color": {
+        "RE9": "VFX/Texture/TEX_Liquid/20_liquid_camerablood_002_00_MSK4.tex"
+    },
+    "ColorBlendMask": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "ColorBlendMask1": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "ColorControlMaskMap": {
         "generic": "systems/rendering/NullATOS.tex"
     },
@@ -1348,13 +1555,25 @@
         "PRAG": "MasterMaterial/Textures/AudioSpectrum/AudioSpectrum_ALB.tex"
     },
     "ColorGradient_A": {
-        "PRAG": "Character/ch/ch01/ch0100/22/ch0100_22_Strand_GradientTexture_A_v3.tex"
+        "PRAG": "Character/ch/ch01/ch0100/22/ch0100_22_Strand_GradientTexture_A_v3.tex",
+        "RE9": "Character/ch/ch01/0100/21/00/ch0100_21_00_Color01.tex"
+    },
+    "ColorGradient_A_2": {
+        "RE9": "Character/ch/ch01/0100/21/00/ch0100_21_00_Color04.tex"
     },
     "ColorGradient_B": {
-        "PRAG": "Character/ch/ch01/ch0100/22/ch0100_22_Strand_GradientTexture_B_v3.tex"
+        "PRAG": "Character/ch/ch01/ch0100/22/ch0100_22_Strand_GradientTexture_B_v3.tex",
+        "RE9": "Character/ch/ch01/0100/21/00/ch0100_21_00_Color02.tex"
+    },
+    "ColorGradient_B_2": {
+        "RE9": "Character/ch/ch01/0100/21/00/ch0100_21_00_Color05.tex"
     },
     "ColorGradient_C": {
-        "PRAG": "Character/ch/ch01/ch0100/22/ch0100_22_Strand_GradientTexture_C_v3.tex"
+        "PRAG": "Character/ch/ch01/ch0100/22/ch0100_22_Strand_GradientTexture_C_v3.tex",
+        "RE9": "Character/ch/ch01/0100/21/00/ch0100_21_00_Color03.tex"
+    },
+    "ColorGradient_C_2": {
+        "RE9": "Character/ch/ch01/0100/21/00/ch0100_21_00_Color06.tex"
     },
     "ColorIndexMap": {
         "SF6": "Product/MasterMaterial/texture/Color_Index.tex"
@@ -1407,6 +1626,12 @@
     "ColorTex": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "ColorTex_1st": {
+        "RE9": "VFX/Texture/TEX_Other/20_other_SmokeAlpha_000_02_MSK1.tex"
+    },
+    "ColorTex_2nd": {
+        "RE9": "VFX/Texture/TEX_Other/20_other_SmokeAlpha_000_02_MSK1.tex"
+    },
     "ColorTexture": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -1425,11 +1650,17 @@
     "ColormaskMap": {
         "MHRSB": "MasterMaterial/Textures/NullMSK1.tex"
     },
+    "CorneaMap": {
+        "generic": "systems/rendering/GroundSmoothNoise.tex"
+    },
     "CorruptionBaseAlphaMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
     "CountTexture_1": {
         "SF6": "Product/VFX/Event/CutScene/cs00/cs00_0000_230/texture/cs00_0000_230_tex_redcount.tex"
+    },
+    "CrackTexture": {
+        "RE9": "MaterialShader/Textures/CarGlassCrack/glasscrack.tex"
     },
     "CrystalDetailMap": {
         "DMC5": "Character/Enemy/em0000/em0000_death2_NRMR.tex"
@@ -1536,6 +1767,9 @@
     "Damage_NormalRoughnessCavity": {
         "PRAG": "Character/ch/ch00/ch0000/00/ch0000_00_Damage_NRRC.tex"
     },
+    "DamegeRipple_Safemask": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "DandruffMaskMap": {
         "DD2": "MasterMaterial/Textures/NoiseMap_00_MSK1.tex"
     },
@@ -1575,6 +1809,9 @@
     "Debag_MapPositionCheck": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "DecalMapArray": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "DecayAlphaMask": {
         "DD2": "MasterMaterial/Textures/NoiseMap_00_MSK1.tex"
     },
@@ -1593,6 +1830,21 @@
         "RE2RT": "VFX/RecordSystem/RecordTexture/em0000/Defect/Defect_Arm00_Shape.tex",
         "RE3": "VFX/RecordSystem/RecordTexture/em0000/Defect/Defect_Arm00_Shape.tex",
         "RE3RT": "Escape/VFX/RecordSystem/RecordTexture/em0000/Defect/Defect_Arm00_Shape.tex"
+    },
+    "Deflate_Skin_ALBA": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_10_LightDamege_death_ALBA.tex"
+    },
+    "Deflate_Skin_NRMR": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_10_LightDamege_death_NRMR.tex"
+    },
+    "Deflate_vertex_mask": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "Deflate_vertex_normal": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "Deflate_vertex_position": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Deform1Map": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -1624,6 +1876,9 @@
     "DentMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "DentProtectMask": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "Depth": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -1638,6 +1893,12 @@
     },
     "DetailAOMap": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "DetailAlbedoMap": {
+        "generic": "systems/rendering/NullGray.tex"
+    },
+    "DetailAlbedoMap2": {
+        "generic": "systems/rendering/NullGray.tex"
     },
     "DetailAlphaMSKMap": {
         "MHRSB": "otomo/OtDog/mod/otd063/otd063_EFF.tex"
@@ -1666,32 +1927,52 @@
     "DetailEmissive_colorMap": {
         "MHRSB": "enemy/em096/00/mod/em096_00_EMI.tex"
     },
+    "DetailHeightMap": {
+        "RE9": "MaterialShader/Textures/NullGray_MSK4.tex"
+    },
     "DetailMap": {
         "DD2": "MasterMaterial/Textures/NullDetailMap_MSK4.tex",
         "PRAG": "MasterMaterial/Textures/NullDetail.tex",
         "RE2RT": "MasterMaterial/Textures/NullDetail.tex",
         "RE3": "MasterMaterial/Textures/NullDetail.tex",
         "RE4": "_Chainsaw/MasterMaterial/Textures/NullGrayArray.tex",
+        "RE9": "MaterialShader/Textures/NullGray_MSK4.tex",
         "generic": "systems/rendering/NullNormal.tex"
     },
     "DetailMap2": {
-        "DD2": "MasterMaterial/Textures/NullDetailMap_MSK4.tex"
+        "DD2": "MasterMaterial/Textures/NullDetailMap_MSK4.tex",
+        "RE9": "MaterialShader/Textures/NullGray_MSK4.tex"
+    },
+    "DetailMapArray": {
+        "generic": "systems/rendering/NullGray.tex"
     },
     "DetailMap_Single": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "DetailMask": {
-        "DMC5": "Props/mesh/textures/sm0012_arcadegate01_ATOS.tex"
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "DetailMaskMap": {
         "MHWILDS": "MasterMaterial/Textures/NullBlack_Alpha_MSK4.tex",
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "DetailMask_Leather": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "DetailNRM_Map": {
         "DD2": "VFX/Texture/Noise/13_Aura_000_01_NRM.tex"
     },
+    "DetailNoise": {
+        "RE9": "MaterialLibrary_2/Textures/Capcom/Mask/CC_Wear_Grunge_00_003/1M/CC_Wear_Grunge_00_003_1M_MSK.tex"
+    },
     "DetailNormal": {
         "generic": "systems/rendering/NullNormal.tex"
+    },
+    "DetailNormalAlpha": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "DetailNormalAlphaMap": {
+        "generic": "systems/rendering/NullNormalRoughnessOcclusion.tex"
     },
     "DetailNormalMap": {
         "generic": "systems/rendering/NullNormal.tex"
@@ -1714,6 +1995,9 @@
     "DetailTexture_4": {
         "generic": "systems/rendering/NullNormal.tex"
     },
+    "DetailUVDistortionMap": {
+        "RE9": "MaterialShader/Textures/Character_Base/Detail/DetailDist_00_MSK2.tex"
+    },
     "Detail_ALBD_A": {
         "generic": "systems/rendering/NullGray.tex"
     },
@@ -1731,6 +2015,9 @@
     },
     "Detail_ALBD_TriPlanar_Top": {
         "generic": "systems/rendering/NullGray.tex"
+    },
+    "Detail_Map": {
+        "RE9": "VFX/Texture/EventTexture/c530s100/20_c530s100_Elpis_Line_NRMR.tex"
     },
     "Detail_NRRH_A": {
         "generic": "systems/rendering/NullNormalRoughnessOcclusion.tex"
@@ -1769,13 +2056,14 @@
         "generic": "systems/rendering/NullWhite.tex"
     },
     "DirtMaskMap": {
-        "RE3RT": "MasterMaterial/Textures/null_black_MSK4.tex"
+        "RE3RT": "MasterMaterial/Textures/null_black_MSK4.tex",
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "DirtMask_Atex": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "DirtWearMap": {
-        "generic": "systems/rendering/NullGray.tex"
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "Dirt_AlbedoMask": {
         "PRAG": "MasterMaterial/Textures/NullBlack_MSK4.tex"
@@ -1825,6 +2113,9 @@
     "Displacement_Waterfall2_Map": {
         "DD2": "MasterMaterial/Textures/NoiseOffsetMap_00_MSK1.tex"
     },
+    "Diss_Mask": {
+        "RE9": "VFX/Texture/MaterialTexture/Item/20_material_item_it70_01_000_BloodyGuts_000_02_MSK1.tex"
+    },
     "DissolveDetailMap": {
         "DMC5": "Event/Mission11/m11_101/Shader/Texture/tex_03_cs_Noise_50_000_MSK1.tex"
     },
@@ -1842,7 +2133,7 @@
         "RE3": "SectionRoot/UI/UI_Shader/tex/tex_LightningNoise_01.tex"
     },
     "DissolveTexture": {
-        "generic": "systems/rendering/NullWhite.tex"
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Dissolve_AlphaMaskTex": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -1862,6 +2153,9 @@
     "DistortionMask": {
         "DMC5": "VFX/Texture/TEX_Light/tex_capcom_light_glint_0005_ALPG.tex"
     },
+    "DistortionNoise": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_00_MSK4.tex"
+    },
     "DistortionTex": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -1872,10 +2166,12 @@
         "RE3": "alphaTest/VFX/test/watamura/FallWater/BendTest/FoamMask_ALB.tex"
     },
     "Distortion_Map": {
-        "DD2": "VFX/Texture/Liquid/13_Water_003_00_MSK1.tex"
+        "DD2": "VFX/Texture/Liquid/13_Water_003_00_MSK1.tex",
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_DiveInBlood_Distortion_000_00_MSK2.tex"
     },
     "Distortion_Mask": {
-        "RE4": "_Chainsaw/Test/escapeOnline/systems/rendering/NullWhite.tex"
+        "RE4": "_Chainsaw/Test/escapeOnline/systems/rendering/NullWhite.tex",
+        "RE9": "MaterialShader/Textures/NullBlack_128.tex"
     },
     "Distortion_NormalMap": {
         "DMC5": "alphaTest/UXTest/hayakawa/tex/NormalMap (52).tex"
@@ -1886,6 +2182,9 @@
     "DotNoise": {
         "PRAG": "MasterMaterial/Textures/DotNoise_MSK1.tex"
     },
+    "DotSight_ShakeGradient": {
+        "RE9": "MaterialShader/Textures/DotSight_ShakeMap.tex"
+    },
     "Dot_Alp": {
         "generic": "systems/rendering/NullWhite.tex"
     },
@@ -1894,6 +2193,15 @@
     },
     "Dot_Tex": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "DownflowMap": {
+        "RE9": "RE_ENGINE_LIBRARY/MasterMaterial/SourceTexture/Lib_Container_RainWetWindow/Lib_Container_RainWetWindow_down_MSK4.tex"
+    },
+    "DropMap": {
+        "RE9": "RE_ENGINE_LIBRARY/MasterMaterial/SourceTexture/Lib_Container_RainWetWindow/Lib_Container_RainWetWindow_drop_MSK3.tex"
+    },
+    "DropMask": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Drop_NormalMap": {
         "MHRSB": "enemy/em097/00/mod/em097_00_icetiling_NRMR.tex"
@@ -1979,6 +2287,9 @@
     "Earth_NormalAlphaMap": {
         "PRAG": "Environment/Textures/sm14_006_NRA.tex"
     },
+    "EdgeMask": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/Highway_ALP.tex"
+    },
     "EdgeSpecularMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -1988,8 +2299,17 @@
     "EdgeWearMaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "Edge_Base_Tex": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "Edge_MSK4": {
         "DMC5": "Event/Mission12/m12_101/Shader/Texture/tex_03_cs_EdgeMask_50_000_MSK4.tex"
+    },
+    "Edge_Tex": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_00_gore_03_NRMR.tex"
+    },
+    "EditNormal_NRM": {
+        "generic": "systems/rendering/NullNormal.tex"
     },
     "EffectMap": {
         "DMC5": "Character/Weapon/wp01_010/wp01_010_01_ATOS.tex"
@@ -2005,6 +2325,9 @@
     },
     "ElectTex": {
         "RE3": "VFX/Texture/TEX_Other/tex_other_ElectricalDiagram_01.tex"
+    },
+    "ElpisDistortion_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Blood/Old_20_material_blood_000_01_NRMR.tex"
     },
     "EmblemMap": {
         "SF6": "Product/MasterMaterial/texture/Null_RGBA_0000.tex"
@@ -2085,6 +2408,7 @@
     },
     "EmissiveTex": {
         "DMC5": "VFX/Mesh/MESH_Character/pl0000/mesh_03_pl0000_maximumbet_0000_00_00_ALBA.tex",
+        "RE9": "VFX/Texture/TEX_Dust/Lib_20_dust_multiple_006_00_ALBA.tex",
         "SF6": "Product/VFX/Resource/Texture/TEX_Props/wtc0102/sm05_316_cloth_emissive01_C_MSK4.tex"
     },
     "EmissiveTex01": {
@@ -2092,6 +2416,9 @@
     },
     "EmissiveTex02": {
         "generic": "systems/rendering/NullBlack.tex"
+    },
+    "EmissiveTexsture": {
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "EmissiveTexture": {
         "DD2": "Gui/ui01/ui0199/ui019904/TEX_ui019904_bg01_IAM.tex"
@@ -2101,6 +2428,12 @@
     },
     "EmissiveTextureB": {
         "RE3": "ObjectRoot/SetModel/textures/sm41_1014_HugeSlotMachine01A_F_EMI.tex"
+    },
+    "Emissive_ColorMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "Emissive_DistortionMap": {
+        "RE9": "Environment/Textures/sm15_081_B_NRRC.tex"
     },
     "Emissive_FXMap": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -2169,6 +2502,9 @@
     },
     "ExtraPatternMap_NRMR": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
+    },
+    "ExtraWearMap": {
+        "RE9": "MaterialShader/Textures/ExtraWearMap_MSK4.tex"
     },
     "EyePattern_MaskMap": {
         "DD2": "MasterMaterial/Textures/NullBlack_MSK4.tex"
@@ -2282,7 +2618,8 @@
         "generic": "systems/rendering/NullBlack.tex"
     },
     "FakeGlassMap": {
-        "RE4": "_Chainsaw/MasterMaterial/Textures/FakeGlass_ALBA.tex"
+        "RE4": "_Chainsaw/MasterMaterial/Textures/FakeGlass_ALBA.tex",
+        "RE9": "MaterialShader/Textures/FakeGlass_ALBA.tex"
     },
     "FakeGlass_FakeSphereMap": {
         "PRAG": "MasterMaterial/Textures/FakeGlass_ALBA.tex"
@@ -2302,6 +2639,9 @@
     "FakeReflectCubeMap": {
         "MHS3": "Art/Effect/99_res/tex/tex_cubemap/tex_24_CubeMap_0_001_HDR.tex"
     },
+    "FakeReflection_Map": {
+        "RE9": "MaterialShader/Textures/EyeTextures/eye_fake_reflection.tex"
+    },
     "FakeRefractMap": {
         "DMC5": "Environments/Location/textures/l23_01_bp_crystal_blend_ATOS.tex"
     },
@@ -2309,7 +2649,7 @@
         "PRAG": "Character/ch/ch01/ch0100/10/ch0100_10_fake_specular0.tex"
     },
     "FakeSpecular": {
-        "PRAG": "MasterMaterial/Textures/EyeTextures/fake_specular.tex"
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "FakeSpecularEmissiveMap": {
         "DMC5": "Character/Enemy/em5000/em5000_eye_specular_ALBA.tex"
@@ -2320,6 +2660,9 @@
     "FakeSpecularNoiseMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "FakeSpecular_PanoramaMap": {
+        "RE9": "Character/Textures/Glass/Glass_FakeSpecular_ALB.tex"
+    },
     "FakeSphereBaseAlphaMap": {
         "RE4": "_Chainsaw/MasterMaterial/Textures/NullGray_MSK4.tex"
     },
@@ -2328,6 +2671,9 @@
     },
     "FakeSphereMap_Multiply": {
         "RE4": "_Chainsaw/Character/ch/cha0/cha006/00/Feather_FakeSphere_TU1_ALBD.tex"
+    },
+    "FakeSphereMask": {
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "FakeSphereMaskMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -2343,6 +2689,12 @@
     },
     "FakeSphere_Multiply": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "FakeSphere_Tex_Rough_Max": {
+        "RE9": "Character/ch/ch76/7600/00/Textures/ch7600_00_00_01_MatCap_Gold_RoughnessMax.tex"
+    },
+    "FakeSphere_Tex_Rough_Min": {
+        "RE9": "Character/ch/ch76/7600/00/Textures/ch7600_00_00_01_MatCap_Gold_RoughnessMin.tex"
     },
     "FakeTranslucency_BaseAlphaMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -2371,6 +2723,9 @@
     "FarRiverTex": {
         "generic": "systems/rendering/NullNormalRoughnessOcclusion.tex"
     },
+    "Far_FlowMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "Far_LUT": {
         "generic": "systems/rendering/ColorCubeLinear.tex"
     },
@@ -2380,8 +2735,14 @@
     "FilamentColor3D": {
         "PRAG": "MasterMaterial/Textures/Noise3D_01_MSK3.tex"
     },
+    "FilmDamage_Texture": {
+        "RE9": "MaterialShader/Textures/CustomFilter/FilmDamage_MSK1.tex"
+    },
     "FilmDeterioration_Mask": {
         "RE4": "_Chainsaw/Test/Personal/Shader/Aso/CustomFilter/_Texture/FilmDeteriorationMask_MSK3.tex"
+    },
+    "FilmGrain_Texture": {
+        "RE9": "MaterialShader/Textures/CustomFilter/FilmGrain8mm_MSK1.tex"
     },
     "FilmMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -2394,6 +2755,9 @@
     },
     "Fire_BaseAlphaMap": {
         "DMC5": "VFX/Mesh/MESH_Character/plcommon/mesh_03_plcommon_fire_000_00_00_ALBA.tex"
+    },
+    "FixBloodMask": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Fixed_AlphaMap": {
         "generic": "systems/rendering/NullGray.tex"
@@ -2419,6 +2783,9 @@
     "FlagB_NRM": {
         "SF6": "Product/MasterMaterial/texture/Perlin_NRM.tex"
     },
+    "FlakesMap": {
+        "RE9": "MaterialShader/Textures/CarPaint/CarPaintFlakes_ALB.tex"
+    },
     "FlashTex": {
         "RE3": "ObjectRoot/SetModel/textures/sm43_1003_4PDoor01A_FX.tex",
         "SF6": "Product/VFX/Resource/Texture/TEX_Light/tex_capcom_light_glow_0001_ALPG.tex"
@@ -2428,6 +2795,9 @@
     },
     "Flashing_FaceMaskMap": {
         "SF6": "Product/Model/wpl/wpl200/00/MSK/wpl100_00_Atlas.tex"
+    },
+    "FlickDrops": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_02_NMR.tex"
     },
     "FloatingThingA_BaseDielectricMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -2464,6 +2834,9 @@
     },
     "Flont": {
         "SF6": "Product/VFX/Resource/Texture/TEX_GUI/brash/tex_10_brash_bg_00_0001_MSK2.tex"
+    },
+    "FloorMask": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Flow3D": {
         "DD2": "MasterMaterial/Textures/tex_capcom_vectorfield_0003_NotCompress_MSK3.tex"
@@ -2505,6 +2878,9 @@
         "DMC5": "alphaTest/Character/Aso_test/CubeMapCullingTest/FlowNoiseMap_NRM.tex",
         "RE3": "VFX/Texture/TEX_Tile/Tile_105_tex.tex"
     },
+    "FlowMap_00": {
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_00_MSK2.tex"
+    },
     "FlowMap_01": {
         "RE3RT": "RE_ENGINE_LIBRARY/VFX_Library/Mesh/MESH_Sample/MESH_ShaderManual/sample00/shader_sample_03_aura00_MSK2.tex"
     },
@@ -2532,6 +2908,15 @@
     "FlowMap_Tex": {
         "generic": "systems/rendering/NullGray.tex"
     },
+    "FlowMeatMap_ALBM": {
+        "RE9": "Character/ch/ch51/5120/Textures/ch5120_00_00_00_Meat_ALBM.tex"
+    },
+    "FlowMeatMap_NRMR": {
+        "RE9": "Character/ch/ch51/5120/Textures/ch5120_00_00_00_Meat_NRMR.tex"
+    },
+    "FlowMeatMask_MSK1": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "FlowNoiseMap": {
         "DMC5": "Props/mesh/sm7007_sealhellWall_01/texture/sm7007_sealhellWall_01_NoiseMap_NRM.tex"
     },
@@ -2545,7 +2930,8 @@
         "DMC5": "alphaTest/Character/Aso_test/em0700_Scissors/Appear/em0700_AppearPlane2_NRMR.tex"
     },
     "FlowOffsetNoiseMap": {
-        "RE3RT": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Sample/TEX_ShaderManual/noise_00_ALB.tex"
+        "RE3RT": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Sample/TEX_ShaderManual/noise_00_ALB.tex",
+        "RE9": "Character/ch/ch51/5120/Textures/ch5120_00_00_00_FlowOffsetNoiseMap_ALB.tex"
     },
     "FlowTexture": {
         "DMC5": "Environments/Location/textures/l16_01_Fluid_ALBA.tex"
@@ -2564,6 +2950,9 @@
     },
     "FlowUV_Map": {
         "DMC5": "Environments/Location/textures/l16_01_cellfloor_B_flowmap_MSK2.tex"
+    },
+    "Flow_BaseMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_00_ALB.tex"
     },
     "Flow_MapUV": {
         "RE4": "_Chainsaw/UI/UI_Shader/tex/cs_ui_grenade_throw_IM.tex"
@@ -2586,6 +2975,9 @@
     "Flowmap_MSK1": {
         "MHWILDS": "Art/VFX/Decal/Stage/st101/11_st101_sandwave_002_MSK1.tex"
     },
+    "Fluctuation_Noise3D": {
+        "RE9": "MaterialShader/Textures/Noise3D_00_MSK1.tex"
+    },
     "FluffyMask": {
         "MHS3": "MaterialShader/Texture/NullWhite.tex"
     },
@@ -2601,6 +2993,9 @@
     "FluidTexture_B": {
         "RE3": "VFX/Texture/TEX_Tile/tex_tile_noise_03.tex"
     },
+    "Fluid_Gch_DetailFlowMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "FlutterNoiseMap": {
         "DD2": "systems/effect/Noise3D_MSK4.tex"
     },
@@ -2608,6 +3003,9 @@
         "RE2RT": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_rpd_st3_635_shallowwater_0000/mesh_0002_rpd_st3_634_shallowwater_0000_01_00_ALBA.tex",
         "RE3": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_rpd_st3_635_shallowwater_0000/mesh_0002_rpd_st3_634_shallowwater_0000_01_00_ALBA.tex",
         "RE3RT": "VFX/Mesh/MESH_Stage/MESH_WasteWater/mesh_0002_rpd_st3_635_shallowwater_0000/mesh_0002_rpd_st3_634_shallowwater_0000_01_00_ALBA.tex"
+    },
+    "FoamColorMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_000_00_ALB.tex"
     },
     "FoamDetailMap": {
         "DD2": "MasterMaterial/Textures/Foam_FN_01_MSK3.tex"
@@ -2626,17 +3024,32 @@
         "RE3RT": "RE_ENGINE_LIBRARY/VFX_Library/Shader/SourceTexture/shader_waterfall_dissolve/shader_waterfall_dissolve_foammask_ALB.tex",
         "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Shader/SourceTexture/shader_waterfall_dissolve/shader_waterfall_dissolve_foammask_ALB.tex"
     },
+    "FoamNormalRoughnessMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_001_00_NRMR.tex"
+    },
+    "FoamWPOMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_000_02_ALB.tex"
+    },
     "Foam_BaseMap": {
         "RE3": "MasterMaterial/Textures/Env_WetFloor/WetFloor_vector_water_00_NRMR.tex"
     },
     "Foam_Map": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "Foam_Mask": {
+        "RE9": "VFX/Texture/TEX_Other/20_other_ch3_04_waterstream_000_00_MSK1.tex"
+    },
     "Foam_Mask_Map": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "Foam_NormalMap": {
         "RE3": "MasterMaterial/Textures/Env_Water/Env_Water_NRM.tex"
+    },
+    "Foam_Normal_Tex": {
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_00_NRMR.tex"
+    },
+    "Foam_Tex": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_wave_000_00_ALPG.tex"
     },
     "FogZoneSdf": {
         "MHS3": "Art/Light/Light_Prefab/ZonedVFog_Prefab/ZonedVFog_Data/ZonedVFog_00_00_MSK1.tex",
@@ -2717,7 +3130,14 @@
         "DD2": "MasterMaterial/Textures/FugeHuman_NRRM.tex"
     },
     "FurDetailMap": {
-        "RE4": "_Chainsaw/Character/Textures/Fur/ShellFur_Detail_A_MSK4.tex"
+        "RE4": "_Chainsaw/Character/Textures/Fur/ShellFur_Detail_A_MSK4.tex",
+        "RE9": "Character/ch/ch01/0100/Textures/ch0100_01_GloveRibStitch_MSKM.tex"
+    },
+    "FurDetailUVDistortionMap": {
+        "RE9": "MaterialShader/Textures/Character_Base/Detail/DetailDist_00_MSK2.tex"
+    },
+    "FurDust_ImperfectDetailMap": {
+        "RE9": "MaterialShader/Textures/Character_Base/Mask/ImperfectDetail_MSK4.tex"
     },
     "FurFlowMap": {
         "generic": "systems/rendering/NullNormal.tex"
@@ -2743,6 +3163,9 @@
     },
     "FurVelocity_SPMaskMap": {
         "MHRSB": "player/mod/m/hair/m_hair000/m_hair000_FMS.tex"
+    },
+    "Fur_DepthColorMap": {
+        "generic": "systems/rendering/NullWhite.tex"
     },
     "Fur_FlowMap": {
         "generic": "systems/rendering/NullGray.tex"
@@ -2793,7 +3216,37 @@
     "Gauge_ATOS": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "Gch_Foam_BaseMap": {
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_01_ALBA.tex"
+    },
+    "Gch_FormNormalMap": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
+    "Gem_FakeSphereMap": {
+        "RE9": "MaterialShader/Textures/FakeGlass_ALBA.tex"
+    },
     "GlassBackMovie": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "GlassCrack_A_ColorMap": {
+        "RE9": "VFX/Texture/EventTexture/c341s900/20_c341s900_GlassCracks_001_01_ALB.tex"
+    },
+    "GlassCrack_A_DistortionMask": {
+        "RE9": "VFX/Texture/EventTexture/c341s900/20_c341s900_GlassCracks_003_01_MSK1.tex"
+    },
+    "GlassCrack_A_Normal": {
+        "RE9": "VFX/Texture/EventTexture/c341s900/20_c341s900_GlassCracks_002_01_NRMR.tex"
+    },
+    "GlassCrack_B_ColorMap": {
+        "RE9": "VFX/Texture/EventTexture/c341s900/20_c341s900_GlassCracks_001_00_ALB.tex"
+    },
+    "GlassCrack_B_DistortionMask": {
+        "RE9": "VFX/Texture/EventTexture/c341s900/20_c341s900_GlassCracks_003_00_MSK1.tex"
+    },
+    "GlassCrack_B_Normalmap": {
+        "RE9": "VFX/Texture/EventTexture/c341s900/20_c341s900_GlassCracks_002_00_NRMR.tex"
+    },
+    "GlassMaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "GlassNormalIDmask": {
@@ -2807,6 +3260,12 @@
     },
     "GlitchMask": {
         "RE3": "VFX/Texture/TEX_Mask/tex_ValueOne.tex"
+    },
+    "Glitch_Map": {
+        "RE9": "MaterialShader/Textures/Noise_000_00_MSK2.tex"
+    },
+    "GlobalWind_LeafSwing_Noise3D": {
+        "RE9": "MaterialShader/Textures/tex_capcom_vectorfield_0003_NotCompress_MSK3.tex"
     },
     "GlowMap": {
         "RE3": "VFX/Texture/TEX_Other/tex_other_GridLine.tex"
@@ -2844,14 +3303,30 @@
     "GradTex": {
         "MHS3": "MaterialShader/Texture/VerticalGradation_MSK1.tex"
     },
+    "Gradation01": {
+        "RE9": "Gui/Material/ui2004/ui2004_g01_IAM.tex"
+    },
+    "Gradation02_": {
+        "RE9": "Gui/Material/ui2004/ui2004_g02_IAM.tex"
+    },
     "GradationMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "GradientColorMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "GradientColorMask": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "GradientColorTexture": {
+        "RE9": "Character/ch/ch06/0600/Textures/ch0600_40_00_Bijou.tex"
+    },
     "GradientColor_GradientAsset": {
-        "DD2": "Character/ch/ch53_001/ch53_001_wingfeather_GradientColor.tex"
+        "DD2": "Character/ch/ch53_001/ch53_001_wingfeather_GradientColor.tex",
+        "RE9": "Character/Textures/Glass/Glass_Gradient_ALB.tex"
+    },
+    "GradientDirtMaskMap": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "GradientMap": {
         "DD2": "VFX/Texture/Null/13_NullBlack1D_000_00.tex",
@@ -2900,6 +3375,9 @@
     "GunNom": {
         "DMC5": "UI/Mesh/ui3200/tex/Gun_Center_NM.tex"
     },
+    "HDRI": {
+        "RE9": "Light/Texture/Sky_NEW/1_AdandonedHotel/st10_Evening_CloudGlay_Sky.tex"
+    },
     "HGT": {
         "RE4": "MaterialLibrary/Original/TerrainAtlas/NewChainsaw_Terrain_ALBD.tex"
     },
@@ -2940,6 +3418,12 @@
     "Heat_Mask": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "HeavyDamage_ALBD": {
+        "RE9": "MaterialShader/Textures/Record_Base/HeavyDamage_ALBD.tex"
+    },
+    "HeavyDamage_NRRA": {
+        "RE9": "MaterialShader/Textures/Record_Base/HeavyDamage_NRRA.tex"
+    },
     "HeightAlphaMap": {
         "PRAG": "Environment/Textures/sm50_004_B_HGAL.tex"
     },
@@ -2954,6 +3438,9 @@
     },
     "HeightMap2": {
         "generic": "systems/rendering/NullGray.tex"
+    },
+    "HeightMap_CoverMat": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "HeightOffsetDepthCavity": {
         "PRAG": "Character/ch/ch01/ch0100/20/ch0100_20_DHair_HO__D_C_ALBA.tex"
@@ -3008,6 +3495,12 @@
     },
     "Hight_tex": {
         "RE4": "_Chainsaw/MasterMaterial/Textures/NullBlack_128.tex"
+    },
+    "Hole_mask": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_00_hole_00_MSK1.tex"
+    },
+    "Hole_mask_noise": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/20_material_liquid_waterplace_000_00_MSK2.tex"
     },
     "Holo3D_DamageMap": {
         "SF6": "Product/MasterMaterial/texture/Raid/3DHologram_Damage_000_MSK1.tex"
@@ -3078,6 +3571,9 @@
     "IBLTextureResource": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "IBLTextureResource_Add": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "IBLmap": {
         "MHRSB": "MasterMaterial/Textures/IBL_small.tex"
     },
@@ -3139,7 +3635,11 @@
         "RE3": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Other/tex_other_tv_01_ALPG.tex"
     },
     "ImperfectDetail_Map": {
-        "RE4": "_Chainsaw/MasterMaterial/Textures/NullGray_MSK4.tex"
+        "RE4": "_Chainsaw/MasterMaterial/Textures/NullGray_MSK4.tex",
+        "RE9": "MaterialShader/Textures/Character_Base/Mask/ImperfectDetail_MSK4.tex"
+    },
+    "ImperfectDetail_OverrideMap": {
+        "RE9": "Character/ch/ch15/1500/Textures/ch1500_45_Jacket_IPMask_MSK1.tex"
     },
     "InSide_NormalRoughnessCavityMap": {
         "SF6": "Product/MasterMaterial/texture/NullNormalRoughnessCavity.tex"
@@ -3149,6 +3649,18 @@
     },
     "InSide_Texture": {
         "generic": "systems/rendering/NullBlack.tex"
+    },
+    "InjuryMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_00_gore_04_ALBA.tex"
+    },
+    "InjuryMap_ALBA": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "InjuryMap_NRM": {
+        "generic": "systems/rendering/NullNormalRoughness.tex"
+    },
+    "InjuryNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_00_gore_04_NRMR.tex"
     },
     "Injury_Map_ALBA": {
         "RE4": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/Record_Injury_Map_ALBA.tex"
@@ -3193,12 +3705,21 @@
     "InsideEmissiveNoise": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "InsideRippleMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch4400_DamegeRipple_01_ALBA.tex"
+    },
+    "InsideRippleNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch4400_DamegeRipple_01_NRM.tex"
+    },
     "IntensityMap": {
         "RE3RT": "MasterMaterial/Textures/null_black_MSK4.tex",
         "generic": "systems/rendering/NullWhite.tex"
     },
     "InteriorMap": {
         "DMC5": "Props/mesh/textures/sm0182_emissivewindowA_A_interior.tex"
+    },
+    "InteriorMap_01": {
+        "generic": "systems/rendering/NullBlackCubemap.tex"
     },
     "Interior_DielectricMap": {
         "SF6": "Product/MaterialLibrary/Interior/Room/IMR_002.tex"
@@ -3213,7 +3734,11 @@
         "generic": "systems/rendering/NullWhiteCubemap.tex"
     },
     "IrisBaseMap": {
-        "PRAG": "Character/ch/ch01/ch0100/10/ch0100_10_iris_type1_ALB.tex"
+        "PRAG": "Character/ch/ch01/ch0100/10/ch0100_10_iris_type1_ALB.tex",
+        "RE9": "MaterialShader/Textures/EyeTextures/iris_type1_ALB.tex"
+    },
+    "IrisBumMap": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "IrisColorMaskMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -3222,7 +3747,8 @@
         "generic": "systems/rendering/EyeMaterials/iris_type1_DISP.tex"
     },
     "IrisNormalMap": {
-        "PRAG": "Character/ch/ch01/ch0100/10/ch0100_10_iris_type1_NRM.tex"
+        "PRAG": "Character/ch/ch01/ch0100/10/ch0100_10_iris_type1_NRM.tex",
+        "RE9": "MaterialShader/Textures/EyeTextures/iris_type1_NRM.tex"
     },
     "IronWeb": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -3245,6 +3771,9 @@
     "LYMO_Common": {
         "RE4": "_Chainsaw/Environment/texture/sm13_517_LYMO.tex"
     },
+    "LargeNoise": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/clouds_ALP.tex"
+    },
     "Large_NormalAlphaMap": {
         "MHRSB": "item/item/item_164/mod/item_164_NRM.tex"
     },
@@ -3263,6 +3792,12 @@
     "LayerMaskOcclusionMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "Layer_BaseDielectricMap": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/vhwmdias_2K_ALBH.tex"
+    },
+    "Layer_NormalRoughnessHeightMap": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/vhwmdias_2K_NRRO.tex"
+    },
     "LeafSway_MaskMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
@@ -3273,7 +3808,8 @@
         "DMC5": "Event/Mission01/m01_010/Shader/Texture/mesh_03_cs_BloodWindow_50_003_NRMR.tex"
     },
     "LensDepthMap": {
-        "PRAG": "MasterMaterial/Textures/EyeTextures/refraction_mask_master.tex"
+        "PRAG": "MasterMaterial/Textures/EyeTextures/refraction_mask_master.tex",
+        "RE9": "MaterialShader/Textures/EyeTextures/refraction_mask_master.tex"
     },
     "LensMap": {
         "generic": "systems/rendering/NullGray.tex"
@@ -3296,11 +3832,29 @@
     "LevelUpNoiseDiffuse_03": {
         "RE3": "VFX/Texture/TEX_Tile/Tile_035_tex.tex"
     },
+    "LightDamage_ALBD": {
+        "RE9": "MaterialShader/Textures/Record_Base/LightDamage_ALBD.tex"
+    },
+    "LightDamage_NRRA": {
+        "RE9": "MaterialShader/Textures/Record_Base/LightDamage_NRRA.tex"
+    },
     "LightMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "LightNoise": {
         "MHWILDS": "GUI/ui_texture/tex000000/tex000201_MM0_IMLM1.tex"
+    },
+    "LightProjectionMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "LightdamageMap_ALBA": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_LightDamege_000_00_ALBA.tex"
+    },
+    "LightdamageMap_Bubble_NRMR": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_LightDamege_000_01_NRMR.tex"
+    },
+    "LightdamageMap_NRMR": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_LightDamege_000_00_NRMR.tex"
     },
     "Lightleak_ColorMap": {
         "RE4": "_Chainsaw/Test/Personal/Shader/Aso/CustomFilter/_Texture/Lightleak_ALB.tex"
@@ -3319,6 +3873,18 @@
     },
     "LineMap": {
         "PRAG": "MasterMaterial/Textures/AudioSpectrum/AudioSpectrum_Line_MSK1.tex"
+    },
+    "Line_ALB": {
+        "RE9": "Gui/Material/ui1506/ui1506_Line_ALB.tex"
+    },
+    "LinesALBH": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/HighwayLines_ALBH.tex"
+    },
+    "LinesMask": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/HighwayLines_ALP.tex"
+    },
+    "LinesNRRO": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/HighwayLines_NRRO.tex"
     },
     "Lip_MaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -3412,6 +3978,9 @@
     "MainLayerWeatherTexture": {
         "MHWILDS": "Art/Library/Light/LightPostLibrary/LP_Assets/Cloudscape2/StandardCloud2/StdCld2_MainLayerWeather_RTT_1024.rtex"
     },
+    "MainNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_01_NRM.tex"
+    },
     "MainTex": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -3438,6 +4007,9 @@
     },
     "Makai_NRMR": {
         "DMC5": "alphaTest/Character/Aso_test/_Texture/MakaiTest01_NRMR.tex"
+    },
+    "MakeHole_Map": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Map": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -3568,6 +4140,9 @@
     "Mask_MSK4": {
         "DMC5": "Event/Mission01/m01_010/Shader/Texture/mesh_03_cs_BloodWindow_50_000_MSK4.tex"
     },
+    "Mask_Map": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "Mask_Map_Anime": {
         "DMC5": "Event/Mission12/m12_300/Shader/Texture/tex_03_cs_bodybloofvessel_50_000_MSK1.tex"
     },
@@ -3646,6 +4221,9 @@
     "MeganeRimMap": {
         "generic": "systems/rendering/NullNormal.tex"
     },
+    "Melt_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Item/20_material_item_it70_01_000_BloodyGuts_000_03_ALB.tex"
+    },
     "MeshEmitterMap": {
         "MHS3": "Art/Model/character/common/meshEmitterTexture/meshEmitterCommon_MEC_MSK4.tex"
     },
@@ -3662,7 +4240,7 @@
         "RE3": "VFX/Texture/TEX_Other/tex_other_smoketiled_00.tex"
     },
     "MicroDetailDetailMap": {
-        "RE4": "_Chainsaw/Character/Textures/Detail/Mask/AgingDetail_Leather_MSK4.tex"
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Middle": {
         "SF6": "Product/VFX/Resource/Texture/TEX_GUI/brash/tex_10_brash_bg_00_0002_MSK3.tex"
@@ -3694,6 +4272,9 @@
     "MirrorMap": {
         "RE3RT": "Escape/VFX/Texture/TEX_Stage/TEX_st00_0201_0/tex_0006_st00_0201_0_mirror_0000_RTT.rtex"
     },
+    "Mirror_RTT": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "Mirror_RTT_Texture": {
         "RE2RT": "ObjectRoot/SetModel/sm4x_Gimmick/sm42/sm42_007_MagicMirror01A/sm42_007_MagicMirror01A_00_RTT.rtex",
         "RE3": "ObjectRoot/SetModel/sm2x_ArtifactLocation/sm23/sm23_1071_TheWhiteCube01A/NewRenderTargetTexture.rtex"
@@ -3706,6 +4287,9 @@
     },
     "Moire_Texture": {
         "RE4": "_Chainsaw/MasterMaterial/Textures/NullBlack_128.tex"
+    },
+    "Monitor_EmissiveTexture": {
+        "RE9": "Character/wp/wp35/3566/00/Emissive_A_no_Grid.tex"
     },
     "Monitor_RenderTarget": {
         "SF6": "@Product/GUI/data/BattleHub_Movie/BattleHubMovie.rtex"
@@ -3767,6 +4351,18 @@
     "MucusMask": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "MudBaseMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "MudNomalMap": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
+    "Mud_Normal_Tex": {
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_00_NRMR.tex"
+    },
+    "Mud_Tex": {
+        "RE9": "VFX/Mesh/MESH_Environment/WaterPlace/20_environment_waterplace_001_00_ALBA.tex"
+    },
     "Mud_mask": {
         "MHRSB": "enemy/em095/00/mod/em095_00_mudtiling_Mask_ALP.tex"
     },
@@ -3786,6 +4382,7 @@
         "DD2": "VFX/Texture/Volume/13_Cloud_000_00_MSK4.tex",
         "MHWILDS": "MasterMaterial/Textures/__3DTexture_Seamless_000_000_MSK4.tex",
         "RE4": "_Chainsaw/Test/Personal/Shader/Tamura/VolumetricFogCustomMaterial/Textures/__3DTexture_Seamless_000_000_MSK4.tex",
+        "RE9": "VFX/Texture/TEX_Other/20_other_normaldensity_000_00_MSK4.tex",
         "SF6": "Product/VFX/Resource/Texture/TEX_Props/wtc0101/__3DTexture_Seamless_000_000_MSK4.tex"
     },
     "NRMR": {
@@ -3830,6 +4427,9 @@
     "NRRC_Common": {
         "RE4": "_Chainsaw/Environment/texture/sm13_517_NRRC.tex"
     },
+    "NRRO_1": {
+        "RE9": "Character/ch/ch42/4200/Textures/ch4200_10_62_BreathFog_NRRO.tex"
+    },
     "NRRTMap": {
         "MHRSB": "enemy/em095/00/mod/em095_00_NRRT.tex"
     },
@@ -3868,6 +4468,9 @@
     "Noise3DMap": {
         "DD2": "MasterMaterial/Textures/Noise3D_02_MSK1.tex"
     },
+    "Noise3D_Tex": {
+        "RE9": "MaterialShader/Textures/Noise3D_00_MSK1.tex"
+    },
     "NoiseDiffuse_01": {
         "RE3": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Other/tex_tile_grid_0002.tex"
     },
@@ -3897,6 +4500,12 @@
     },
     "NoiseMap_B": {
         "DD2": "VFX/Texture/Noise/13_Noise_000_00.tex"
+    },
+    "NoiseMap_CoverMat": {
+        "RE9": "MaterialShader/Textures/NoiseMap_03_MSK1.tex"
+    },
+    "NoiseMap_RainWall": {
+        "RE9": "MaterialShader/Textures/NoiseMap_03_MSK1.tex"
     },
     "NoiseMask": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -3932,6 +4541,12 @@
     "NoiseUVMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "NoiseWaveMap": {
+        "RE9": "Environment/Textures/tx_073_NRRC.tex"
+    },
+    "Noise_ALB": {
+        "RE9": "Gui/Material/ui1506/ui1506_Noise_ALB.tex"
+    },
     "Noise_Emissive_FilamentColorMap": {
         "PRAG": "MasterMaterial/Textures/NoiseMap_03_MSK4.tex"
     },
@@ -3939,7 +4554,7 @@
         "DMC5": "Event/Mission12/m12_101/Shader/Texture/tex_03_cs_NoiseMask_50_001_MSK4.tex"
     },
     "Noise_Map": {
-        "generic": "systems/rendering/NullWhite.tex"
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "Noise_NormalRoughnessAlphaMap": {
         "DD2": "Character/ch/ch29_001/ch29_001_mantleNoise_NRRA.tex"
@@ -3960,7 +4575,8 @@
         "generic": "systems/rendering/NullBlack.tex"
     },
     "Noisemap": {
-        "DMC5": "UI/MasterMaterial/tex/DT_ATOS.tex"
+        "DMC5": "UI/MasterMaterial/tex/DT_ATOS.tex",
+        "RE9": "VFX/Texture/TEX_Other/NullWhite_MSK4.tex"
     },
     "NoizeMap": {
         "SF6": "Product/MasterMaterial/texture/Perlin_NRM.tex"
@@ -3972,6 +4588,7 @@
         "DMC5": "Props/mesh/textures/sm0175_waterfall_NoneBlendmask_ATOS.tex"
     },
     "Normal": {
+        "RE9": "VFX/Texture/TEX_Liquid/20_liquid_camerablood_000_00_NRMR.tex",
         "SF6": "Product/VFX/Resource/Texture/TEX_Shader/tex_10_Shader_Normal_0004_NRM.tex"
     },
     "Normal1_Tex": {
@@ -4017,7 +4634,8 @@
         "generic": "systems/rendering/NullNormal.tex"
     },
     "NormalMapLayer1": {
-        "PRAG": "MasterMaterial/Textures/EyeTextures/vein_NRM.tex"
+        "PRAG": "MasterMaterial/Textures/EyeTextures/vein_NRM.tex",
+        "RE9": "MaterialShader/Textures/EyeTextures/vein_NRM.tex"
     },
     "NormalMap_Glass": {
         "generic": "systems/rendering/NullNormal.tex"
@@ -4039,6 +4657,9 @@
     },
     "NormalMaskMap_B": {
         "DMC5": "Character/Enemy/em0700/em0700_Cloak_NRMR.tex"
+    },
+    "NormalMp": {
+        "RE9": "VFX/Mesh/MESH_Gimmick/Gm99_004/20_gm99_004_aquarium_00_NRMR.tex"
     },
     "NormalOcclusionCavityMap": {
         "PRAG": "Character/ch/ch01/ch0100/20/ch0100_20_DHair_NROC.tex"
@@ -4111,6 +4732,12 @@
     "NormalRoughnessCavityMap_C": {
         "SF6": "Product/MasterMaterial/texture/NullNormalRoughnessCavity.tex"
     },
+    "NormalRoughnessCavityMap_ClearCoat": {
+        "generic": "systems/rendering/NullNormalRoughnessOcclusion.tex"
+    },
+    "NormalRoughnessCavityMap_CoverMat": {
+        "generic": "systems/rendering/NullNormalRoughness.tex"
+    },
     "NormalRoughnessHeightMap": {
         "generic": "systems/rendering/NullNormalRoughnessOcclusion.tex"
     },
@@ -4133,6 +4760,9 @@
     },
     "NormalRoughnessMap_1": {
         "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Mesh/MESH_Creature/fly00/mesh_capcom_creature_fly00_NRMR.tex"
+    },
+    "NormalRoughnessMap_A": {
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_childSpider_000_01_NRMR.tex"
     },
     "NormalRoughnessMap_B": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
@@ -4162,6 +4792,9 @@
     "NormalTex": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
     },
+    "NormalTexture": {
+        "RE9": "VFX/Texture/AtlasTexture/Water/20_atlas_water_060_00_NRMR.tex"
+    },
     "NormalTranslucencyMap": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
     },
@@ -4176,7 +4809,8 @@
     },
     "Normal_Map": {
         "MHS3": "Art/Effect/99_res/tex/tex_other/tex_24_other_0_900_nullwhite_ALBA.tex",
-        "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Decal/tex_capcom_decal_oil_0000_NRM.tex"
+        "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Decal/tex_capcom_decal_oil_0000_NRM.tex",
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_lerge_000_00_bone_NRMR.tex"
     },
     "Normal_S_Tex": {
         "RE4": "_Chainsaw/VFX/Texture/arraytex/tex_ptn/tex_0015_vector_water_61_NRMR.tex"
@@ -4195,6 +4829,9 @@
     },
     "Normal_mini_tex": {
         "RE4": "_Chainsaw/VFX/Texture/TEX_Stage/TEX_st45/TEX_st45_400/TEX_0015_st45_400_swamp_0002_NRM.tex"
+    },
+    "NoseMask": {
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_lerge_000_00_noise_MSK2.tex"
     },
     "NosePattern_MaskMap": {
         "DD2": "MasterMaterial/Textures/NullBlack_MSK4.tex"
@@ -4305,6 +4942,12 @@
     "OutlineTarget": {
         "SF6": "Product/VFX/Event/CutScene/cs04/cs04_0000_001/texture/tex_10_shader_cs04_0000_001_outlineTarget00.rtex"
     },
+    "OutsideNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch4400_DamegeRipple_00_NRM.tex"
+    },
+    "OutsideRippleMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch4400_DamegeRipple_00_ALBA.tex"
+    },
     "OverRayMap_1": {
         "DMC5": "UI/Mesh/ui3400/tex/OverlayPhoto_C_IM.tex"
     },
@@ -4320,6 +4963,9 @@
     "PLShadowColorMaterialMask": {
         "DMC5": "Props/mesh/textures/sm0658_bloodwarpShadowMask_B_ALBA.tex"
     },
+    "POM_HeightMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "PP2_AnimationMask": {
         "SF6": "Product/Environment/Texture/sm51_000_telephone_A_DSP.tex"
     },
@@ -4331,6 +4977,30 @@
     },
     "PP2_Xvecter": {
         "SF6": "Product/Environment/Texture/sm51_000_telephone_A_VEC.tex"
+    },
+    "PadLock_Bubble_NRMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_03_NRMR.tex"
+    },
+    "PadLock_Foam_DiffuseMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_02_ALB.tex"
+    },
+    "PadLock_Foam_DistortionMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_01_MSK2.tex"
+    },
+    "PadLock_Foam_NRMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_03_NRM.tex"
+    },
+    "PadLock_Melt_DiffuseMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_06_ALB.tex"
+    },
+    "PadLock_Melt_Nmap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_04_NRMR.tex"
+    },
+    "PadLock_Melt_mask": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_00_MSK1.tex"
+    },
+    "PadLock_SmallBubble_NRMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Gimmick/20_material_gimmick_02_028_Padlock_000_05_NRMR.tex"
     },
     "PaintColorPalletRamp_R": {
         "MHS3": "MaterialShader/Texture/Null_GradationColorMap.tex"
@@ -4359,6 +5029,18 @@
     "PanoramaMaskMap": {
         "DMC5": "Character/Orb/orb006/orb006_0_Panorama_ALBA.tex"
     },
+    "ParallaxBlend_BaseMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "ParallaxBlend_DistortionMap": {
+        "generic": "systems/rendering/NullNormalRoughnessOcclusion.tex"
+    },
+    "ParallaxBlend_HeightMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "ParallaxBlend_NormalRoughnessCavityMap": {
+        "generic": "systems/rendering/NullNormalRoughnessOcclusion.tex"
+    },
     "ParallaxHeightMap": {
         "PRAG": "MasterMaterial/Textures/Anamorph/Anamorph_CrossSection_Parallax_HGT.tex"
     },
@@ -4377,6 +5059,9 @@
     "Parallax_ALBA": {
         "DMC5": "Props/mesh/textures/sm0163_deadpeopleA_I_ALBA.tex"
     },
+    "Parallax_AlbedoAlphaMap": {
+        "RE9": "Character/ch/ch40/4001/Textures/ch4001_00_00_00_Body00_Plastic_Parallax_ALBA.tex"
+    },
     "Parallax_AlbedoMap": {
         "generic": "systems/rendering/NullWhite.tex"
     },
@@ -4388,6 +5073,9 @@
     },
     "Parallax_BaseHightMap": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "Parallax_HeightMap": {
+        "RE9": "Environment/Textures/sm21_020_A_HGT.tex"
     },
     "Parallax_NRMR": {
         "DMC5": "Props/mesh/textures/sm0163_deadpeopleA_I_NRMR.tex"
@@ -4486,11 +5174,29 @@
     "PrimaryTex": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "ProjectedGrungeNoise": {
+        "RE9": "MaterialLibrary_2/Textures/Capcom/Mask/CC_Wear_Grunge_00_005/1M/CC_Wear_Grunge_00_005_1M_MSK.tex"
+    },
+    "ProjectionALBH": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/Sand_ALB.tex"
+    },
+    "ProjectionAOMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "ProjectionMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "ProjectionMaskBreakup": {
+        "RE9": "MaterialLibrary_2/Textures/Capcom/Mask/CC_Wear_Grunge_00_003/1M/CC_Wear_Grunge_00_003_1M_MSK.tex"
+    },
+    "ProjectionNRRO": {
+        "RE9": "Environment/Optimization/GroundZero/ConvertedSpline/MoonSoil_NRRO.tex"
+    },
     "PuddleRippleMap": {
         "DD2": "Light/Weather/RainPuddle_00_NRM.tex"
+    },
+    "Pulsation_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch8620_Pulsation_00_MSK2.tex"
     },
     "PulseMask": {
         "DMC5": "Props/mesh/textures/sm0163_deadpeopleA_I_ATOS.tex"
@@ -4498,14 +5204,33 @@
     "Pulse_GradientMap": {
         "MHWILDS": "MasterMaterial/Textures/sample_Pulse_MSK.tex"
     },
+    "Pulse_mask_0": {
+        "RE9": "Character/wp/wp35/3566/00/wp3566_00_mask_pulse_0_MSK3.tex"
+    },
+    "Pulse_mask_1": {
+        "RE9": "Character/wp/wp35/3566/00/wp_3566_00_mask_pulse_1_MSK3.tex"
+    },
+    "Pulse_mask_Gradation": {
+        "RE9": "Character/wp/wp35/3566/00/wp_3566_00_gradation_MSK1.tex"
+    },
     "PupilColorMap": {
         "DMC5": "Character/Enemy/em5900/em5900_eye00_ALBA.tex"
     },
     "PupilMap": {
-        "PRAG": "MasterMaterial/Textures/NullBlack_MSK4.tex"
+        "PRAG": "MasterMaterial/Textures/NullBlack_MSK4.tex",
+        "generic": "systems/rendering/lens_mask.tex"
     },
     "Pus_DamageMask": {
         "RE3RT": "Escape/Character/Enemy/Em9300/Em9330/Mesh/em9330_Damage_MSK1.tex"
+    },
+    "Pus_DisplacementMap": {
+        "RE9": "Character/ch/ch51/5120/Textures/ch5120_30_00_00_DisplacementMap_ALB.tex"
+    },
+    "Pus_DisplacementMask_MSK1": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "Pus_EmissiveMask_MSK1": {
+        "RE9": "Character/ch/ch51/5120/Textures/ch5120_30_00_00_EmissiveMask_MSK1.tex"
     },
     "PushOffsetMask": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -4532,7 +5257,8 @@
         "SF6": "Product/VFX/Resource/Mesh/MESH_Creature/chick00/10_mesh_chick00_00_RGH.tex"
     },
     "ROCMMap": {
-        "DD2": "AppData/Contents/_HLOD/out_instanced_merged_DNG_015_mul_1_0_ROCM.tex"
+        "DD2": "AppData/Contents/_HLOD/out_instanced_merged_DNG_015_mul_1_0_ROCM.tex",
+        "RE9": "VFX/Texture/TEX_Other/NullWhite_MSK4.tex"
     },
     "RT": {
         "RE3RT": "Escape/SetModel/textures/sm46_122_ES_EDSky01A_ALBM.tex"
@@ -4557,6 +5283,9 @@
     },
     "RTT_Foam_BloodDensity": {
         "generic": "systems/rendering/NullBlack.tex"
+    },
+    "RTT_RGDensity": {
+        "RE9": "VFX/Texture/RenderTargetTexture/RTT_environment/shallowwater/RTT_shallowwater_Density_00.rtex"
     },
     "RTT_ReflectedMap": {
         "MHS3": "@GameDesign/Camera/RTT/EventWipeCameraTarget_1.rtex"
@@ -4602,6 +5331,18 @@
     },
     "RadialBlurMaskArray": {
         "MHS3": "Art/Effect/99_res/tex/tex_atlas/tex_24_atlas_000_ALBA.tex"
+    },
+    "Rain": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_00_NMR.tex"
+    },
+    "RainDrop_DropMask": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_01_MSK4.tex"
+    },
+    "RainDrop_FlickDrops": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_02_NMR.tex"
+    },
+    "RainDrop_StopDrops": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_01_NMR.tex"
     },
     "RainDropsMaskMap": {
         "RE4": "_Chainsaw/MasterMaterial/Textures/RainMask1_NRRC.tex"
@@ -4657,6 +5398,9 @@
     "RainWet_drop_Map": {
         "RE2RT": "RE_ENGINE_LIBRARY/MasterMaterial/SourceTexture/Lib_Container_RainWetWindow/Lib_Container_RainWetWindow_drop_MSK3.tex",
         "RE3": "RE_ENGINE_LIBRARY/MasterMaterial/SourceTexture/Lib_Container_RainWetWindow/Lib_Container_RainWetWindow_drop_MSK3.tex"
+    },
+    "RainWindow": {
+        "RE9": "Light/Texture/ProjectionSpotLight/PSL_RainWetWindow_Caustics_MSK4.tex"
     },
     "RainWindowMist_DropNorm": {
         "RE2RT": "VFX/Mesh/MESH_CutScene/MESH_EV011_s00/mesh_0002_ev011_s00_truckwetwindow_0000/mesh_0002_ev011_s00_truckwetwindow_0000_00_01_MSK4.tex"
@@ -4746,17 +5490,30 @@
     "Rec_Rain_WetMask": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "RecordSys_AddMask": {
+        "RE9": "MaterialShader/Textures/NullBlack_MSK4.tex"
+    },
     "RecordSys_FACEMASK": {
         "generic": "systems/rendering/NullWhite.tex"
     },
     "RecordSys_Fix": {
         "RE4": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
     },
+    "RecordSys_FixMask": {
+        "RE9": "VFX/Texture/TEX_Other/NullWhite_MSK4.tex"
+    },
     "RecordSys_Protect": {
         "RE4": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
     },
+    "RecordSys_ProtectMask": {
+        "RE9": "MaterialShader/Textures/NullBlack_MSK4.tex"
+    },
     "RecordSys_rtt": {
-        "RE4": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex"
+        "RE4": "_Chainsaw/VFX/RecordSystem/RecordTexture/BaseTextures/null_black_MSK4.tex",
+        "RE9": "MaterialShader/Textures/NullBlack_MSK4.tex"
+    },
+    "RefelctionBaseNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_002_01_NRM.tex"
     },
     "ReflectImage": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -4769,7 +5526,8 @@
         "MHS3": "MaterialShader/Texture/CubeMap/Crystal_CubeMap.tex"
     },
     "RefractMap": {
-        "RE4": "_Chainsaw/MasterMaterial/Textures/RefractMap_NRM.tex"
+        "RE4": "_Chainsaw/MasterMaterial/Textures/RefractMap_NRM.tex",
+        "RE9": "MaterialShader/Textures/RefractMap_NRM.tex"
     },
     "RefractNormalMap": {
         "generic": "systems/rendering/NullNormal.tex"
@@ -4835,7 +5593,11 @@
         "DD2": "MasterMaterial/Textures/tex_capcom_vectorfield_0003_NotCompress_MSK3.tex"
     },
     "Reticle_Tex": {
-        "RE4": "_Chainsaw/MasterMaterial/Textures/NullBlack_MSK4.tex"
+        "RE4": "_Chainsaw/MasterMaterial/Textures/NullBlack_MSK4.tex",
+        "RE9": "Character/wp/wp01/0102/00/scope_reticle_01_MSK4.tex"
+    },
+    "Reticle_Texture": {
+        "generic": "systems/rendering/NullBlack.tex"
     },
     "RightMask_01": {
         "RE3": "VFX/Texture/TEX_Mask/tex_mask_RightLine_01.tex"
@@ -4906,6 +5668,9 @@
     "RoughnessTex": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "SSSCavityOcclusionTranslucentMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "SSSSheenOcclusionCavityMap": {
         "PRAG": "Character/ch/ch01/ch0100/10/ch0100_10_Head_Face_SSOC.tex"
     },
@@ -4913,7 +5678,8 @@
         "generic": "systems/rendering/NullBlack.tex"
     },
     "SandNoiseMap": {
-        "RE4": "_Chainsaw/MasterMaterial/Textures/TVScreen_SandNoise_ALBM.tex"
+        "RE4": "_Chainsaw/MasterMaterial/Textures/TVScreen_SandNoise_ALBM.tex",
+        "RE9": "MaterialShader/Textures/TVScreen_SandNoise_ALBM.tex"
     },
     "Sarcoma_TextureMask": {
         "RE4": "_Chainsaw/Environment/texture/sm61_305_A_MSK4.tex"
@@ -4929,6 +5695,9 @@
     },
     "ScaleTexture_01": {
         "RE3": "VFX/Texture/TEX_Common/Tex_Square_01.tex"
+    },
+    "Scan_ALB": {
+        "RE9": "Gui/Material/ui1506/ui1506_Scan_ALB.tex"
     },
     "Scar1_MaskMap": {
         "DD2": "Character/_kit/wound/wound_001/wound_001_body_m_MSKM.tex"
@@ -4946,10 +5715,17 @@
         "generic": "systems/rendering/NullBlack.tex"
     },
     "ScleraMap": {
-        "PRAG": "MasterMaterial/Textures/EyeTextures/vein_master.tex"
+        "PRAG": "MasterMaterial/Textures/EyeTextures/vein_master.tex",
+        "RE9": "MaterialShader/Textures/EyeTextures/vein_master.tex"
     },
     "ScnEfcTypeBG": {
         "ONI2": "GameDesign/DistortionFx/RTT_DistortionMap.rtex"
+    },
+    "ScopeSpecular_Texture": {
+        "RE9": "Gui/Material/Scope0/Scope0_FakeSpec_NRRA.tex"
+    },
+    "Scope_Texture": {
+        "RE9": "Gui/Material/Scope0/Scope0_Scope_ALBA.tex"
     },
     "Scratch_HeightRoughnessMetallic": {
         "PRAG": "Character/ch/ch00/ch0000/00/ch0000_00_Damage_Scratch_MSKM.tex"
@@ -4960,11 +5736,23 @@
     "ScreenDot_Map": {
         "SF6": "Product/VFX/Resource/Material/MAT_Character/CMN/preset/texture/paint_map/tex_10_shader_paint_dot_01_MSK4.tex"
     },
+    "ScreenImageMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "ScreenImageMap2": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "ScreenMaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "ScreenSpaceEmitter_mask": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_AmpouleExplosion_000_00_MSK2.tex"
+    },
     "ScreenTexture": {
         "SF6": "Product/VFX/Resource/Texture/TEX_Shader/tex_10_Shader_grad_0000_MSK1.tex"
+    },
+    "ScreenTransitionMap": {
+        "RE9": "Environment/Textures/sm87_190_ScreenTransition_MSK4.tex"
     },
     "Screen_Texture": {
         "RE4": "_Chainsaw/MasterMaterial/Textures/NullWhite_128.tex"
@@ -5005,6 +5793,12 @@
     "SecondaryBaseAlphaMap": {
         "ONI2": "@Character/Player/pl0/pl00/Texture/pl0000_00_ALB_MSK3.tex"
     },
+    "SecondaryBaseColorMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
+    "SecondaryBaseColorMap_MaskMap": {
+        "generic": "systems/rendering/NullWhite.tex"
+    },
     "SecondaryBaseMap": {
         "DD2": "Environment/Textures/tx_181_A_ALBD.tex"
     },
@@ -5025,6 +5819,9 @@
     },
     "SecondaryNormalMap": {
         "ONI2": "@Character/Player/pl0/pl00/Texture/pl0000_00_NRM.tex"
+    },
+    "SecondaryNormalRoughnessMap": {
+        "generic": "systems/rendering/NullNormalRoughness.tex"
     },
     "SecondaryNormalTex": {
         "generic": "systems/rendering/NullNormal.tex"
@@ -5214,6 +6011,9 @@
     "Slime_Noise3d": {
         "DD2": "MasterMaterial/Textures/Noise3D_02_MSK1.tex"
     },
+    "SmallBubble_NormalRoughnessMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Item/20_material_item_it70_01_000_BloodyGuts_000_04_NRMR.tex"
+    },
     "SmallCubeRefTex": {
         "SF6": "Product/VFX/Resource/Texture/TEX_Shader/tex_10_Shader_0054_ALPG.tex"
     },
@@ -5297,6 +6097,9 @@
         "RE3": "SectionRoot/Character/Player/pl1000/pl1050/pl1050_Face_SPC.tex",
         "RE3RT": "Escape/Character/Player/Pl2000/pl2001/Mesh/pl2001_Face_SPC.tex"
     },
+    "Specular_FlowMap": {
+        "RE9": "MaterialShader/Textures/NullAnisoFlow.tex"
+    },
     "SpellMaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -5315,11 +6118,17 @@
     "Stage_Image": {
         "SF6": "Product/GUI/data/Area_Image/ess/ess0000_00/tex_StageImage_ess0000_00_IM.tex"
     },
+    "StainMap_MSK4": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "Stain_Cloth_Map_MSK4": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "StampMap": {
         "MHWILDS": "Art/VFX/Texture/Enemy/Scar/11_em_scar_atlas_null.tex"
+    },
+    "StampMaskRTT": {
+        "RE9": "VFX/Texture/RenderTargetTexture/RTT_character/record_named/RTT_cp_A100_Strand.rtex"
     },
     "StampRenderTarget": {
         "MHWILDS": "@Art/VFX/VFX_SubScene_RenderTarget.rtex"
@@ -5357,6 +6166,9 @@
     "Stamp_Texture_Threshold": {
         "DMC5": "Event/Mission03/m03_600/Shader/Texture/tex_03_cs_threshold_50_000_MSK3.tex"
     },
+    "StampedStrandColorGradient": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_StrandColor_Blood_000_00.tex"
+    },
     "StandBaseMask": {
         "SF6": "Product/Model/esf/esf007/001/20/esf007_001_20_CMASK.tex"
     },
@@ -5382,19 +6194,33 @@
         "generic": "systems/rendering/NullBlack.tex"
     },
     "StitchMap": {
+        "RE9": "Character/Textures/Detail/Stitch/Detail_Stitch_VTL03_MSK4.tex",
         "SF6": "Product/MasterMaterial/texture/Null_RGBA_128_128_255_0.tex"
     },
     "Stitch_NAM": {
         "DD2": "MasterMaterial/Textures/NullStitch.tex",
         "RE4": "_Chainsaw/Character/Textures/Stitches/Stitch_06_MSK4.tex"
     },
+    "StopDrops": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_01_NMR.tex"
+    },
     "StrataNRRAMap": {
         "DD2": "Environment/Textures/tx_331_NRRA.tex"
+    },
+    "SubNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_00_NRM.tex"
+    },
+    "SubinteriorALBD": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "SubinteriorATOS": {
+        "generic": "systems/rendering/NullATOS.tex"
     },
     "SurfaceTensionNormalMap": {
         "RE4": "_AnotherOrder/VFX/Mesh/MESH_Event/MESH_cse340_s00/tex_0015_cse340_s00_ripple_0011_NRM.tex"
     },
     "SweatMap": {
+        "RE9": "MaterialShader/Textures/NullBlack_MSK4.tex",
         "SF6": "Product/MasterMaterial/texture/Null_RGB_128_128_0.tex"
     },
     "SwellingMaskCube": {
@@ -5429,13 +6255,15 @@
         "RE2RT": "SectionRoot/UI/UI_Shader/tex/ui_monitor_lens_MSK4.tex",
         "RE3": "SectionRoot/UI/UI_Shader/tex/ui_monitor_lens_MSK4.tex",
         "RE3RT": "Escape/VFX/Texture/TEX_UI/tex_0006_ui_monitor_lens_MSK4.tex",
-        "RE4": "_Chainsaw/UI/UI_Shader/tex/tex_0006_ui_monitor_lens_MSK4.tex"
+        "RE4": "_Chainsaw/UI/UI_Shader/tex/tex_0006_ui_monitor_lens_MSK4.tex",
+        "RE9": "Gui/Material/ui1642/ui1642_monitor_MSK4.tex"
     },
     "TVSnow_Map": {
         "RE2RT": "SectionRoot/UI/UI_Shader/tex/ui_monitor_noise_ALB.tex",
         "RE3": "SectionRoot/UI/UI_Shader/tex/ui_monitor_noise_ALB.tex",
         "RE3RT": "Escape/VFX/Texture/TEX_UI/tex_0006_ui_monitor_noise_ALB.tex",
-        "RE4": "_Chainsaw/UI/UI_Shader/tex/tex_0006_ui_monitor_noise_ALB.tex"
+        "RE4": "_Chainsaw/UI/UI_Shader/tex/tex_0006_ui_monitor_noise_ALB.tex",
+        "RE9": "Gui/Material/ui1610_003/ui1610_00_2_MSK1.tex"
     },
     "TVscreen_distortionMap": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -5471,9 +6299,22 @@
         "MHRSB": "stage/m04d/m04a08d/NullWhite.tex"
     },
     "TearMap": {
-        "MHRSB": "npc/mod/npc004_00/npc004_02_face/npc004_02_tearMap.tex"
+        "MHRSB": "npc/mod/npc004_00/npc004_02_face/npc004_02_tearMap.tex",
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_ch1210_20_teat_00_NRMR.tex"
     },
     "TearNullNRM": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
+    "TearsFace_MaskMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "TearsFace_NormalRoughnessMap": {
+        "generic": "systems/rendering/NullNormalRoughness.tex"
+    },
+    "Tears_MaskMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "Tears_NormalMap": {
         "generic": "systems/rendering/NullNormal.tex"
     },
     "Teeth_MaskMap": {
@@ -5508,6 +6349,9 @@
         "DD2": "Gui/ui02/ui0208/TEX_ui020804_06_MSK1.tex",
         "MHWILDS": "GUI/ui_texture/tex000000/tex000201_10_MM0_IMLM4.tex"
     },
+    "Tex2D_4": {
+        "RE9": "VFX/Mesh/MESH_Gimmick/Gm99_004/20_gm99_004_caustice_flow_00_NRM.tex"
+    },
     "Tex2D_5": {
         "DD2": "Gui/ui02/ui0208/TEX_ui020804_00_MSK2.tex"
     },
@@ -5521,7 +6365,8 @@
         "MHWILDS": "GUI/ui_texture/tex010000/tex010100_MM0_IMLM4.tex"
     },
     "Tex2D_Base": {
-        "PRAG": "UI/Asset/ui2000/texture/ui2030_shape_01_IAM.tex"
+        "PRAG": "UI/Asset/ui2000/texture/ui2030_shape_01_IAM.tex",
+        "RE9": "Gui/Material/ui1630/ui1630_01_00_IAM.tex"
     },
     "Tex2D_Capture": {
         "MHS3": "GUI/ui_texture/tex_render/rtt_game_view.rtex"
@@ -5541,11 +6386,20 @@
     "Tex2D_FadeMask": {
         "MHS3": "GUI/ui_texture/common/Common_CloudNoise_IML2.tex"
     },
+    "Tex2D_Flash": {
+        "RE9": "Gui/Material/ui1630/ui1630_00_00_IAM.tex"
+    },
     "Tex2D_Flow": {
         "MHWILDS": "GUI/ui_texture/tex010000/tex010100_MM1_IMLM4.tex"
     },
+    "Tex2D_Image": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "Tex2D_LayerMask": {
         "MHS3": "GUI/ui_material/RangerMark_LayerMask_IML4.tex"
+    },
+    "Tex2D_Line": {
+        "RE9": "Gui/Material/ui1610_003/ui1610_00_0_0_IAM.tex"
     },
     "Tex2D_Main": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -5576,6 +6430,15 @@
     },
     "Tex2D_WaveLineMask": {
         "MHS3": "GUI/ui_material/WaveLine_IML2.tex"
+    },
+    "Tex2D_image": {
+        "RE9": "Gui/ui1600/tex/ui1610_00_0420_1_IM.tex"
+    },
+    "Tex2D_ui1020_0": {
+        "RE9": "Gui/Material/ui1020/ui1020_0_IAM.tex"
+    },
+    "Tex2D_ui1020_1": {
+        "RE9": "Gui/Material/ui1020/ui1020_1_IAM.tex"
     },
     "TexBlend2_BaseDielectricMap": {
         "RE4": "_Chainsaw/MasterMaterial/Textures/NullWhiteBlack.tex"
@@ -5616,14 +6479,26 @@
     "Tex_Base_ALBA": {
         "PRAG": "MasterMaterial/Textures/NullWhite_64.tex"
     },
+    "Tex_Bubble": {
+        "RE9": "VFX/Texture/DecalTexture/Liquid/Lib_20_decal_liquid_001_00_ALBA.tex"
+    },
+    "Tex_BubbleNormal": {
+        "RE9": "VFX/Texture/DecalTexture/Liquid/Lib_20_decal_liquid_001_00_NRMR.tex"
+    },
     "Tex_Circle": {
         "MHWILDS": "GUI/ui_texture/tex_effect/tex_eff_MM00_IMLM4.tex"
+    },
+    "Tex_Detail": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_01_NRM.tex"
     },
     "Tex_DetailMap": {
         "PRAG": "VFX/Texture/Decal/17_Decal_200_01_D_MSK4.tex"
     },
     "Tex_Dirty": {
         "MHWILDS": "GUI/ui_texture/tex060000/st000/tex060000_st000_00_IMLM4.tex"
+    },
+    "Tex_Distortion": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/20_material_liquid_waterplace_000_00_MSK2.tex"
     },
     "Tex_Effect": {
         "MHWILDS": "GUI/ui_texture/tex060000/st000/tex060000_st000_10_IMLM4.tex"
@@ -5637,6 +6512,12 @@
     "Tex_FilamentColor": {
         "PRAG": "VFX/Texture/Decal/17_Decal_200_01_ALB.tex"
     },
+    "Tex_Glass_Add": {
+        "RE9": "Gui/Material/ui0301/ui0301_Glass_Add_IAM.tex"
+    },
+    "Tex_Glass_NRM": {
+        "RE9": "Gui/Material/ui0301/ui0301_Glass_NRM.tex"
+    },
     "Tex_GlitchMask": {
         "PRAG": "VFX/Texture/Mask/17_Mask_000_10_MSK2.tex"
     },
@@ -5645,6 +6526,12 @@
     },
     "Tex_Normal": {
         "MHWILDS": "GUI/ui_texture/tex060000/st000/tex060000_st000_20_IMLM4.tex"
+    },
+    "Tex_NormalA": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_01_NRM.tex"
+    },
+    "Tex_NormalB": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_01_NRM.tex"
     },
     "Tex_NormalRoughness": {
         "PRAG": "MasterMaterial/Textures/NullNormalRoughness_white.tex"
@@ -5748,6 +6635,9 @@
     },
     "TillingCare_MaskTex": {
         "generic": "systems/rendering/NullWhite.tex"
+    },
+    "TillingMask_Map": {
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_lerge_000_00_vessel_mask_MSK1.tex"
     },
     "TimeLock_EmissiveColor": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -5990,10 +6880,14 @@
         "DD2": "Light/Weather/VolumetricFog/tex_capcom_vectorfield_0007_MSK4.tex",
         "MHWILDS": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Vectorfield/tex_capcom_vectorfield_0007_MSK4.tex",
         "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Vectorfield/tex_capcom_vectorfield_0007_MSK4.tex",
+        "RE9": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Vectorfield/tex_capcom_vectorfield_0007_MSK4.tex",
         "SF6": "Product/VFX/Resource/Texture/TEX_Vectorfield/tex_capcom_vectorfield_0003_MSK4.tex"
     },
     "Vein_Tex2D": {
         "MHS3": "GUI/ui_texture/common/Common_CloudNoise_IML2.tex"
+    },
+    "Velocity": {
+        "RE9": "VFX/Texture/RenderTargetTexture/RTT_environment/waterstream/RTT_ch3_04_waterstream01_Velocity.rtex"
     },
     "VelocityMap": {
         "RE3": "MasterMaterial/Textures/Env_Water/Env_Water_DensityMap_1K_16bit_MSK3.tex"
@@ -6016,7 +6910,8 @@
     },
     "VertexAnim_PositionMap": {
         "DD2": "Character/ch/ch29_001/ch29_001_mantle_Position.tex",
-        "RE4": "_Chainsaw/Character/wp/wp53/wp5300/00/wp5300_00_chain1_Position.tex"
+        "RE4": "_Chainsaw/Character/wp/wp53/wp5300/00/wp5300_00_chain1_Position.tex",
+        "RE9": "Character/wp/wp65/6533/00/wp6533_00_chain1_Position.tex"
     },
     "VertexAnimationNoiseMap": {
         "MHS3": "MaterialShader/Texture/PerlinNoise_MSK1.tex"
@@ -6030,6 +6925,9 @@
     "VertexB_Map": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "VertexMainNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_01_NRM.tex"
+    },
     "VertexMask": {
         "generic": "systems/rendering/NullWhite.tex"
     },
@@ -6038,6 +6936,15 @@
     },
     "VertexNoisemap": {
         "RE4": "_AnotherOrder/MasterMaterial/Textures/AO_0015_Noise_0001_ALB.tex"
+    },
+    "VertexSafeMask": {
+        "RE9": "VFX/Texture/MaterialTexture/Item/20_material_item_it70_01_000_BloodyGuts_000_00_MSK1.tex"
+    },
+    "VertexSubNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_02_NRM.tex"
+    },
+    "VertexTex_B": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/20_material_liquid_waterslider_000_00_MSK1.tex"
     },
     "Vertex_Anime_Map": {
         "DMC5": "Event/Mission12/m12_300/Shader/Texture/tex_03_cs_bodybloofvessel_50_000_MSK1.tex"
@@ -6048,7 +6955,11 @@
     "Vertex_Mask_body_RGB_Root_cu_xi": {
         "DMC5": "Event/Mission12/m12_300/Shader/Texture/tex_03_cs_bodybloofvessel_50_000_MSK3.tex"
     },
+    "Vertex_MeltMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Item/20_material_item_it70_01_000_BloodyGuts_000_05_ALB.tex"
+    },
     "Vertex_NoiseMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Item/20_material_item_it70_01_000_BloodyGuts_000_06_ALB.tex",
         "SF6": "Product/VFX/Resource/Texture/TEX_Shader/tex_10_Shader_0012_ALPG.tex"
     },
     "Vertex_Tex": {
@@ -6056,6 +6967,9 @@
     },
     "VertexxAnimMap": {
         "MHRSB": "vfx/mtu/tex_0004_cm_04_0010_ALB.tex"
+    },
+    "Vessel_Map": {
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_lerge_000_00_vessel_NRMR.tex"
     },
     "Vfx_NoiseMap": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -6087,6 +7001,9 @@
     "VolumeNoiseMap": {
         "MHWILDS": "MasterMaterial/Textures/Noise3D_MSK3.tex"
     },
+    "VtxTex_A": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/20_material_liquid_waterslider_000_00_MSK1.tex"
+    },
     "WE_EmissiveMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -6108,6 +7025,9 @@
     "WN2_ShadowTexture": {
         "MHWILDS": "Art/Light/Light_Assets/Texture/Noise/InvWorley3D_Sh20_16_MSK1.tex"
     },
+    "WPOAllNoiseMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_000_01_ALB.tex"
+    },
     "W_Base": {
         "generic": "systems/rendering/NullBlack.tex"
     },
@@ -6119,6 +7039,9 @@
     },
     "WaterBubble_MaskMap": {
         "DD2": "MasterMaterial/Textures/NoiseMap_04_MSK1.tex"
+    },
+    "WaterColorMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_000_03_ALB.tex"
     },
     "WaterDripMap": {
         "DD2": "MasterMaterial/Textures/WaterDrip_MSK4.tex"
@@ -6138,11 +7061,20 @@
     "WaterFall_ElementMap": {
         "SF6": "Product/Environment/Stage/Resource/wtc/wtc0101/wtc0101_04/wtc_0101_04_waterFall_ALP.tex"
     },
+    "WaterLevel": {
+        "RE9": "VFX/Texture/RenderTargetTexture/RTT_environment/waterstream/RTT_ch3_04_waterstream01_WaterLevel.rtex"
+    },
     "WaterMask": {
         "SF6": "test/180993/test/noise.tex"
     },
+    "WaterMask4_MAP": {
+        "generic": "systems/rendering/NullGray.tex"
+    },
     "WaterNRMmap": {
         "MHRSB": "enemy/em058/00/mod/em058_wave_displace_MSK4.tex"
+    },
+    "WaterNormalMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_002_00_NRM.tex"
     },
     "WaterNormalRoughnessMap": {
         "DMC5": "Props/mesh/textures/sm0175_waterfall02water_NRMR.tex"
@@ -6167,6 +7099,9 @@
     "WaveAnim_OffsetMap": {
         "DMC5": "Character/Enemy/em0500/em0500_03_Offset_ATOS.tex"
     },
+    "WaveColorMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_000_04_ALB.tex"
+    },
     "WaveColor_EmissiveMask": {
         "SF6": "Product/Light/Scene/ess/ess0201_00/texture/Wave_water_EMI.tex"
     },
@@ -6182,6 +7117,9 @@
     },
     "WaveNormalMap": {
         "MHWILDS": "MasterMaterial/Textures/wave_MSK4.tex"
+    },
+    "WaveNormalRoughnessMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_001_01_NRMR.tex"
     },
     "WaveNormalTex": {
         "RE3": "RE_ENGINE_LIBRARY/VFX_Library/Decal/Sample/Decal_Shader/shader_title02_19_LiquidDecal_MSK3.tex"
@@ -6207,6 +7145,9 @@
     "WaveVfx_texB": {
         "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Mesh/MESH_Sample/MESH_Shader/title02/13_shallowWater/shader_title02_13_shallowWater_00_00_NRMR.tex"
     },
+    "WaveWpoMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Environment/20_Material_Environment_Ch3_05_WaterFall_000_04_ALB.tex"
+    },
     "Wave_FlowMap": {
         "RE3": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Sample/TEX_ShaderManual/Flag_01_NM.tex"
     },
@@ -6222,11 +7163,15 @@
     "Wave_NormalMap": {
         "RE3": "MasterMaterial/Textures/Env_Water/Env_Water_NRM.tex"
     },
+    "Wave_Normal_Tex": {
+        "RE9": "VFX/Texture/AtlasTexture/Water/20_atlas_core_water_NRMR.tex"
+    },
     "Wave_Normal_Texture2DArray": {
         "RE2RT": "MasterMaterial/Textures/Env_WetFloor/WetFloor_vector_water_00_NRMR.tex",
         "RE3": "MasterMaterial/Textures/Env_WetFloor/WetFloor_vector_water_00_NRMR.tex",
         "RE3RT": "MasterMaterial/Textures/Env_WetFloor/WetFloor_vector_water_00_NRMR.tex",
-        "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Mesh/MESH_Sample/MESH_Shader/title02/13_shallowWater/shader_title02_13_shallowWater00_NRMR.tex"
+        "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Mesh/MESH_Sample/MESH_Shader/title02/13_shallowWater/shader_title02_13_shallowWater00_NRMR.tex",
+        "RE9": "VFX/Texture/AtlasTexture/Water/20_atlas_core_water_NRMR.tex"
     },
     "Wave_Pattern": {
         "DD2": "Gui/ui06/ui0602/TEX_pattern_wave_IM.tex"
@@ -6267,6 +7212,9 @@
     "Wear_NormalRoughnessCavityMap": {
         "SF6": "Product/MasterMaterial/texture/NullNormalRoughnessCavity.tex"
     },
+    "Web_MSK4": {
+        "RE9": "VFX/Mesh/MESH_Event/c410s300/20_event_c410s300_s00_sm87_200_00_00_MSK4.tex"
+    },
     "Wedge_Bias_Transition": {
         "RE4": "_Chainsaw/Test/Personal/Shader/Tamura/NewGroundShader/Textures/bias_transition_MSK1.tex"
     },
@@ -6281,6 +7229,12 @@
         "RE3": "MasterMaterial/Textures/Env_WetFloor/WetFloor_vector_water_00_NRMR.tex",
         "RE3RT": "MasterMaterial/Textures/Env_WetFloor/WetFloor_vector_water_00_NRMR.tex"
     },
+    "WetMap": {
+        "RE9": "VFX/Texture/MaterialTexture/Character/20_material_WetMask_000_00_MSK4.tex"
+    },
+    "WetNormalMap": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
     "WetOffset3DMap": {
         "DD2": "MasterMaterial/Textures/Noise3D_00_MSK1.tex"
     },
@@ -6293,8 +7247,14 @@
     "Wet_MaskArea": {
         "generic": "systems/rendering/NullWhite.tex"
     },
+    "Wet_NormalMap": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
     "WhiteNoiseTex": {
         "RE3": "VFX/Texture/tex_WhiteNoise_01.tex"
+    },
+    "WhiteWater_Map": {
+        "RE9": "VFX/Texture/MaterialTexture/Liquid/Old_20_material_liquid_waterplace_000_01_NRM.tex"
     },
     "WhiteWater_Tex_1": {
         "generic": "systems/rendering/NullWhite.tex"
@@ -6382,23 +7342,36 @@
     "Worm_NormalMap": {
         "generic": "systems/rendering/NullNormal.tex"
     },
+    "WoundHealing_Base": {
+        "RE9": "VFX/Texture/EventTexture/c441s200/20_c441s200_ch1300_01_MSK4.tex"
+    },
+    "WoundHealing_HealingMap": {
+        "RE9": "VFX/Texture/TEX_Vector/Lib_20_vector_lens_001_00_MSK4.tex"
+    },
+    "WoundHealing_Normal": {
+        "RE9": "VFX/Texture/EventTexture/c441s200/20_c441s200_ch1300_01_NRMR.tex"
+    },
     "Wound_BloodNormalMap": {
         "generic": "systems/rendering/NullNormalRoughness.tex"
     },
     "Wound_NoiseMap": {
         "RE4": "_AnotherOrder/MasterMaterial/Textures/AO_0015_Noise_0000_ALB.tex"
     },
+    "WpBlood_Texture": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
     "WrinkleDiffuseMap1": {
-        "generic": "systems/rendering/NullBlack.tex"
+        "generic": "systems/rendering/NullGray.tex"
     },
     "WrinkleDiffuseMap2": {
-        "generic": "systems/rendering/NullBlack.tex"
+        "generic": "systems/rendering/NullGray.tex"
     },
     "WrinkleDiffuseMap3": {
-        "generic": "systems/rendering/NullBlack.tex"
+        "generic": "systems/rendering/NullGray.tex"
     },
     "WrinkleMap": {
-        "PRAG": "MasterMaterial/Textures/NullDetail.tex"
+        "PRAG": "MasterMaterial/Textures/NullDetail.tex",
+        "RE9": "MaterialShader/Textures/Character_Base/Mask/SmallWrinkles_Distortion_01_MSK4.tex"
     },
     "WrinkleMap1": {
         "DD2": "MasterMaterial/Textures/NullGray_MSK4.tex"
@@ -6410,19 +7383,29 @@
         "DD2": "MasterMaterial/Textures/NullGray_MSK4.tex"
     },
     "WrinkleNormalMap": {
-        "RE4": "_Chainsaw/MasterMaterial/Textures/NullWrinkleNormalMap.tex"
+        "RE4": "_Chainsaw/MasterMaterial/Textures/NullWrinkleNormalMap.tex",
+        "generic": "systems/rendering/NullNormal.tex"
     },
     "WrinkleNormalMap1": {
-        "generic": "systems/rendering/NullNormalRoughness.tex"
+        "generic": "systems/rendering/NullNormal.tex"
     },
     "WrinkleNormalMap2": {
-        "generic": "systems/rendering/NullNormalRoughness.tex"
+        "generic": "systems/rendering/NullNormal.tex"
     },
     "WrinkleNormalMap3": {
+        "generic": "systems/rendering/NullNormal.tex"
+    },
+    "WrinkleOverrideMap": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "WrinkledMap": {
         "generic": "systems/rendering/NullNormal.tex"
+    },
+    "WriteTextMap": {
+        "RE9": "Environment/Textures/sm15_036_C_MSK1.tex"
+    },
+    "WriteTextNormalMap": {
+        "RE9": "Environment/Textures/sm15_036_C_NRM.tex"
     },
     "YPos_MaskMap": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -6498,6 +7481,9 @@
     },
     "_Texture2D_1_3": {
         "DMC5": "UI/MasterMaterial/tex/smoke_B_IM.tex"
+    },
+    "_Texture2D_1_3_4": {
+        "RE9": "Gui/Material/ui2260/ui2260_Glass_NRM.tex"
     },
     "_Texture2D_2": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -6607,6 +7593,9 @@
     "awa_Texture": {
         "RE4": "RE_ENGINE_LIBRARY/VFX_Library/Texture/TEX_Decal/tex_capcom_decal_liquid_ground_0001_ALBA.tex"
     },
+    "base": {
+        "RE9": "Gui/Material/ui2100/ui2100_rtt.rtex"
+    },
     "baseColorTex": {
         "RE3RT": "Escape/VFX/Mesh/MESH_Character/MESH_Character_bakeanimation/mesh_0006_bakeanim_0000/mesh_0006_bakeanim_0000_Mixing_UV_B.tex"
     },
@@ -6624,6 +7613,15 @@
     },
     "bloodNoiseTex": {
         "DMC5": "Event/Mission08/m08_500/Shader/Texture/tex_03_cs_noise01_50_000.tex"
+    },
+    "blood_tank_Map": {
+        "RE9": "VFX/Mesh/MESH_Gimmick/Gm99_004/20_gm99_004_aquarium_00_NRMR.tex"
+    },
+    "bubble_NRMR": {
+        "generic": "systems/rendering/NullNormalRoughness.tex"
+    },
+    "caustics": {
+        "RE9": "VFX/Mesh/MESH_Gimmick/Gm99_004/20_gm99_004_caustice_00_MSK1.tex"
     },
     "caustics01Tex": {
         "SF6": "Product/VFX/Resource/Texture/TEX_Shader/tex_10_Shader_0018_ALPG.tex"
@@ -6712,12 +7710,18 @@
     "cut06": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "dirtyBubble_BaseMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "displacement_noiseMap": {
         "RE4": "_Chainsaw/MasterMaterial/Textures/NoiseMap_03_MSK1.tex"
     },
     "dissolve": {
         "DD2": "Gui/MasterMaterial/ui09/ui0901/TEX_ui090100_MSK1.tex",
         "SF6": "Product/VFX/Resource/Texture/TEX_Shader/tex_10_Shader_0018_ALPG.tex"
+    },
+    "distortion_map": {
+        "generic": "systems/rendering/NullNormal.tex"
     },
     "e2d": {
         "DMC5": "VFX/EffectEditer/EFD_Props/EFD_sm0163/efd_03_sm0163_001_00.rtex"
@@ -6734,11 +7738,17 @@
     "earth_tex": {
         "SF6": "Product/GUI/data/BattleHub_ShopMonitor/material/tex_earth.tex"
     },
+    "edge_mask": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "emissive": {
         "SF6": "Product/VFX/Resource/Texture/TEX_Shader/tex_10_Shader_0045_ALPG.tex"
     },
     "emissiveMask_map": {
         "MHRSB": "player/mod/m/pl424/pl424_lens_PR.tex"
+    },
+    "emissive_anim_tex": {
+        "RE9": "VFX/Texture/TEX_Liquid/20_liquid_camerablood_000_00_animgrad_MSK1.tex"
     },
     "emname_Tex": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -6808,6 +7818,9 @@
     },
     "ice_PanoramaMap": {
         "MHRSB": "MasterMaterial/Textures/panorama01.tex"
+    },
+    "image": {
+        "RE9": "Gui/Material/ui0322/ui0322_IAM.tex"
     },
     "kizu_Map": {
         "DMC5": "Event/Mission11/m11_101/Shader/Texture/tex_03_cs_Scar_50_002_MSK3.tex"
@@ -6902,6 +7915,15 @@
     "nami_RT1": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "noise": {
+        "RE9": "Gui/Material/ui2100/ui2100_noise_glitch.tex"
+    },
+    "noise_blur": {
+        "RE9": "Gui/Material/ui2100/ui2100_noise_glitch.tex"
+    },
+    "noise_mask": {
+        "RE9": "VFX/Texture/MaterialTexture/Blood/Old_20_material_blood_000_00_MSK2.tex"
+    },
     "noisemap": {
         "MHWILDS": "MasterMaterial/Textures/bluenoise_msk1.tex"
     },
@@ -6909,6 +7931,12 @@
         "MHRSB": "stage/m32/textures/m32_numa01_NRMR.tex"
     },
     "normalnoise_tex": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
+    "nosie": {
+        "RE9": "VFX/Mesh/MESH_Debris/Meat/20_debris_meat_lerge_000_00_noise_MSK2.tex"
+    },
+    "object_shape_mask": {
         "generic": "systems/rendering/NullBlack.tex"
     },
     "panoramamap": {
@@ -6928,6 +7956,12 @@
     },
     "printmask": {
         "RE4": "_Chainsaw/VFX/Mesh/MESH_Charactor/MESH_chf0/tex_0015_chf0_footstep_mask_0000_A_ALBD.tex"
+    },
+    "rainTex": {
+        "RE9": "VFX/Texture/TEX_Liquid/20_liquid_raindrop_002_00_ALBA.tex"
+    },
+    "raindrop_noise": {
+        "RE9": "VFX/Texture/MaterialTexture/Rain/20_material_noise_000_00_MSK2.tex"
     },
     "reflectionMap": {
         "generic": "systems/rendering/NullBlack.tex"
@@ -7001,6 +8035,9 @@
     "tex_Circle_00": {
         "MHWILDS": "GUI/ui_texture/tex060000/tex060002_01_IMLM4.tex"
     },
+    "tex_Cover_Frame": {
+        "RE9": "Gui/Material/Common/GUIBtnGlassCover_frame_IAM.tex"
+    },
     "tex_Gauge": {
         "DMC5": "UI/Mesh/ui1016/tex/V_GaugeBase_ALB.tex"
     },
@@ -7022,20 +8059,39 @@
     "tex_Sicon": {
         "MHWILDS": "GUI/ui_texture/tex060000/tex060002_00_IMLM4.tex"
     },
+    "tex_base": {
+        "RE9": "Gui/Material/ui2600/ui2600_base_ALB.tex"
+    },
     "tex_displace_X": {
         "PRAG": "UI/Asset/ui2000/texture/ui2030_displace_03_IM.tex"
     },
     "tex_displace_Y": {
         "PRAG": "UI/Asset/ui2000/texture/ui2030_displace_03_IM.tex"
     },
+    "tex_line": {
+        "RE9": "Gui/Material/Common/GUIGlassCover_line_ALB.tex"
+    },
     "tex_lineMusk": {
         "generic": "systems/rendering/NullBlack.tex"
     },
+    "tex_line_g": {
+        "RE9": "Gui/Material/Common/GUIBtnGlassCover_line_g_IAM.tex"
+    },
     "tex_mask": {
+        "RE9": "Gui/Material/ui2220/ui2220_GlassCover_mask_IAM.tex",
         "SF6": "Product/GUI/gm/ui10600/part/tex_StageThumb_mask_IM.tex"
     },
     "tex_noise": {
         "MHWILDS": "GUI/ui_texture/tex060000/st000/tex_st000_06_IMLM4.tex"
+    },
+    "tex_vital": {
+        "RE9": "Gui/Material/ui2060/vital_2_IAM.tex"
+    },
+    "tex_vital_2": {
+        "RE9": "Gui/Material/ui2060/ui2060_bg_IAM.tex"
+    },
+    "text": {
+        "RE9": "Gui/Material/ui2100/ui2100_rtt.rtex"
     },
     "texture1": {
         "DMC5": "UI/Mesh/ui1010/ui1010_IAM.tex"
@@ -7043,8 +8099,14 @@
     "texture2": {
         "DMC5": "UI/Mesh/ui1010/ui1008_00_IAM.tex"
     },
+    "texture_NormalMap": {
+        "generic": "systems/rendering/NullBlack.tex"
+    },
     "v_MorphMap": {
         "generic": "systems/rendering/NullBlack.tex"
+    },
+    "vertex_normal_map": {
+        "RE9": "MaterialShader/Textures/NullBlack_MSK4.tex"
     },
     "vtx_DetailEmissiveMap": {
         "MHRSB": "item/item/item_170/mod/item_170_Body_DEM.tex"
@@ -7087,6 +8149,9 @@
     },
     "wave_displacementmap": {
         "MHRSB": "MasterMaterial/Textures/wave_displace_MSK4.tex"
+    },
+    "wave_map": {
+        "RE9": "VFX/Mesh/MESH_Gimmick/Gm99_004/20_gm99_004_topsurface_00_NRM.tex"
     },
     "wave_mask": {
         "MHRSB": "MasterMaterial/Textures/Flag_Mask_MM.tex"

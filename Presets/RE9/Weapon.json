@@ -1,0 +1,469 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE9",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "WeaponMat",
+        "Master Material Path": "MaterialShader/Master/ChWp_Default_Wet.mmtr",
+        "Material Shader Type": "0"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 144,
+        "FlagBitFlagB": 0,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "WetMap_Tiling_Offset",
+            "Data Type": "VEC4",
+            "Value": [
+                4.0,
+                4.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Color",
+            "Data Type": "COLOR",
+            "Value": [
+                0.7912979125976562,
+                0.7912979125976562,
+                0.7912979125976562,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrop_Tiling",
+            "Data Type": "VEC4",
+            "Value": [
+                2.0,
+                2.0,
+                0.0,
+                0.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "BaseColor",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "HighLight_Color",
+            "Data Type": "COLOR",
+            "Value": [
+                0.5529412031173706,
+                0.019607843831181526,
+                0.007843137718737125,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_Color",
+            "Data Type": "COLOR",
+            "Value": [
+                0.06666667014360428,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_ifUseGlass_Alpha_x",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_ifUseGlass_Alpha_y",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Overall_Rate_Control",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Rate_Control",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Color_Override_Control",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Overall_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Range",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Range_UseVertexColor",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_BorderBlur",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WetMap_FillRate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WetMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Color_Override",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Metallic",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Roughness",
+            "Data Type": "FLOAT",
+            "Value": 0.05000000074505806,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_NormalWeaken",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Wet_Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrop_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilColor_Enable",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_TertiaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OcclusionMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CavityMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Ignore_AlphaMap",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "MaskMap_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTranslucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RimTranslucency_Curve",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Cavity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Cavity_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Occlusion_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "AlphaTestRef",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_UseSecondaryUV",
+            "Data Type": "BOOL",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Use_HighLight",
+            "Data Type": "BOOL",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HighLight_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilColor_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilColor_ThicknessRate",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_Rate",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OilColor_DetailNormal",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HighLight_Blend_DetailNormal",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HighLight_Curve_RimColor",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_Roughness",
+            "Data Type": "FLOAT",
+            "Value": 0.30000001192092896,
+            "Padding": 0
+        },
+        {
+            "Property Name": "HideMesh",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_GradationLevel_Min",
+            "Data Type": "FLOAT",
+            "Value": 0.3499999940395355,
+            "Padding": 0
+        },
+        {
+            "Property Name": "NormalMapWeaken",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_GradationLevel_Max",
+            "Data Type": "FLOAT",
+            "Value": 0.7599999904632568,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_U_Scale",
+            "Data Type": "FLOAT",
+            "Value": 0.800000011920929,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_V_Scale",
+            "Data Type": "FLOAT",
+            "Value": 0.800000011920929,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_U_Offset",
+            "Data Type": "FLOAT",
+            "Value": 0.3499999940395355,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_V_Offset",
+            "Data Type": "FLOAT",
+            "Value": 0.27000001072883606,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrop_NormalRate",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_Metallic",
+            "Data Type": "FLOAT",
+            "Value": 0.30000001192092896,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrop_Speed",
+            "Data Type": "FLOAT",
+            "Value": 2.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "WpBlood_NormalBlendRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrop_YMask",
+            "Data Type": "FLOAT",
+            "Value": 0.05000000074505806,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RainDrop_Interval",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 12
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "GradientColorMask",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "WetMap",
+            "Texture Path": "VFX/Texture/MaterialTexture/Character/20_material_WetMask_000_00_MSK4.tex"
+        },
+        {
+            "Texture Type": "BaseDielectricMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "NormalRoughnessMap",
+            "Texture Path": "systems/rendering/NullNormalRoughness.tex"
+        },
+        {
+            "Texture Type": "AlphaCavityOcclusionTranslucentMap",
+            "Texture Path": "systems/rendering/NullWhite.tex"
+        },
+        {
+            "Texture Type": "WpBlood_Texture",
+            "Texture Path": "systems/rendering/NullNormal.tex"
+        },
+        {
+            "Texture Type": "RainDrop_StopDrops",
+            "Texture Path": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_01_NMR.tex"
+        },
+        {
+            "Texture Type": "RainDrop_FlickDrops",
+            "Texture Path": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_02_NMR.tex"
+        },
+        {
+            "Texture Type": "RainDrop_DropMask",
+            "Texture Path": "VFX/Texture/MaterialTexture/Rain/20_material_rain_000_01_MSK4.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": []
+}

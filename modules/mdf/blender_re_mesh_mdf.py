@@ -84,7 +84,6 @@ albedoTypeSet = set([
 	"Moon_Tex",
 	"Sky_Top_Tex",
 	"RTReflectionBaseMap",
-	"SecondaryBaseColorMap",
 	#"IrisBaseMap"
 
 	])
@@ -195,7 +194,7 @@ MiscMapTypes = set([
 	"tex_lineMusk",
 	"Tex2D_0",
 	"FakeSpecular",
-	
+	"SecondaryBaseColorMap",
 	#"Detail_ALBD_R",
 	#"Detail_ALBD_G",
 	#"Detail_ALBD_B",
@@ -638,6 +637,9 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 				if bpy.app.version < (4,2,0):
 					blenderMaterial.shadow_method = "NONE"
 			elif matInfo["mmtrName"] == "env_decal.mmtr":
+				matInfo["isAlphaBlend"] = True
+			
+			elif "blend" in matInfo["mmtrName"]:
 				matInfo["isAlphaBlend"] = True
 			
 			

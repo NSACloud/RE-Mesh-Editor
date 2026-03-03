@@ -485,7 +485,7 @@ class WM_OT_REBatchExporter(Operator):
 		self.itemList_items.clear()
 		for collection in collectionRoots:
 			populateCollectionList(self.itemList_items, collection, recursionLevel = 0,parentName = "")
-		
+		#print(f"Item Count: {len(self.itemList_items)}")
 		#Add fbxskel armatures for export
 		for armatureObj in [obj for obj in bpy.data.objects if obj.type == "ARMATURE" and (".fbxskel" in obj.name.lower() or (".skeleton" in obj.name.lower()))]:
 			item = self.itemList_items.add()
@@ -593,5 +593,5 @@ class WM_OT_QuickBatchExport(Operator):
 	bl_idname = "re_mesh.quick_batch_export"
 	bl_description = "Single click batch export. Works the same as RE Batch Export but there is no prompt to configure settings.\nThe previous settings of RE Batch Export are used."
 	def execute(self, context):
-		bpy.ops.re_mesh.batch_exporter(skipPrompt = True)
+		bpy.ops.re_mesh.batch_exporter()
 		return {'FINISHED'}

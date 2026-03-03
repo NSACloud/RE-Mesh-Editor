@@ -1,0 +1,539 @@
+{
+    "presetType": "RE_MDF_MATERIAL",
+    "MDFVersion": "RE9",
+    "presetVersion": 5,
+    "Material Header": {
+        "Material Name": "EyeMat",
+        "Master Material Path": "MaterialShader/Master/EyeballShader_Title_FakeHighlight.mmtr",
+        "Material Shader Type": "33"
+    },
+    "Flags": {
+        "Ver32Unknown": -1,
+        "Ver32Unknown1": -1,
+        "Ver32Unknown2": -1,
+        "FlagBitFlag": 135874576,
+        "FlagBitFlagB": 262144,
+        "ShaderLODNum": 0,
+        "BakeTextureArraySize": 0
+    },
+    "Property List": [
+        {
+            "Property Name": "ScleraColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.5058823823928833,
+                0.47843137383461,
+                0.43921568989753723,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "RednessColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.501960813999176,
+                0.10980392247438431,
+                0.10980392247438431,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer1Color",
+            "Data Type": "COLOR",
+            "Value": [
+                0.7098039388656616,
+                0.0313725508749485,
+                0.0313725508749485,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer2Color",
+            "Data Type": "COLOR",
+            "Value": [
+                1.0,
+                0.14901961386203766,
+                0.13333334028720856,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer3Color",
+            "Data Type": "COLOR",
+            "Value": [
+                0.5254902243614197,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "LimbusColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.054901961237192154,
+                0.054901961237192154,
+                0.054901961237192154,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisColor",
+            "Data Type": "COLOR",
+            "Value": [
+                0.5568627715110779,
+                0.5254902243614197,
+                0.5254902243614197,
+                1.0
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "CausticModifier",
+            "Data Type": "VEC4",
+            "Value": [
+                0.6000000238418579,
+                1.0,
+                0.699999988079071,
+                0.6000000238418579
+            ],
+            "Padding": 0
+        },
+        {
+            "Property Name": "CornetMapShift_x",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CornetMapShift_y",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CornetMapShift_z",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeReflection_Rotation_Add_x",
+            "Data Type": "FLOAT",
+            "Value": -0.30000001192092896,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeReflection_Rotation_Add_y",
+            "Data Type": "FLOAT",
+            "Value": 0.10000000149011612,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Additional_Adjustment_x",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Additional_Adjustment_y",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "TertiaryScleraUV",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RednessMask",
+            "Data Type": "FLOAT",
+            "Value": 0.3799999952316284,
+            "Padding": 0
+        },
+        {
+            "Property Name": "RednessPower",
+            "Data Type": "FLOAT",
+            "Value": 0.7699999809265137,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ScleraStartUV",
+            "Data Type": "FLOAT",
+            "Value": -0.09000000357627869,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FlipNormal",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "NormalStrength",
+            "Data Type": "FLOAT",
+            "Value": 0.30000001192092896,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer1Rotation",
+            "Data Type": "FLOAT",
+            "Value": 288.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer1Mask",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer1Power",
+            "Data Type": "FLOAT",
+            "Value": 0.699999988079071,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer2Rotation",
+            "Data Type": "FLOAT",
+            "Value": 195.2100067138672,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer2Mask",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer2Power",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer3Rotation",
+            "Data Type": "FLOAT",
+            "Value": 224.00999450683594,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer3Mask",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Layer3Power",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BlendRadius",
+            "Data Type": "FLOAT",
+            "Value": 0.25,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LimbusPower",
+            "Data Type": "FLOAT",
+            "Value": 0.699999988079071,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LimbusRadius",
+            "Data Type": "FLOAT",
+            "Value": 0.49399998784065247,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LimbusShadow",
+            "Data Type": "FLOAT",
+            "Value": 0.20000000298023224,
+            "Padding": 0
+        },
+        {
+            "Property Name": "OutsideLimbusRadius",
+            "Data Type": "FLOAT",
+            "Value": 0.17000000178813934,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisNormalStrength",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BlendCoatNormal",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisStartUV",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisEndUV",
+            "Data Type": "FLOAT",
+            "Value": 0.75,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisRotation",
+            "Data Type": "FLOAT",
+            "Value": 215.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisRadius",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ZoomDepthMap",
+            "Data Type": "FLOAT",
+            "Value": -0.18000000715255737,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LensDistortion",
+            "Data Type": "FLOAT",
+            "Value": 0.25,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisDspLayer",
+            "Data Type": "FLOAT",
+            "Value": 8.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisDspHeight",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisDspOffset",
+            "Data Type": "FLOAT",
+            "Value": 0.30000001192092896,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IrisDepth",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PupilMapSize",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Blindness",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PupilRadius",
+            "Data Type": "FLOAT",
+            "Value": 0.12700000405311584,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PupilOffsetX",
+            "Data Type": "FLOAT",
+            "Value": -0.05000000074505806,
+            "Padding": 0
+        },
+        {
+            "Property Name": "PupilOffsetY",
+            "Data Type": "FLOAT",
+            "Value": -0.029999999329447746,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CorneaMapRange",
+            "Data Type": "FLOAT",
+            "Value": 0.5099999904632568,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CorneaMapInnerBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.5,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CorneaMapOuterBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CorneaMapOppacity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EmissiveBlend",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CausticIntensity",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "IOR",
+            "Data Type": "FLOAT",
+            "Value": 1.409999966621399,
+            "Padding": 0
+        },
+        {
+            "Property Name": "CausticArea",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "LensSpecReflectance",
+            "Data Type": "FLOAT",
+            "Value": 0.029999999329447746,
+            "Padding": 0
+        },
+        {
+            "Property Name": "ScleraSpecReflectance",
+            "Data Type": "FLOAT",
+            "Value": 0.019999999552965164,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Roughness",
+            "Data Type": "FLOAT",
+            "Value": 0.009999999776482582,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSChannel",
+            "Data Type": "FLOAT",
+            "Value": 5.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "SSSBlendRate",
+            "Data Type": "FLOAT",
+            "Value": 1.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Translucency",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "NormalMap_BlendRate",
+            "Data Type": "FLOAT",
+            "Value": 0.009999999776482582,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Metallic",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "EmissiveIntensity",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "FakeReflection_Intensity",
+            "Data Type": "FLOAT",
+            "Value": 100.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "Light_MaxLux",
+            "Data Type": "FLOAT",
+            "Value": 100.0,
+            "Padding": 0
+        },
+        {
+            "Property Name": "BAB_OffSet",
+            "Data Type": "FLOAT",
+            "Value": 0.0,
+            "Padding": 0
+        }
+    ],
+    "Texture Bindings": [
+        {
+            "Texture Type": "ScleraMap",
+            "Texture Path": "MaterialShader/Textures/EyeTextures/vein_master.tex"
+        },
+        {
+            "Texture Type": "NormalMapLayer1",
+            "Texture Path": "MaterialShader/Textures/EyeTextures/vein_NRM.tex"
+        },
+        {
+            "Texture Type": "RTReflectionBaseMap",
+            "Texture Path": "MaterialShader/Textures/EyeTextures/RTReflectionBaseMap_ALB.tex"
+        },
+        {
+            "Texture Type": "IrisBaseMap",
+            "Texture Path": "MaterialShader/Textures/EyeTextures/iris_type1_ALB.tex"
+        },
+        {
+            "Texture Type": "IrisDispMap",
+            "Texture Path": "MaterialShader/Textures/EyeTextures/iris_type1_DISP.tex"
+        },
+        {
+            "Texture Type": "IrisNormalMap",
+            "Texture Path": "MaterialShader/Textures/EyeTextures/iris_type1_NRM.tex"
+        },
+        {
+            "Texture Type": "LensDepthMap",
+            "Texture Path": "systems/rendering/EyeMaterials/refraction_mask.tex"
+        },
+        {
+            "Texture Type": "PupilMap",
+            "Texture Path": "Character/Textures/Eye/EyePupil_ALB.tex"
+        },
+        {
+            "Texture Type": "CorneaMap",
+            "Texture Path": "systems/rendering/GroundSmoothNoise.tex"
+        },
+        {
+            "Texture Type": "FakeReflection_Map",
+            "Texture Path": "MaterialShader/Textures/EyeTextures/eye_fake_reflection.tex"
+        }
+    ],
+    "MMTRS Data": [],
+    "GPBF Data": [
+        "Eyeball_BAB,Character/Textures/Eye/EyeballBAB_ch0200.gpbf,0,1"
+    ]
+}

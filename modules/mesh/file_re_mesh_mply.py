@@ -25,7 +25,7 @@ VERSION_DD2 = 115#file:230517984,internal:230517984
 VERSION_KG = 120#file:240306278,internal:230727984
 VERSION_DD2NEW = 124#file:240423143,internal:230517984
 VERSION_MHWILDS = 130#file:240820143,internal:240704828
-
+VERSION_RE9 = 135#file:240820143,internal:240704828
 
 
 c_uint64 = ctypes.c_uint64
@@ -70,7 +70,7 @@ class ContentFlagsB(ctypes.Union):
 					("asUInt8", c_uint8)
 				]
 
-class ClusterFlags_bits(ctypes.LittleEndianStructure):
+class ClusterFlagsMHWILDS_bits(ctypes.LittleEndianStructure):
 	_fields_ = 	[
 					("isMeshletCompressedNormal",c_uint8,1),
 					("isMeshletCompressedTexcoord1",c_uint8,1),
@@ -86,46 +86,95 @@ class ClusterFlags_bits(ctypes.LittleEndianStructure):
 					("isMeshletUseTexcoord3",c_uint8,1),
 					("isMeshletUseSkinned",c_uint8,1),
 					("use32BitPos",c_uint8,1),
-					("unkn5",c_uint8,1),
-					("unkn6",c_uint8,1),
-					("useUnknStruct",c_uint8,1),
+					("use24BitPos",c_uint8,1),
+					("unkn14",c_uint8,1),
+					("hasTangentBitsBlock",c_uint8,1),
 					
-					("positionScaling2x",c_uint8,1),
-					("positionScaling4x",c_uint8,1),
-					("positionScaling8x",c_uint8,1),
-					("positionScaling256x",c_uint8,1),
-					("unkn12",c_uint8,1),#Setting to 1 makes model disappear
-					("unkn13",c_uint8,1),#Setting to 1 makes model disappear
-					("unkn14",c_uint8,1),#Setting to 1 makes model disappear
-					("usePosScalingMaybe",c_uint8,1),#Setting to 0 makes model disappear, files that have it set to 0 have flags that make no sense
+					("scaleBit1",c_uint8,1),
+					("scaleBit2",c_uint8,1),
+					("scaleBit3",c_uint8,1),
+					("scaleBit4",c_uint8,1),
+					("scaleBit5",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit6",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit7",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit8",c_uint8,1),#Setting to 0 makes model disappear, files that have it set to 0 have flags that make no sense
 					
-					("scale2x",c_uint8,1),
-					("scale4x",c_uint8,1),
-					("scale8x",c_uint8,1),
-					("scale256x",c_uint8,1),
-					("killPerformance",c_uint8,1),#Don't know what this is doing but it murders FPS if true
-					("unkn21",c_uint8,1),#Setting to 1 makes model disappear
-					("unkn22",c_uint8,1),#Setting to 1 makes model disappear
-					("useScalingMaybe",c_uint8,1),#Setting to 0 makes model disappear
+					("scaleBit9",c_uint8,1),
+					("scaleBit10",c_uint8,1),
+					("scaleBit11",c_uint8,1),
+					("scaleBit12",c_uint8,1),
+					("scaleBit13",c_uint8,1),#Don't know what this is doing but it murders FPS if true
+					("scaleBit14",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit15",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit16",c_uint8,1),#Setting to 0 makes model disappear
 		
 		
 				]
 	
-class ClusterFlags(ctypes.Union):
+class ClusterFlagsMHWILDS(ctypes.Union):
 	
 	_anonymous_ = ("flags",)
 	_fields_ =	[
-					("flags",    ClusterFlags_bits ),
+					("flags",    ClusterFlagsMHWILDS_bits ),
 					("asUInt32", c_uint32)
 				]
 
+
+class ClusterFlagsRE9_bits(ctypes.LittleEndianStructure):
+	_fields_ = 	[
+					("isMeshletCompressedNormal",c_uint8,1),
+					("isMeshletCompressedTexcoord1",c_uint8,1),
+					("isMeshletCompressedTexcoord2",c_uint8,1),
+					("isMeshletCompressedTexcoord3",c_uint8,1),
+					("isMeshletCompressedVertexColor",c_uint8,1),
+					("isMeshletNoTangent",c_uint8,1),
+					("isMeshletUseSkinned",c_uint8,1),
+					("isMeshletCompressedSkinned",c_uint8,1),
+					
+					("isMeshletUseVertexColor",c_uint8,1),
+					("isMeshletUseTexcoord2",c_uint8,1),
+					("isMeshletUseTexcoord3",c_uint8,1),
+					("isMeshletUseSkinnedNot",c_uint8,1),
+					("use32BitPos",c_uint8,1),
+					("use24BitPos",c_uint8,1),
+					("unkn14",c_uint8,1),
+					("hasTangentBitsBlock",c_uint8,1),
+					
+					("scaleBit1",c_uint8,1),
+					("scaleBit2",c_uint8,1),
+					("scaleBit3",c_uint8,1),
+					("scaleBit4",c_uint8,1),
+					("scaleBit5",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit6",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit7",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit8",c_uint8,1),#Setting to 0 makes model disappear, files that have it set to 0 have flags that make no sense
+					
+					("scaleBit9",c_uint8,1),
+					("scaleBit10",c_uint8,1),
+					("scaleBit11",c_uint8,1),
+					("scaleBit12",c_uint8,1),
+					("scaleBit13",c_uint8,1),#Don't know what this is doing but it murders FPS if true
+					("scaleBit14",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit15",c_uint8,1),#Setting to 1 makes model disappear
+					("scaleBit16",c_uint8,1),#Setting to 0 makes model disappear
+		
+		
+				]
+	
+class ClusterFlagsRE9(ctypes.Union):
+	
+	_anonymous_ = ("flags",)
+	_fields_ =	[
+					("flags",    ClusterFlagsRE9_bits ),
+					("asUInt32", c_uint32)
+				]
 
 class FileHeader():
 	def __init__(self):
 		self.magic = 1498173517
 		self.version = 0
 		self.fileSize = 0
-		self.unknHash = 0
+		self.lodGroupNameHash = 0
 		self.contentFlagsA = ContentFlagsA()
 		self.contentFlagsB = ContentFlagsB() #Bitflag 1000 XXXX-[GroupPivot/Floats][Blendshape][Skeleton][AABB]
 		self.pad = 0
@@ -157,7 +206,7 @@ class FileHeader():
 		self.magic = read_uint(file)
 		self.version = read_uint(file)
 		self.fileSize = read_uint(file)
-		self.unknHash = read_uint(file)
+		self.lodGroupNameHash = read_uint(file)
 		if version >= VERSION_MHWILDS:
 			
 			self.wilds_unkn0 = read_uint(file)
@@ -471,12 +520,12 @@ class ClusterInfo():
 		self.bboxExtentY = 0
 		self.bboxAABBCenterZRaw = 0
 		self.bboxExtentZ = 0
-		self.bitFlag = ClusterFlags()
+		self.bitFlag = None
 		
 		self.faceBuffer = bytes()
 		self.vertexBuffer = bytes()
 		
-	def read(self,file):
+	def read(self,file,version):
 		self.partAABBCenter = (read_float(file),read_float(file),read_float(file))
 		self.vertexCount = read_ubyte(file)
 		self.faceCount = read_ubyte(file)
@@ -491,6 +540,13 @@ class ClusterInfo():
 		
 		self.bboxAABBCenter = (self.bboxAABBCenterXRaw/65535,self.bboxAABBCenterYRaw/65535,self.bboxAABBCenterZRaw/65535)
 		self.bboxExtent = (self.bboxExtentXRaw/65535,self.bboxExtentYRaw/65535,self.bboxExtentZRaw/65535)
+		
+		if version >= VERSION_RE9:
+			self.bitFlag = ClusterFlagsRE9()
+			
+		else:
+			self.bitFlag = ClusterFlagsMHWILDS()
+		
 		self.bitFlag.asUInt32 = read_uint(file)
 		
 		self.faceBuffer = file.read(self.faceCount*3)#Faces are streamed from streaming mesh, max of 128 faces for non streaming
@@ -502,7 +558,9 @@ class ClusterInfo():
 		file.seek(getPaddedPos(file.tell(), 4))
 		
 		#print(f"vert start {file.tell()}")
-		if self.bitFlag.flags.use32BitPos:
+		if self.bitFlag.flags.use24BitPos:
+			self.posBuffer = file.read(self.vertexCount*3)
+		elif self.bitFlag.flags.use32BitPos:
 			self.posBuffer = file.read(self.vertexCount*4)
 		else:
 			self.posBuffer = file.read(self.vertexCount*6)
@@ -514,10 +572,13 @@ class ClusterInfo():
 			else:
 				self.normalBuffer = file.read(self.vertexCount*4)
 		else:
-			self.normalBuffer = file.read(self.vertexCount*8)
+			if self.bitFlag.flags.isMeshletCompressedNormal:
+				self.normalBuffer = file.read(8)*self.vertexCount
+			else:
+				self.normalBuffer = file.read(self.vertexCount*8)
 			
 		
-		if self.bitFlag.flags.useUnknStruct:
+		if (self.bitFlag.flags.hasTangentBitsBlock and version < VERSION_RE9) or (self.bitFlag.flags.hasTangentBitsBlock and self.bitFlag.flags.isMeshletNoTangent):
 			dataSize = (self.vertexCount // 32 + (self.vertexCount % 32 > 0))*4
 			self.unknStructBuffer = file.read(dataSize)
 		else:
@@ -559,28 +620,34 @@ class ClusterLODEntry():
 		self.entryCount = 0
 		self.entryOffsetList = []
 		self.entryList = []
-	def read(self,file,startOffset):
+	def read(self,file,startOffset,version):
 		self.entryCount = read_uint(file)
 		
 		for i in range(0,self.entryCount):
 			self.entryOffsetList.append(read_uint(file))
+		endOffset = 0
 		for offset in self.entryOffsetList:
 			#print(offset)
+			if endOffset != 0 and endOffset != startOffset+offset:
+				raiseWarning(f"Potential file read error, current submesh position not as expected. Expected:{startOffset+offset} Actual: {endOffset}")
+			
 			file.seek(startOffset+offset)
 			entry = ClusterInfo()
-			entry.read(file)
+			entry.read(file,version)
+			endOffset = file.tell()
 			self.entryList.append(entry)
+			
 
 class ClusterInfoLayout():
 	def __init__(self):
 		self.lodList = []
-	def read(self,file,startOffset,LODOffsetList):
+	def read(self,file,startOffset,LODOffsetList,version):
 		
 		for offset in LODOffsetList:
 			if offset != 0:
 				file.seek(startOffset + offset)
 				entry = ClusterLODEntry()
-				entry.read(file,startOffset)
+				entry.read(file,startOffset,version)
 				self.lodList.append(entry)
 			
 	def write(self,file):
@@ -645,7 +712,7 @@ class REMeshMPLY():
 		if self.fileHeader.gpuMeshletOffset and self.meshletLayout.gpuDataSize != 0:
 			
 			self.clusterInfoLayout = ClusterInfoLayout()
-			self.clusterInfoLayout.read(file, self.meshletLayout.gpuMeshletOffset, self.meshletLayout.gpuMeshletHeader.lodClustersOffset)
+			self.clusterInfoLayout.read(file, self.meshletLayout.gpuMeshletOffset, self.meshletLayout.gpuMeshletHeader.lodClustersOffset,version)
 			
 			#file.seek(self.fileHeader.gpuMeshletOffset)
 			#self.gpuData = file.read(self.meshletLayout.gpuDataSize)

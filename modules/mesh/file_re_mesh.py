@@ -2016,8 +2016,10 @@ def ParsedREMeshToREMesh(parsedMesh,meshVersion):
 			reMesh.lodHeader.skinWeightCount = 9
 		elif version == VERSION_MHWILDS:
 			reMesh.lodHeader.skinWeightCount = 25#Not sure why but this fixes monsters causing crashes and dead hitbox issues
-		elif version >= VERSION_PRAGDEMO:
+		elif version == VERSION_PRAGDEMO:
 			reMesh.lodHeader.skinWeightCount = 27#
+		elif version == VERSION_RE9:
+			reMesh.lodHeader.skinWeightCount = 18#
 		if parsedMesh.bufferHasUV2:#This is wrong, uv count is determined by something else. However uv count is unused by the game so it doesn't really matter
 			reMesh.lodHeader.uvCount = 2
 		else:

@@ -2,7 +2,7 @@
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.64 (2/28/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.65 (3/2/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -94,6 +94,11 @@ Be sure to check the box next to RE Mesh Editor in the addons menu. The addon sh
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.65 - 3/2/2026
+* Meshlet (MPLY) model importing is now fully working. These are used for props and stage meshes. (Thanks shadowcookie)
+* Added material presets for RE9.
+* Fixed issue where hair color wouldn't import correctly on certain models in RE9.
 
 ### V0.64 - 2/28/2026
 * Added new material presets for RE2, RE2RT, RE3, RE3RT, RE4 and RE7RT. (Thank you to Raq and Haise)
