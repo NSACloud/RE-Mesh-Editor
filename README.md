@@ -1,3 +1,12 @@
+# PSA - Blender 5.1 is currently bugged
+
+Blender 5.1 currently has an issue that makes importing and exporting meshes extremely slow.
+
+Stay on Blender 5.0 or lower until this issue is fixed.
+
+See here for details: https://projects.blender.org/blender/blender/issues/155858
+
+---
 
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
