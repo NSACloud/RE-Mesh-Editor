@@ -468,6 +468,7 @@ class WM_OT_ConvertToREEngine(Operator):
 		region = bpy.context.region
 		centerX = region.width // 2
 		centerY = region.height
+		self.materialList_items.clear()
 		objList = [obj for obj in bpy.context.selected_objects if obj.type == "MESH"]
 		if len(objList) == 0:
 			self.report({"ERROR"},"No meshes are selected.")

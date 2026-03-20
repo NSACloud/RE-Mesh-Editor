@@ -377,7 +377,7 @@ def findMDFPathFromMeshPath(meshPath,gameName = None):
 	return mdfPath
 texVersionDict = {
 	6:".8",
-	10:".10",
+	#10:".10",
 	13:".190820018",
 	19:".30",
 	20:".31",
@@ -639,8 +639,6 @@ def importMDF(mdfFile,meshMaterialDict,loadUnusedTextures,loadUnusedProps,useBac
 			elif matInfo["mmtrName"] == "env_decal.mmtr":
 				matInfo["isAlphaBlend"] = True
 			
-			elif "blend" in matInfo["mmtrName"]:
-				matInfo["isAlphaBlend"] = True
 			
 			
 					

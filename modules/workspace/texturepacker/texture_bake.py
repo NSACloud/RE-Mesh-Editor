@@ -140,7 +140,7 @@ def bakeMaterialMaps(obj,normalBakeObj,material,textureSetName,imageXRes,imageYR
 		textureNode.location = nodePos
 		textureNode.image = img #Assign the image to the node
 		
-		if principledBSDFNode.inputs["Base Color"].is_linked:
+		if principledBSDFNode != None and principledBSDFNode.inputs["Base Color"].is_linked:
 			obj.select_set(False)
 			normalBakeObj.hide_render = False	
 			bpy.context.view_layer.objects.active = normalBakeObj#Switch to baking from flat plane

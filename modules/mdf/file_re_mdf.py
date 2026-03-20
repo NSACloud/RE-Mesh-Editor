@@ -161,6 +161,7 @@ class Property():
 		self.unicodeMMH3Hash = 0
 		self.asciiMMH3Hash = 0
 		self.paramCount = 0
+		self.unknFlag = 0
 		self.propDataOffset = 0
 		self.propName = "MDFProp"
 		self.propValue = []
@@ -173,7 +174,8 @@ class Property():
 		self.asciiMMH3Hash = read_uint(file)
 		if version >= 13:
 			self.propDataOffset = read_int(file)
-			self.paramCount = read_int(file)
+			self.paramCount = read_ushort(file)
+			self.unknFlag = read_ushort(file)
 		else:
 			self.paramCount = read_int(file)
 			self.propDataOffset = read_int(file)
@@ -191,7 +193,8 @@ class Property():
 		write_uint(file,self.asciiMMH3Hash)
 		if version >= 13:
 			write_int(file,self.propDataOffset)
-			write_int(file,self.paramCount)
+			write_ushort(file,self.paramCount)
+			write_ushort(file,self.unknFlag)
 		else:
 			write_int(file,self.paramCount)
 			write_int(file,self.propDataOffset)

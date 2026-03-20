@@ -11,7 +11,7 @@ See here for details: https://projects.blender.org/blender/blender/issues/155858
 ![REMeshEditorTitle](https://github.com/NSACloud/RE-Mesh-Editor/assets/46909075/156d0b53-ff4f-43db-9a3d-9e0cbd71326e)
 
 
-**V0.65 (3/2/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
+**V0.66 (3/20/2026) | [Planned Features](https://github.com/NSACloud/RE-Mesh-Editor/milestone/1) | [Change Log](https://github.com/NSACloud/RE-Mesh-Editor?tab=readme-ov-file#change-log)**
 
 **BETA RELEASE, THERE MAY BE BUGS**
 
@@ -103,6 +103,10 @@ Be sure to check the box next to RE Mesh Editor in the addons menu. The addon sh
 To update this addon, navigate to Preferences > Add-ons > RE Mesh Editor and press the "Check for update" button.
 
 ## Change Log
+
+### V0.66 - 3/20/2026
+* Fixed issue where certain materials would be set to use alpha blend when they shouldn't be.
+* Fixed issue where textures from DMC 5 wouldn't be loaded.
 
 ### V0.65 - 3/2/2026
 * Meshlet (MPLY) model importing is now fully working. These are used for props and stage meshes. (Thanks shadowcookie)
