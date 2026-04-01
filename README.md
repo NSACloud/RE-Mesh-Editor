@@ -1,3 +1,11 @@
+# End Of Support Notice
+
+I am ending development of my RE Engine addons. No further updates or support will be provided.
+
+Feel free to fork the project if you want to.
+
+---
+
 # PSA - Blender 5.1 is currently bugged
 
 Blender 5.1 currently has an issue that makes importing and exporting meshes extremely slow.
